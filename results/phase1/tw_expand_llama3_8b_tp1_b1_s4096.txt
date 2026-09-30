@@ -1,0 +1,2 @@
+requests=485839360 reads=485835264 writes=4096 bytes=15546859520 hash=0x8fdf6134cc81fb25
+./build/cpp/tw_expand traces/llama3_8b_tp1_b1_s4096.segs  1.19s user 0.01s system 99% cpu 1.202 total

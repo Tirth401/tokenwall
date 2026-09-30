@@ -1,6 +1,6 @@
 """Tokenwall: HBM3 timing model driven by LLM decode traces.
 
-Phase 1 adds the trace generator here; Phase 2 the address mapping.
+Phase 1: decode-step trace generator (model shape -> ordered request stream).
 """
 
-__version__ = "0.0.1-phase0"
+__version__ = "0.1.0"

@@ -1,0 +1,29 @@
+{
+  "date": "2026-09-30",
+  "command": "python scripts/ramulator2_run_trace.py traces/llama3_8b_layer0_tp1_b1_s1024_prefix1800k.txt --label llama3_8b_layer0_prefix1800k --out results/phase1/ramulator_format_check_llama3_8b_layer0_prefix1800k.json",
+  "trace": "traces/llama3_8b_layer0_tp1_b1_s1024_prefix1800k.txt",
+  "label": "llama3_8b_layer0_prefix1800k",
+  "refresh": "allbank",
+  "org_preset": "HBM3_16Gb_8hi",
+  "timing_preset": "HBM3_6400Mbps",
+  "controller": "HBM34 + FRFCFS + Open row policy + RoBaRaCoCh, 1 channel",
+  "peak_channel_GBps": 51.2,
+  "tick_ps": 312.5,
+  "result": {
+    "requests_accepted": 1800000,
+    "requests_served": 1799962,
+    "in_flight_at_end": 38,
+    "controller_ticks": 8563403,
+    "sim_time_us": 2676.0634375,
+    "achieved_GBps": 21.523699024791895,
+    "pct_of_channel_peak": 42.03847465779667,
+    "row_hits": 1742594,
+    "row_misses": 43635,
+    "row_conflicts": 13733,
+    "row_hit_rate_pct": 96.81282160401165,
+    "avg_read_latency_ticks": 198.260376,
+    "avg_read_latency_ns": 61.9563675,
+    "ramulator_total_throughput_MBps": 21558.191406,
+    "wall_seconds": 3.8436076641082764
+  }
+}

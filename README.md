@@ -14,51 +14,115 @@ takes banks offline. Tokenwall answers one question with a simulator:
 
 ## Three pieces
 
-1. **Trace generator (Python).** Turns a model shape (layers, hidden size,
-   heads, KV heads, dtype, batch, sequence length) into the ordered stream of
-   memory requests one decode step issues. No GPU needed: the pattern is
-   deterministic from the model's shape. KV-cache layout is configurable
-   because it changes row locality.
-2. **Address mapping + timing core (Python + C++).** A swappable bit-slice
-   mapping from linear address to (channel, pseudo channel, bank group, bank,
-   row, column), then a per-bank state machine enforcing JEDEC HBM3 timing
-   (tRCD, tRP, tRAS, tRC, tCCD_S/L, tRRD_S/L, tFAW, read/write turnaround,
-   tREFI/tRFC). Reports cycles, achieved bandwidth, row-buffer hit rate, and
-   a stall breakdown.
-3. **Sweep (Python).** Varies mapping, KV layout, refresh policy, batch size and
-   sequence length; plots what actually matters.
+1. **Trace generator (Python, done).** Turns a model shape (layers, hidden
+   size, heads, KV heads, dtype, batch, past positions) into the ordered stream
+   of 32-byte memory requests one decode step issues on one GPU. No GPU needed:
+   the pattern is deterministic from the model's shape. KV-cache layout and
+   issue order are knobs because they change row locality.
+2. **Address mapping + timing core (Python + C++, Phases 2 and 3).** A swappable
+   bit-slice mapping from linear address to (channel, pseudo channel, bank
+   group, bank, row, column), then a per-bank state machine enforcing JEDEC
+   HBM3 timing (tRCD, tRP, tRAS, tRC, tCCD_S/L, tRRD_S/L, tFAW, read/write
+   turnaround, tREFI/tRFC). Reports cycles, achieved bandwidth, row-buffer hit
+   rate, and a stall breakdown.
+3. **Sweep (Python, Phase 5).** Varies mapping, KV layout, refresh policy, batch
+   size and sequence length; plots what actually matters.
 
 [Ramulator 2.1](https://github.com/CMU-SAFARI/ramulator2) is the reference:
-it supplies the HBM3 timing parameters (see `configs/hbm3/`) and, in Phase 4,
-the ground truth the C++ core is validated against.
+it supplies the HBM3 timing parameters (`configs/hbm3/`) and, in Phase 4, the
+ground truth the C++ core is validated against.
 
 ## Status
 
 | Phase | Scope | State |
 |------:|-------|-------|
-| 0 | Repo, build system, Ramulator 2.1 built and run, HBM3 parameters extracted | done (2026-09-30) |
-| 1 | Decode-step trace generator | next |
-| 2 | Address mapping policies + unit tests | planned |
+| 0 | Repo, build system, Ramulator 2.1 built and run, HBM3 parameters extracted | done 2026-09-30 |
+| 1 | Decode-step trace generator, Llama 3 8B/70B configs, Python/C++ cross-checked trace format | done 2026-09-30 |
+| 2 | Address mapping policies + unit tests | next |
 | 3 | C++ timing core, one constraint at a time | planned |
 | 4 | Validation against Ramulator 2.1 | planned |
 | 5 | Sweeps and findings | planned |
 | 6 | Writeup | planned |
 
-`PROGRESS.md` has the session-by-session log and open design questions.
-`RESULTS.md` has every measured number, the command that produced it, and the
-date. Nothing in `RESULTS.md` is estimated or typed by hand.
+`PROGRESS.md` is the session log with open design questions. `RESULTS.md` has
+every measured number, the command that produced it, and the date. Nothing in
+`RESULTS.md` is estimated or typed by hand.
+
+## Provenance rules (read before quoting any number)
+
+- **HBM3 timings are "per Ramulator 2.1's `HBM3_6400Mbps` preset", never "per
+  JEDEC".** Thirteen core timings in that preset (tCL, tCWL, tFAW, tRAS,
+  tRCDRD, tRCDWR, tRP, tRRD_L, tRRD_S, tRTP, tWR, tWTR_L, tWTR_S) sit inside a
+  block Ramulator's source labels `Ramulator Guesstimate`; JEDEC JESD238 leaves
+  them to vendor datasheets. Every timing in `configs/hbm3/*.yaml` carries a
+  `source` tag saying whether it is a speed-bin value, an estimate, a derived
+  formula, or a user override. Plot captions and RESULTS entries repeat this.
+- **Model shapes come from published `config.json` files**, fetched by
+  `scripts/import_hf_config.py`, which records the URL that answered, the
+  SHA-256 of the bytes, and keeps the raw file under `configs/models/raw/`.
+  The official Meta repos are gated (HTTP 401); the NousResearch mirrors
+  served identical files, and the record says so.
+- **Phase 0 and Phase 1 bandwidth figures are toolchain checks** on synthetic
+  traffic or a single channel. Project findings start with Phase 4.
+
+### Swapping in real vendor timings
+
+A memory architect's first question is "what if tRCD is really X?". The
+override path is one flag per timing, in clock cycles, and the output file is
+forced to carry a distinct name so it cannot be mistaken for the preset:
+
+```bash
+python scripts/extract_hbm3_params.py --override nRCDRD=28 --override nRP=24 --name vendor_x
+# -> configs/hbm3/hbm3_16gb_8hi_6400_vendor_x.yaml, overridden keys tagged "override: user-supplied"
+```
+
+Ramulator applies overrides after it computes derived timings, so nRC, nRTW,
+nREFIpb and friends are not recomputed from an overridden input; override them
+too when a datasheet changes their inputs (the YAML's `override_note` repeats
+this). The same keyword overrides work directly in Ramulator:
+`ramulator.dram.HBM3(org_preset=..., timing_preset=..., nRCDRD=28)`.
+
+## Models and why one shard is the honest unit
+
+Two shapes, `configs/models/llama3_8b.yaml` and `llama3_70b.yaml`. There is no
+third model: `--n-kv-heads 32` on the 8B config gives full multi-head attention
+so the GQA effect on KV traffic shows up in isolation, without confounding it
+against a different layer count and hidden size.
+
+A single HBM3 stack holds 16 GiB, and Llama 3 70B in bf16 is 131 GiB. Real 70B
+serving shards the model across 8 GPUs with tensor parallelism, so a single
+GPU's HBM genuinely holds about an eighth of the weights plus its share of the
+KV cache. That is the actual deployment shape, not a workaround: Tokenwall
+simulates **one tensor-parallel shard** (`--tp 8` for 70B, `--tp 1` for 8B) on
+a GPU with `--stacks` HBM3 stacks (an H100 has five). The generator refuses a
+run whose footprint does not fit and names the stack count that would.
+
+## Trace format: a recipe, not a list
+
+One decode step of Llama 3 8B is 486 million 32-byte requests; a plain list is
+tens of gigabytes. Tokenwall stores a *segment list* instead: "start at base,
+read run_bytes, repeat runs times with this stride", grouped so that a group
+can either play its segments in order or round-robin chunks between them
+(many streams hitting memory at once). Both `python/tokenwall/segments.py` and
+`cpp/include/tokenwall/segments.h` expand the same file to the same request
+sequence, and `tests/test_cross_expander.py` hashes both streams and compares
+them line by line, so the two implementations cannot drift silently. A full
+8B step expands in 1.2 s in C++ and has a stable fingerprint
+(`RESULTS.md`, "Stream fingerprint").
 
 ## Layout
 
 ```
-cpp/                 C++ timing core (Phase 3), CMake, dependency-free unit tests
-python/tokenwall/    trace generator, address mapping, analysis (Phases 1, 2, 5)
+cpp/                 C++: shared trace format + expander (tw_expand), timing core (Phase 3), unit tests
+python/tokenwall/    trace generator, CLI (python -m tokenwall), address mapping (Phase 2)
 configs/hbm3/        HBM3 parameters extracted from Ramulator 2.1, with provenance
-configs/models/      model shapes for the trace generator (Phase 1)
-scripts/             setup_ramulator2.sh, extract_hbm3_params.py, smoke and probe runs
-patches/ramulator2/  two-line build fix for Apple Clang (see below)
+configs/models/      Llama 3 shapes imported from published config.json, raw files under raw/
+tests/               pytest suite incl. the Python-vs-C++ cross-expander check
+scripts/             setup_ramulator2.sh, extract_hbm3_params.py, import_hf_config.py, Ramulator runners
+patches/ramulator2/  two-hunk build fix for Apple Clang
 docs/                phase walkthroughs written for study
 results/             raw outputs behind every number in RESULTS.md
+traces/              generated traces (.segs gitignored, .meta.json committed)
 external/ramulator2  Ramulator 2.1 git submodule (pinned commit)
 ```
 
@@ -68,32 +132,40 @@ Requirements: git, CMake 3.16+, a C++20 compiler, Python 3.10+.
 
 ```bash
 git clone --recursive <this repo> tokenwall && cd tokenwall
-python3 -m venv .venv && .venv/bin/pip install -r requirements.txt
+python3 -m venv .venv && .venv/bin/pip install -r requirements.txt && .venv/bin/pip install -e .
 scripts/setup_ramulator2.sh        # builds Ramulator 2.1 into external/, pip-installs it into .venv
-cmake -S . -B build && cmake --build build && ctest --test-dir build   # Tokenwall C++ core
+cmake -S . -B build && cmake --build build && ctest --test-dir build   # Tokenwall C++
+.venv/bin/python -m pytest -q      # 36 tests incl. the cross-expander check
 ```
 
 `scripts/setup_ramulator2.sh` applies `patches/ramulator2/0001-apple-clang-build-fixes.patch`:
 a missing `template` keyword in `param.h` that Apple Clang 21 rejects, and a
-bump of the fetched `fmt` library from 10.2.1 to 11.2.0 (10.2.1 fails to
-compile under Clang 21). Nothing in the patch touches simulation behaviour.
+bump of the fetched `fmt` library from 10.2.1 to 11.2.0. Nothing in the patch
+touches simulation behaviour.
 
-## Reproduce Phase 0
+## Reproduce
+
+Phase 0 (HBM3 parameters and toolchain checks):
 
 ```bash
 source .venv/bin/activate
 python scripts/extract_hbm3_params.py        # -> configs/hbm3/hbm3_16gb_8hi_6400.yaml
-python scripts/ramulator2_hbm3_smoke.py      # -> results/phase0/smoke_summary_allbank.json
+python scripts/ramulator2_hbm3_smoke.py      # synthetic sequential/random reads on one channel
 python scripts/ramulator2_probe_demo.py      # asks the device model when commands become legal
 ```
 
-Read `docs/phase0_ramulator2_walkthrough.md` for what each number means.
+Phase 1 (decode-step traces):
 
-## Honesty notes
+```bash
+python scripts/import_hf_config.py --repo meta-llama/Meta-Llama-3-8B --mirror NousResearch/Meta-Llama-3-8B --name llama3_8b
+python -m tokenwall gen --model configs/models/llama3_8b.yaml --batch 1 --seq 4096 --out traces/llama3_8b_tp1_b1_s4096
+./build/cpp/tw_expand traces/llama3_8b_tp1_b1_s4096.segs             # count + fingerprint hash
+python -m tokenwall gen --model configs/models/llama3_70b.yaml --tp 8 --stacks 2 --batch 1 --seq 4096 --out traces/llama3_70b_tp8_b1_s4096
+python -m tokenwall gen --model configs/models/llama3_8b.yaml --n-kv-heads 32 --stacks 2 --batch 1 --seq 4096 --out traces/llama3_8b_mha32_tp1_b1_s4096
+python -m tokenwall export-ramulator traces/llama3_8b_tp1_b1_s4096.segs --out traces/slice.txt --max-requests 1000000
+```
 
-- Ramulator 2.1's HBM3 speed bin marks 13 core timings (tCL, tRCD, tRP, tRAS,
-  tFAW, ...) as "Ramulator Guesstimate": JEDEC JESD238 leaves those to vendor
-  datasheets. Every Tokenwall result is therefore "HBM3 per Ramulator 2.1's
-  `HBM3_6400Mbps` preset", never "HBM3 per JEDEC".
-- Phase 0 bandwidth figures come from synthetic traffic. They prove the
-  toolchain works and are not project findings.
+`python -m tokenwall gen --help` lists every knob: `--kv-layout`, `--kv-order`,
+`--weight-streams`, `--chunk-bytes`, `--kv-chunk-bytes`, `--layers a:b`,
+`--request-bytes`, `--stacks`, `--tp`, `--n-kv-heads`, `--dtype-bytes`.
+`docs/phase1_trace_generator.md` explains what each one models.

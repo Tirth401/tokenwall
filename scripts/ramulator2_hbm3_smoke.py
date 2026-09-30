@@ -17,14 +17,12 @@ import json
 import pathlib
 import random
 import sys
-import time
 
-import ramulator
+sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
+from r2util import ORG_PRESET, TIMING_PRESET, hbm3_facts, print_summary, run_trace, summarize  # noqa: E402
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 OUT = ROOT / "results" / "phase0"
-ORG_PRESET = "HBM3_16Gb_8hi"
-TIMING_PRESET = "HBM3_6400Mbps"
 
 
 def write_trace(path: pathlib.Path, pattern: str, n: int, tx_bytes: int, seed: int = 1) -> None:
@@ -36,49 +34,13 @@ def write_trace(path: pathlib.Path, pattern: str, n: int, tx_bytes: int, seed: i
             f.write(f"LD {addr}\n")
 
 
-def make_refresh(kind: str):
-    return {
-        "allbank": ramulator.refresh_manager.AllBank,
-        "perbank": ramulator.refresh_manager.HBM34PerBankRefresh,
-        "none": ramulator.refresh_manager.NoRefresh,
-    }[kind]()
-
-
-def run_one(trace_path: pathlib.Path, refresh: str, verbose: bool):
-    dram = ramulator.dram.HBM3(org_preset=ORG_PRESET, timing_preset=TIMING_PRESET, verbose=verbose)
-    ctrl = ramulator.controller.HBM34(
-        dram=dram,
-        scheduler=ramulator.scheduler.FRFCFS(),
-        refresh_manager=make_refresh(refresh),
-        row_policy=ramulator.row_policy.Open(),
-        addr_mapper=ramulator.addr_mapper.RoBaRaCoCh(),
-    )
-    mem = ramulator.memory_system.GenericDRAM(
-        clock_ratio=1,
-        controllers=[ctrl],
-        channel_mapper=ramulator.channel_mapper.CacheLineInterleave(),
-    )
-    frontend = ramulator.frontend.LoadStoreTrace(clock_ratio=1, path=str(trace_path))
-    sim = ramulator.Simulation(frontend, mem)
-    t0 = time.time()
-    sim.run()
-    wall = time.time() - t0
-    return sim.stats, sim.stats_yaml, wall
-
-
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--requests", type=int, default=20000)
     ap.add_argument("--refresh", default="allbank", choices=["allbank", "perbank", "none"])
     args = ap.parse_args()
     OUT.mkdir(parents=True, exist_ok=True)
-
-    probe = ramulator.dram.HBM3(org_preset=ORG_PRESET, timing_preset=TIMING_PRESET)
-    org, t = probe.resolve()
-    tck_ps = t["tCK_ps"]
-    tick_ps = tck_ps / type(probe).tick_multiplier
-    tx_bytes = type(probe).data_payload_bytes
-    peak_channel_gbps = tx_bytes / (t["nBL"] * tck_ps * 1e-12) / 1e9 * org["pseudochannel"]
+    facts = hbm3_facts()
 
     summary = {
         "date": datetime.date.today().isoformat(),
@@ -88,58 +50,25 @@ def main() -> int:
         "controller": "HBM34 + FRFCFS + Open row policy + RoBaRaCoCh",
         "refresh": args.refresh,
         "requests_per_run": args.requests,
-        "access_bytes": tx_bytes,
-        "tick_ps": tick_ps,
-        "peak_channel_GBps": peak_channel_gbps,
+        "access_bytes": facts["tx_bytes"],
+        "tick_ps": facts["tick_ps"],
+        "peak_channel_GBps": facts["peak_channel_GBps"],
         "runs": {},
     }
-
     first = True
     for pattern in ("sequential", "random"):
         trace = OUT / f"smoke_{pattern}.trace"
-        write_trace(trace, pattern, args.requests, tx_bytes)
-        stats, stats_yaml, wall = run_one(trace, args.refresh, verbose=first)
+        write_trace(trace, pattern, args.requests, facts["tx_bytes"])
+        stats, stats_yaml, wall = run_trace(trace, args.refresh, verbose=first)
         first = False
-        c = stats["memory_system"]["controller"]
-        cycles = c["cycles"]
-        accepted = c["num_read_reqs"] + c["num_write_reqs"]
-        # Ramulator stops when the frontend has SENT its last request, so the
-        # requests still queued at that moment were never served. Count only
-        # served requests as bytes moved.
-        served = c["num_read_reqs_served"] + c["num_write_reqs_served"]
-        bytes_moved = served * tx_bytes
-        seconds = cycles * tick_ps * 1e-12  # true tick = tCK / 2 = 312.5 ps
-        achieved = bytes_moved / seconds / 1e9
-        hits, misses, conflicts = c["row_hits"], c["row_misses"], c["row_conflicts"]
-        classified = hits + misses + conflicts
-        row = {
-            "requests_accepted": accepted,
-            "requests_served": served,
-            "in_flight_at_end": accepted - served,
-            "controller_ticks": cycles,
-            "sim_time_us": seconds * 1e6,
-            "achieved_GBps": achieved,
-            "pct_of_channel_peak": 100 * achieved / peak_channel_gbps,
-            "row_hits": hits,
-            "row_misses": misses,
-            "row_conflicts": conflicts,
-            "row_hit_rate_pct": (100 * hits / classified) if classified else None,
-            "avg_read_latency_ticks": c["avg_read_latency"],
-            "avg_read_latency_ns": c["avg_read_latency"] * tick_ps / 1000,
-            # Ramulator's own stat uses an integer tick of 312 ps (625 // 2), so it
-            # reads ~0.16% high relative to the true 312.5 ps tick.
-            "ramulator_total_throughput_MBps": c.get("total_throughput_MBps"),
-            "wall_seconds": wall,
-        }
+        row = summarize(stats, facts, wall)
         summary["runs"][pattern] = row
         (OUT / f"smoke_{pattern}_{args.refresh}.stats.yaml").write_text(stats_yaml)
-        print(f"\n[{pattern} reads, refresh={args.refresh}]")
-        for k, v in row.items():
-            print(f"  {k:32s} {v:.3f}" if isinstance(v, float) else f"  {k:32s} {v}")
+        print_summary(f"{pattern} reads, refresh={args.refresh}", row)
 
     out = OUT / f"smoke_summary_{args.refresh}.json"
     out.write_text(json.dumps(summary, indent=2))
-    print(f"\nchannel peak {peak_channel_gbps:.1f} GB/s; wrote {out.relative_to(ROOT)}")
+    print(f"\nchannel peak {facts['peak_channel_GBps']:.1f} GB/s; wrote {out.relative_to(ROOT)}")
     return 0
 
 

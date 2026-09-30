@@ -1,0 +1,56 @@
+=============== llama3_8b tp1 batch1 seq4096 stacks1 ===============
+model llama3_8b: 32 layers, hidden 4096, 32 heads / 8 KV heads, dtype 2 B
+run: batch 1, past positions 4096, tp 1 (this shard: 32 heads / 8 KV heads), kv head_major/head_outer, 1 stack(s), layers 32
+footprint 15.71 GiB of 16.00 GiB (98.2%)
+bytes per decode step:
+  weights       13.98 GiB   96.5%
+  norm         520.00 KiB    0.0%
+  embed          8.00 KiB    0.0%
+  kv_read      512.00 MiB    3.5%
+  kv_write     128.00 KiB    0.0%
+  total         14.48 GiB  100.0%
+requests: 485,839,360 (485,835,264 reads, 4,096 writes) of 32 B; 867 segments in 355 groups
+floor at 819.2 GB/s peak (Ramulator 2.1 preset): 18.978 ms per token
+wrote traces/llama3_8b_tp1_b1_s4096.segs and traces/llama3_8b_tp1_b1_s4096.meta.json
+=============== llama3_8b tp1 batch32 seq4096 stacks2 ===============
+model llama3_8b: 32 layers, hidden 4096, 32 heads / 8 KV heads, dtype 2 B
+run: batch 32, past positions 4096, tp 1 (this shard: 32 heads / 8 KV heads), kv head_major/head_outer, 2 stack(s), layers 32
+footprint 31.21 GiB of 32.00 GiB (97.5%)
+bytes per decode step:
+  weights       13.98 GiB   46.6%
+  norm         520.00 KiB    0.0%
+  embed        256.00 KiB    0.0%
+  kv_read       16.00 GiB   53.4%
+  kv_write       4.00 MiB    0.0%
+  total         29.98 GiB  100.0%
+requests: 1,006,067,968 (1,005,936,896 reads, 131,072 writes) of 32 B; 18754 segments in 355 groups
+floor at 1638.4 GB/s peak (Ramulator 2.1 preset): 19.650 ms per token
+wrote traces/llama3_8b_tp1_b32_s4096.segs and traces/llama3_8b_tp1_b32_s4096.meta.json
+=============== llama3_8b with n_kv_heads=32 (full MHA) tp1 batch1 seq4096 stacks2 ===============
+model llama3_8b: 32 layers, hidden 4096, 32 heads / 32 KV heads, dtype 2 B
+run: batch 1, past positions 4096, tp 1 (this shard: 32 heads / 32 KV heads), kv head_major/head_outer, 2 stack(s), layers 32
+footprint 18.71 GiB of 32.00 GiB (58.5%)
+bytes per decode step:
+  weights       15.48 GiB   88.6%
+  norm         520.00 KiB    0.0%
+  embed          8.00 KiB    0.0%
+  kv_read        2.00 GiB   11.4%
+  kv_write     512.00 KiB    0.0%
+  total         17.48 GiB  100.0%
+requests: 586,514,944 (586,498,560 reads, 16,384 writes) of 32 B; 2403 segments in 355 groups
+floor at 1638.4 GB/s peak (Ramulator 2.1 preset): 11.455 ms per token
+wrote traces/llama3_8b_mha32_tp1_b1_s4096.segs and traces/llama3_8b_mha32_tp1_b1_s4096.meta.json
+=============== llama3_70b tp8 batch1 seq4096 stacks2 ===============
+model llama3_70b: 80 layers, hidden 8192, 64 heads / 8 KV heads, dtype 2 B
+run: batch 1, past positions 4096, tp 8 (this shard: 8 heads / 1 KV heads), kv head_major/head_outer, 2 stack(s), layers 80
+footprint 16.90 GiB of 32.00 GiB (52.8%)
+bytes per decode step:
+  weights       16.18 GiB   99.0%
+  norm           2.52 MiB    0.0%
+  embed         16.00 KiB    0.0%
+  kv_read      160.00 MiB    1.0%
+  kv_write      40.00 KiB    0.0%
+  total         16.34 GiB  100.0%
+requests: 548,309,248 (548,307,968 reads, 1,280 writes) of 32 B; 1043 segments in 883 groups
+floor at 1638.4 GB/s peak (Ramulator 2.1 preset): 10.709 ms per token
+wrote traces/llama3_70b_tp8_b1_s4096.segs and traces/llama3_70b_tp8_b1_s4096.meta.json

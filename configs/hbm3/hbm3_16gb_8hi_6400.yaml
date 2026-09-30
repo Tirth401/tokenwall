@@ -6,6 +6,9 @@ provenance:
   timing_preset: HBM3_6400Mbps
   extracted_on: '2026-09-30'
   command: python scripts/extract_hbm3_params.py
+  overrides_ck: {}
+  override_note: Derived timings (nRC, nCCDL, nCCDR, nRTW, nRFC*, nRFM*, nRREFD, nREFI*) are not recomputed from
+    overridden inputs; override them explicitly if a vendor sheet changes their inputs.
   honesty_note: Keys whose source says 'estimate' are Ramulator's guesses, not JEDEC-published values. Treat the
     resulting bandwidth numbers as 'HBM3 per Ramulator 2.1 preset'.
 clock:

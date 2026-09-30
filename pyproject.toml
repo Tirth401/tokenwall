@@ -1,0 +1,16 @@
+[project]
+name = "tokenwall"
+version = "0.1.0"
+description = "HBM3 timing model driven by LLM decode traces"
+requires-python = ">=3.10"
+dependencies = ["numpy", "pyyaml"]
+
+[build-system]
+requires = ["setuptools>=64"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["python"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

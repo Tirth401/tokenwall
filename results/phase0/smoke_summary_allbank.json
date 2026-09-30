@@ -1,6 +1,6 @@
 {
   "date": "2026-09-30",
-  "command": "python scripts/ramulator2_hbm3_smoke.py --requests 20000 --refresh allbank",
+  "command": "python scripts/ramulator2_hbm3_smoke.py",
   "org_preset": "HBM3_16Gb_8hi",
   "timing_preset": "HBM3_6400Mbps",
   "controller": "HBM34 + FRFCFS + Open row policy + RoBaRaCoCh",
@@ -25,7 +25,7 @@
       "avg_read_latency_ticks": 196.839844,
       "avg_read_latency_ns": 61.51245125,
       "ramulator_total_throughput_MBps": 21727.369141,
-      "wall_seconds": 0.04175114631652832
+      "wall_seconds": 0.04390096664428711
     },
     "random": {
       "requests_accepted": 20000,
@@ -42,7 +42,7 @@
       "avg_read_latency_ticks": 325.986786,
       "avg_read_latency_ns": 101.870870625,
       "ramulator_total_throughput_MBps": 15026.772461,
-      "wall_seconds": 0.09499287605285645
+      "wall_seconds": 0.10656404495239258
     }
   }
 }

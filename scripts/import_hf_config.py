@@ -1,0 +1,132 @@
+#!/usr/bin/env python
+"""Import a published Hugging Face config.json into configs/models/<name>.yaml with provenance.
+
+Usage (repo root, venv active):
+    python scripts/import_hf_config.py --repo meta-llama/Meta-Llama-3-8B \
+        --mirror NousResearch/Meta-Llama-3-8B --name llama3_8b
+
+The official meta-llama repos are gated (HTTP 401 without accepting the licence
+on the website), so a mirror can be tried second. The output records every
+attempt, which URL answered, the SHA-256 of the exact bytes, and keeps the raw
+file under configs/models/raw/. Fields are copied by this script, never typed.
+"""
+from __future__ import annotations
+
+import argparse
+import datetime
+import hashlib
+import json
+import pathlib
+import ssl
+import sys
+import urllib.error
+import urllib.request
+
+import yaml
+
+try:  # python.org macOS builds ship without a CA bundle; certifi provides one
+    import certifi
+
+    _SSL_CTX = ssl.create_default_context(cafile=certifi.where())
+except ImportError:  # pragma: no cover
+    _SSL_CTX = ssl.create_default_context()
+
+from tokenwall.model_config import DTYPE_BYTES, ModelConfig
+
+ROOT = pathlib.Path(__file__).resolve().parents[1]
+RAW_DIR = ROOT / "configs" / "models" / "raw"
+
+
+def fetch(url: str) -> bytes:
+    req = urllib.request.Request(url, headers={"User-Agent": "tokenwall/0.1"})
+    with urllib.request.urlopen(req, timeout=30, context=_SSL_CTX) as r:
+        return r.read()
+
+
+def main() -> int:
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--repo", required=True, help="official Hugging Face repo, e.g. meta-llama/Meta-Llama-3-8B")
+    ap.add_argument("--mirror", default=None, help="ungated mirror to try if the official repo is gated")
+    ap.add_argument("--name", required=True, help="short name, e.g. llama3_8b")
+    args = ap.parse_args()
+
+    attempts, data, served_by = [], None, None
+    for repo in [args.repo] + ([args.mirror] if args.mirror else []):
+        url = f"https://huggingface.co/{repo}/resolve/main/config.json"
+        try:
+            blob = fetch(url)
+            json.loads(blob)  # gated repos may answer 200 with an HTML page
+            data, served_by = blob, {"repo": repo, "url": url}
+            attempts.append({"repo": repo, "url": url, "result": "HTTP 200, valid JSON"})
+            break
+        except urllib.error.HTTPError as e:
+            attempts.append({"repo": repo, "url": url, "result": f"HTTP {e.code}"})
+        except (urllib.error.URLError, json.JSONDecodeError) as e:
+            attempts.append({"repo": repo, "url": url, "result": f"failed: {e}"})
+    if data is None:
+        print("could not fetch config.json:", json.dumps(attempts, indent=2), file=sys.stderr)
+        return 1
+
+    raw = json.loads(data)
+    RAW_DIR.mkdir(parents=True, exist_ok=True)
+    raw_path = RAW_DIR / f"{args.name}.config.json"
+    raw_path.write_bytes(data)
+
+    heads, hidden = raw["num_attention_heads"], raw["hidden_size"]
+    dtype = raw.get("torch_dtype", "bfloat16")
+    fields = {
+        "num_hidden_layers": raw["num_hidden_layers"],
+        "hidden_size": hidden,
+        "num_attention_heads": heads,
+        "num_key_value_heads": raw.get("num_key_value_heads", heads),
+        "head_dim": raw.get("head_dim") or hidden // heads,
+        "intermediate_size": raw["intermediate_size"],
+        "vocab_size": raw["vocab_size"],
+        "max_position_embeddings": raw["max_position_embeddings"],
+        "dtype_bytes": DTYPE_BYTES[dtype],
+        "tie_word_embeddings": bool(raw.get("tie_word_embeddings", False)),
+    }
+    model = ModelConfig(name=args.name, **fields)
+    per_layer = model.per_layer_params()
+    total = model.total_params()
+    doc = {
+        "provenance": {
+            "official_repo": args.repo,
+            "served_by": served_by,
+            "attempts": attempts,
+            "fetched_on": datetime.date.today().isoformat(),
+            "sha256": hashlib.sha256(data).hexdigest(),
+            "raw_file": str(raw_path.relative_to(ROOT)),
+            "architectures": raw.get("architectures"),
+            "torch_dtype": dtype,
+            "command": "python scripts/import_hf_config.py " + " ".join(sys.argv[1:]),
+            "note": "fields are copied from the raw file by this script; derived values are computed from them",
+        },
+        "name": args.name,
+        "fields": fields,
+        "derived": {
+            "kv_dim": model.kv_dim,
+            "gqa_group_size": heads // fields["num_key_value_heads"],
+            "params_per_layer": per_layer,
+            "params_per_layer_total": sum(per_layer.values()),
+            "params_total": total,
+            "params_total_B": round(total / 1e9, 3),
+            "weight_bytes": total * model.dtype_bytes,
+            "weight_GiB": round(total * model.dtype_bytes / 2**30, 3),
+        },
+    }
+    out = ROOT / "configs" / "models" / f"{args.name}.yaml"
+    out.write_text(
+        "# GENERATED by scripts/import_hf_config.py from a published config.json. Do not edit by hand.\n"
+        + yaml.safe_dump(doc, sort_keys=False)
+    )
+    print(f"{args.name}: served by {served_by['repo']}; layers {fields['num_hidden_layers']}, hidden {hidden}, "
+          f"heads {heads}, kv heads {fields['num_key_value_heads']}, intermediate {fields['intermediate_size']}, "
+          f"vocab {fields['vocab_size']}; params {total:,} ({total / 1e9:.2f}B), "
+          f"weights {total * model.dtype_bytes / 2**30:.2f} GiB in {dtype}")
+    print(f"wrote {out.relative_to(ROOT)} and {raw_path.relative_to(ROOT)}")
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())
