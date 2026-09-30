@@ -238,11 +238,27 @@ def stream_hash(trace: SegmentTrace, max_requests: int | None = None) -> tuple[i
     return h, n, w
 
 
-def export_ramulator(trace: SegmentTrace, path: str | pathlib.Path, max_requests: int | None = None) -> int:
+def iter_filtered(trace: SegmentTrace, max_requests: int | None = None, reads_only: bool = False):
+    """iter_blocks with an optional write filter; max_requests counts emitted requests only."""
+    budget = max_requests
+    for addrs, write, tid in trace.iter_blocks():
+        if reads_only and write:
+            continue
+        if budget is not None:
+            if budget <= 0:
+                return
+            if len(addrs) > budget:
+                addrs = addrs[:budget]
+            budget -= len(addrs)
+        yield addrs, write, tid
+
+
+def export_ramulator(trace: SegmentTrace, path: str | pathlib.Path, max_requests: int | None = None,
+                     reads_only: bool = False) -> int:
     """Write Ramulator 2.1 LoadStoreTrace format: one 'LD <addr>' or 'ST <addr>' per line."""
     n = 0
     with open(path, "w") as f:
-        for addrs, write, _ in trace.iter_blocks(max_requests=max_requests):
+        for addrs, write, _ in iter_filtered(trace, max_requests, reads_only):
             op = "ST " if write else "LD "
             f.write("\n".join(op + str(a) for a in addrs.tolist()))
             f.write("\n")

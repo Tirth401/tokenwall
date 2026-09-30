@@ -1,0 +1,49 @@
+=== ramulator ===
+[ramulator, interleave 32 B, 16 channels] 485,839,360 requests
+  ideal row hit rate            96.87%   (row switches 15,188,000)
+  distinct banks per  32 reqs   16.02 of 1024
+  per-channel back-to-back      same PC same BG 96.9%  same PC other BG 0.0%  other PC 3.1%
+  channel imbalance max/mean    1.000
+  other              16,896  hit  93.75%
+  weights       469,041,152  hit  96.88%
+  kv_read        16,777,216  hit  96.87%
+  kv_write            4,096  hit   0.00%
+wrote results/phase2/locality_llama3_8b_tp1_b1_s4096_ramulator.json
+./.venv/bin/python -m tokenwall locality traces/llama3_8b_tp1_b1_s4096.segs    69.36s user 10.86s system 99% cpu 1:20.55 total
+=== bank_low ===
+[bank_low, interleave 32 B, 16 channels] 485,839,360 requests
+  ideal row hit rate            96.87%   (row switches 15,206,400)
+  distinct banks per  32 reqs   32.00 of 1024
+  per-channel back-to-back      same PC same BG 0.0%  same PC other BG 0.0%  other PC 100.0%
+  channel imbalance max/mean    1.000
+  other              16,896  hit   0.00%
+  weights       469,041,152  hit  96.88%
+  kv_read        16,777,216  hit  96.85%
+  kv_write            4,096  hit   0.00%
+wrote results/phase2/locality_llama3_8b_tp1_b1_s4096_bank_low.json
+./.venv/bin/python -m tokenwall locality traces/llama3_8b_tp1_b1_s4096.segs    71.58s user 9.63s system 99% cpu 1:21.34 total
+=== bank_high ===
+[bank_high, interleave 32 B, 16 channels] 485,839,360 requests
+  ideal row hit rate            96.87%   (row switches 15,188,000)
+  distinct banks per  32 reqs   16.02 of 1024
+  per-channel back-to-back      same PC same BG 96.9%  same PC other BG 0.0%  other PC 3.1%
+  channel imbalance max/mean    1.000
+  other              16,896  hit  93.75%
+  weights       469,041,152  hit  96.88%
+  kv_read        16,777,216  hit  96.87%
+  kv_write            4,096  hit   0.00%
+wrote results/phase2/locality_llama3_8b_tp1_b1_s4096_bank_high.json
+./.venv/bin/python -m tokenwall locality traces/llama3_8b_tp1_b1_s4096.segs    60.82s user 9.71s system 99% cpu 1:10.63 total
+=== bank_low_xor ===
+[bank_low_xor, interleave 32 B, 16 channels] 485,839,360 requests
+  ideal row hit rate            96.87%   (row switches 15,206,144)
+  distinct banks per  32 reqs   32.00 of 1024
+  per-channel back-to-back      same PC same BG 0.0%  same PC other BG 0.0%  other PC 100.0%
+  channel imbalance max/mean    1.000
+  other              16,896  hit   0.00%
+  weights       469,041,152  hit  96.88%
+  kv_read        16,777,216  hit  96.85%
+  kv_write            4,096  hit   6.25%
+wrote results/phase2/locality_llama3_8b_tp1_b1_s4096_bank_low_xor.json
+./.venv/bin/python -m tokenwall locality traces/llama3_8b_tp1_b1_s4096.segs    75.96s user 11.51s system 99% cpu 1:28.12 total
+EXIT 0

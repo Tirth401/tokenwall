@@ -8,10 +8,27 @@ import json
 import pathlib
 import sys
 
+from .addrmap import POLICY_NAMES, Geometry, export_ramulator_mapped, make_policy, to_addr_vec
 from .hbm_config import DEFAULT_HBM3_YAML, HBMConfig
+from .locality import analyze_trace
 from .model_config import ModelConfig
 from .segments import SegmentTrace, export_ramulator, stream_hash
 from .tracegen import KV_LAYOUTS, KV_ORDERS, RunConfig, generate
+
+
+def _geo_policy(args: argparse.Namespace):
+    geo = Geometry.from_hbm(stacks=args.stacks, path=args.hbm)
+    k = (args.interleave_bytes // geo.line_bytes).bit_length() - 1
+    if geo.line_bytes << k != args.interleave_bytes:
+        raise SystemExit(f"--interleave-bytes must be {geo.line_bytes} times a power of two")
+    return geo, make_policy(args.policy, geo, k)
+
+
+def _add_map_args(p: argparse.ArgumentParser) -> None:
+    p.add_argument("--policy", choices=POLICY_NAMES, default="ramulator")
+    p.add_argument("--stacks", type=int, default=1, help="HBM3 stacks (16 channels each)")
+    p.add_argument("--interleave-bytes", type=int, default=32, help="bytes per channel before the channel bits change")
+    p.add_argument("--hbm", default=str(DEFAULT_HBM3_YAML))
 
 
 def _fmt_bytes(n: float) -> str:
@@ -75,8 +92,52 @@ def cmd_gen(args: argparse.Namespace) -> int:
 
 def cmd_export(args: argparse.Namespace) -> int:
     trace = SegmentTrace.read(args.segs)
-    n = export_ramulator(trace, args.out, max_requests=args.max_requests)
-    print(f"wrote {n:,} requests to {args.out}")
+    if args.policy is None:
+        n = export_ramulator(trace, args.out, max_requests=args.max_requests, reads_only=args.reads_only)
+        fmt = "LoadStoreTrace (LD/ST <addr>)"
+    else:
+        geo, policy = _geo_policy(args)
+        n = export_ramulator_mapped(trace, args.out, policy, geo, max_requests=args.max_requests,
+                                    reads_only=args.reads_only)
+        fmt = f"ReadWriteTrace (R/W ch,pc,sid,bg,bank,row,col) via {policy.name}"
+    print(f"wrote {n:,} requests to {args.out} as {fmt}")
+    return 0
+
+
+def cmd_map(args: argparse.Namespace) -> int:
+    geo, policy = _geo_policy(args)
+    print(policy.describe(geo))
+    if args.addr:
+        import numpy as np
+        addrs = np.array([int(a, 0) for a in args.addr], dtype=np.uint64)
+        vec = policy.map(addrs, geo)
+        for a, row in zip(addrs.tolist(), to_addr_vec(vec).tolist()):
+            print(f"  {a:#x} -> ch {row[0]} pc {row[1]} sid {row[2]} bg {row[3]} bank {row[4]} row {row[5]} col {row[6]}")
+    return 0
+
+
+def cmd_locality(args: argparse.Namespace) -> int:
+    geo, policy = _geo_policy(args)
+    trace = SegmentTrace.read(args.segs)
+    res = analyze_trace(trace, geo, policy, max_requests=args.max_requests, window=args.window)
+    res.update({"segs": args.segs, "date": datetime.date.today().isoformat(),
+                "command": "python -m tokenwall " + " ".join(sys.argv[1:])})
+    print(f"[{policy.name}, interleave {res['channel_interleave_bytes']} B, {geo.channels} channels] "
+          f"{res['requests']:,} requests")
+    print(f"  ideal row hit rate            {res['ideal_row_hit_rate_pct']:.2f}%   (row switches {res['row_switches']:,})")
+    print(f"  distinct banks per {args.window:>3d} reqs   {res['avg_distinct_banks_per_window']:.2f} of {res['banks_total']}")
+    pp = res["channel_pairs_pct"]
+    print(f"  per-channel back-to-back      same PC same BG {pp['same_pc_same_bg']:.1f}%  same PC other BG "
+          f"{pp['same_pc_diff_bg']:.1f}%  other PC {pp['diff_pc']:.1f}%")
+    print(f"  channel imbalance max/mean    {res['channel_imbalance_max_over_mean']:.3f}")
+    for k, v in res["per_class"].items():
+        hr = v["ideal_row_hit_rate_pct"]
+        print(f"  {k:10s} {v['requests']:>14,}  hit {hr:6.2f}%" if hr is not None else f"  {k:10s} {v['requests']:>14,}")
+    if args.out:
+        out = pathlib.Path(args.out)
+        out.parent.mkdir(parents=True, exist_ok=True)
+        out.write_text(json.dumps(res, indent=2))
+        print(f"wrote {out}")
     return 0
 
 
@@ -121,11 +182,29 @@ def main(argv: list[str] | None = None) -> int:
     g.add_argument("--out", required=True, help="output path stem (writes .segs and .meta.json)")
     g.set_defaults(fn=cmd_gen)
 
-    e = sub.add_parser("export-ramulator", help="expand a .segs to Ramulator LD/ST text")
+    e = sub.add_parser("export-ramulator", help="expand a .segs to Ramulator LD/ST text (or R/W addr_vec with --policy)")
     e.add_argument("segs")
     e.add_argument("--out", required=True)
     e.add_argument("--max-requests", type=int, default=None)
+    e.add_argument("--reads-only", action="store_true", help="drop writes (Ramulator's ReadWriteTrace cannot coalesce them)")
+    e.add_argument("--policy", choices=POLICY_NAMES, default=None, help="pre-map with this policy (ReadWriteTrace format)")
+    e.add_argument("--stacks", type=int, default=1)
+    e.add_argument("--interleave-bytes", type=int, default=32)
+    e.add_argument("--hbm", default=str(DEFAULT_HBM3_YAML))
     e.set_defaults(fn=cmd_export)
+
+    m = sub.add_parser("map", help="describe a mapping policy, optionally map addresses")
+    _add_map_args(m)
+    m.add_argument("--addr", nargs="*", default=None, help="addresses to map (decimal or 0x hex)")
+    m.set_defaults(fn=cmd_map)
+
+    lo = sub.add_parser("locality", help="static locality analysis of a .segs under a mapping policy")
+    lo.add_argument("segs")
+    _add_map_args(lo)
+    lo.add_argument("--max-requests", type=int, default=None)
+    lo.add_argument("--window", type=int, default=32)
+    lo.add_argument("--out", default=None, help="write JSON here")
+    lo.set_defaults(fn=cmd_locality)
 
     h = sub.add_parser("hash", help="stream hash of a .segs (matches cpp tw_expand)")
     h.add_argument("segs")

@@ -23,11 +23,15 @@ def main() -> int:
     ap.add_argument("trace")
     ap.add_argument("--label", required=True)
     ap.add_argument("--refresh", default="allbank", choices=["allbank", "perbank", "none"])
+    ap.add_argument("--channels", type=int, default=1, help="HBM3 channels (16 per stack)")
+    ap.add_argument("--premapped", action="store_true", help="trace is R/W addr_vec (ReadWriteTrace)")
+    ap.add_argument("--interleave-bits", type=int, default=0, help="Ramulator CacheLineInterleave bits (flat traces)")
     ap.add_argument("--out", default=None, help="write summary JSON here")
     args = ap.parse_args()
 
     facts = hbm3_facts()
-    stats, stats_yaml, wall = run_trace(pathlib.Path(args.trace), args.refresh)
+    stats, stats_yaml, wall = run_trace(pathlib.Path(args.trace), args.refresh, channels=args.channels,
+                                        premapped=args.premapped, interleave_bits=args.interleave_bits)
     row = summarize(stats, facts, wall)
     print_summary(f"{args.label}, refresh={args.refresh}", row)
     if args.out:
@@ -38,7 +42,8 @@ def main() -> int:
             "command": "python " + " ".join(sys.argv),
             "trace": args.trace, "label": args.label, "refresh": args.refresh,
             "org_preset": ORG_PRESET, "timing_preset": TIMING_PRESET,
-            "controller": "HBM34 + FRFCFS + Open row policy + RoBaRaCoCh, 1 channel",
+            "controller": "HBM34 + FRFCFS + Open row policy", "channels": args.channels, "premapped": args.premapped,
+            "interleave_bits": args.interleave_bits,
             "peak_channel_GBps": facts["peak_channel_GBps"], "tick_ps": facts["tick_ps"],
             "result": row,
         }, indent=2))

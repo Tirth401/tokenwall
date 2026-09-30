@@ -1,0 +1,136 @@
+{
+  "date": "2026-09-30",
+  "command": "python scripts/ramulator2_mapping_check.py --part b --requests 20000000 --seq 1024",
+  "trace": {
+    "model": "llama3_8b",
+    "run": {
+      "batch": 1,
+      "seq_len": 1024,
+      "tp": 1,
+      "stacks": 1,
+      "kv_layout": "head_major",
+      "kv_order": "head_outer",
+      "kv_capacity": null,
+      "request_bytes": 32,
+      "alignment": 2097152,
+      "small_alignment": 512,
+      "weight_streams": 1,
+      "chunk_bytes": 4096,
+      "kv_chunk_bytes": 0,
+      "layers": [
+        0,
+        1
+      ],
+      "include_embed": false,
+      "include_lm_head": false,
+      "seed": 1
+    },
+    "prefix_requests": 13763072,
+    "layer_reads_total": 13763072,
+    "reads_only": true,
+    "exporter": "tw_expand"
+  },
+  "bit_exactness": [],
+  "policies": [
+    {
+      "policy": "ramulator",
+      "channels": 16,
+      "requests_accepted": 13763072,
+      "requests_served": 13762560,
+      "in_flight_at_end": 512,
+      "served_per_channel_min_max": [
+        860160,
+        860160
+      ],
+      "controller_ticks": 4090635,
+      "sim_time_us": 1278.3234375,
+      "achieved_GBps": 344.515251055154,
+      "peak_GBps": 819.2,
+      "pct_of_peak": 42.0550843573186,
+      "row_hits": 13324063,
+      "row_misses": 333745,
+      "row_conflicts": 104752,
+      "row_hit_rate_pct": 96.8138413202195,
+      "avg_read_latency_ticks": 198.18542787500002,
+      "avg_read_latency_ns": 61.9329462109375,
+      "ramulator_total_throughput_MBps": 345067.343744,
+      "wall_seconds": 30.461973190307617,
+      "export_seconds": 9.134479761123657
+    },
+    {
+      "policy": "bank_low",
+      "channels": 16,
+      "requests_accepted": 13763072,
+      "requests_served": 13762560,
+      "in_flight_at_end": 512,
+      "served_per_channel_min_max": [
+        860160,
+        860160
+      ],
+      "controller_ticks": 2052919,
+      "sim_time_us": 641.5371875,
+      "achieved_GBps": 686.4791762363736,
+      "peak_GBps": 819.2,
+      "pct_of_peak": 83.7987275679167,
+      "row_hits": 13175344,
+      "row_misses": 163152,
+      "row_conflicts": 424064,
+      "row_hit_rate_pct": 95.73323567708333,
+      "avg_read_latency_ticks": 123.42936068750001,
+      "avg_read_latency_ns": 38.57167521484375,
+      "ramulator_total_throughput_MBps": 687579.312496,
+      "wall_seconds": 19.78009009361267,
+      "export_seconds": 9.28527307510376
+    },
+    {
+      "policy": "bank_high",
+      "channels": 16,
+      "requests_accepted": 13763072,
+      "requests_served": 13762560,
+      "in_flight_at_end": 512,
+      "served_per_channel_min_max": [
+        860160,
+        860160
+      ],
+      "controller_ticks": 5719661,
+      "sim_time_us": 1787.3940625,
+      "achieved_GBps": 246.39329918329074,
+      "peak_GBps": 819.2,
+      "pct_of_peak": 30.077307029210292,
+      "row_hits": 13320797,
+      "row_misses": 12881,
+      "row_conflicts": 428898,
+      "row_hit_rate_pct": 96.78999774460827,
+      "avg_read_latency_ticks": 243.84829812499999,
+      "avg_read_latency_ns": 76.20259316406249,
+      "ramulator_total_throughput_MBps": 246788.156256,
+      "wall_seconds": 39.14250612258911,
+      "export_seconds": 8.869889736175537
+    },
+    {
+      "policy": "bank_low_xor",
+      "channels": 16,
+      "requests_accepted": 13763072,
+      "requests_served": 13762560,
+      "in_flight_at_end": 512,
+      "served_per_channel_min_max": [
+        860160,
+        860160
+      ],
+      "controller_ticks": 2054903,
+      "sim_time_us": 642.1571875,
+      "achieved_GBps": 685.816383547058,
+      "peak_GBps": 819.2,
+      "pct_of_peak": 83.71782025720921,
+      "row_hits": 13171320,
+      "row_misses": 165368,
+      "row_conflicts": 425872,
+      "row_hit_rate_pct": 95.70399693080357,
+      "avg_read_latency_ticks": 123.5318063125,
+      "avg_read_latency_ns": 38.60368947265625,
+      "ramulator_total_throughput_MBps": 686915.437504,
+      "wall_seconds": 18.237369060516357,
+      "export_seconds": 8.748311042785645
+    }
+  ]
+}

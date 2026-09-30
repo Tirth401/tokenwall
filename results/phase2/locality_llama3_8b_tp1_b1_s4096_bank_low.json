@@ -1,0 +1,38 @@
+{
+  "policy": "bank_low",
+  "channel_interleave_bytes": 32,
+  "channels": 16,
+  "requests": 485839360,
+  "ideal_row_hit_rate_pct": 96.87007656193191,
+  "row_switches": 15206400,
+  "avg_distinct_banks_per_window": 32.0,
+  "window": 32,
+  "banks_total": 1024,
+  "channel_pairs_pct": {
+    "same_pc_same_bg": 0.0,
+    "same_pc_diff_bg": 0.0007903943115848325,
+    "diff_pc": 99.99920960568842
+  },
+  "channel_imbalance_max_over_mean": 1.0,
+  "per_class": {
+    "other": {
+      "requests": 16896,
+      "ideal_row_hit_rate_pct": 0.0
+    },
+    "weights": {
+      "requests": 469041152,
+      "ideal_row_hit_rate_pct": 96.875
+    },
+    "kv_read": {
+      "requests": 16777216,
+      "ideal_row_hit_rate_pct": 96.8536376953125
+    },
+    "kv_write": {
+      "requests": 4096,
+      "ideal_row_hit_rate_pct": 0.0
+    }
+  },
+  "segs": "traces/llama3_8b_tp1_b1_s4096.segs",
+  "date": "2026-09-30",
+  "command": "python -m tokenwall locality traces/llama3_8b_tp1_b1_s4096.segs --policy bank_low --stacks 1 --out results/phase2/locality_llama3_8b_tp1_b1_s4096_bank_low.json"
+}

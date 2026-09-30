@@ -1,0 +1,38 @@
+{
+  "policy": "bank_high",
+  "channel_interleave_bytes": 32,
+  "channels": 32,
+  "requests": 30413312,
+  "ideal_row_hit_rate_pct": 95.1379185535597,
+  "row_switches": 1478720,
+  "avg_distinct_banks_per_window": 19.588087742630595,
+  "window": 32,
+  "banks_total": 2048,
+  "channel_pairs_pct": {
+    "same_pc_same_bg": 95.15192582475973,
+    "same_pc_diff_bg": 0.0,
+    "diff_pc": 4.848074175240268
+  },
+  "channel_imbalance_max_over_mean": 1.0,
+  "per_class": {
+    "other": {
+      "requests": 512,
+      "ideal_row_hit_rate_pct": 87.5
+    },
+    "weights": {
+      "requests": 13631488,
+      "ideal_row_hit_rate_pct": 96.875
+    },
+    "kv_read": {
+      "requests": 16777216,
+      "ideal_row_hit_rate_pct": 93.73779296875
+    },
+    "kv_write": {
+      "requests": 4096,
+      "ideal_row_hit_rate_pct": 50.0
+    }
+  },
+  "segs": "traces/llama3_8b_layer0_tp1_b32_s4096_position_major.segs",
+  "date": "2026-09-30",
+  "command": "python -m tokenwall locality traces/llama3_8b_layer0_tp1_b32_s4096_position_major.segs --policy bank_high --stacks 2 --out results/phase2/locality_llama3_8b_layer0_tp1_b32_s4096_position_major_bank_high.json"
+}

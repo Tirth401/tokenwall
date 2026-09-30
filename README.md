@@ -19,12 +19,12 @@ takes banks offline. Tokenwall answers one question with a simulator:
    of 32-byte memory requests one decode step issues on one GPU. No GPU needed:
    the pattern is deterministic from the model's shape. KV-cache layout and
    issue order are knobs because they change row locality.
-2. **Address mapping + timing core (Python + C++, Phases 2 and 3).** A swappable
-   bit-slice mapping from linear address to (channel, pseudo channel, bank
-   group, bank, row, column), then a per-bank state machine enforcing JEDEC
-   HBM3 timing (tRCD, tRP, tRAS, tRC, tCCD_S/L, tRRD_S/L, tFAW, read/write
-   turnaround, tREFI/tRFC). Reports cycles, achieved bandwidth, row-buffer hit
-   rate, and a stall breakdown.
+2. **Address mapping (done) + timing core (Phase 3), Python + C++.** A swappable
+   bit-slice mapping from linear address to (channel, pseudo channel, SID, bank
+   group, bank, row, column) with four policies, then a per-bank state machine
+   enforcing JEDEC HBM3 timing (tRCD, tRP, tRAS, tRC, tCCD_S/L, tRRD_S/L, tFAW,
+   read/write turnaround, tREFI/tRFC). Reports cycles, achieved bandwidth,
+   row-buffer hit rate, and a stall breakdown.
 3. **Sweep (Python, Phase 5).** Varies mapping, KV layout, refresh policy, batch
    size and sequence length; plots what actually matters.
 
@@ -38,8 +38,8 @@ ground truth the C++ core is validated against.
 |------:|-------|-------|
 | 0 | Repo, build system, Ramulator 2.1 built and run, HBM3 parameters extracted | done 2026-09-30 |
 | 1 | Decode-step trace generator, Llama 3 8B/70B configs, Python/C++ cross-checked trace format | done 2026-09-30 |
-| 2 | Address mapping policies + unit tests | next |
-| 3 | C++ timing core, one constraint at a time | planned |
+| 2 | Four address-mapping policies, bit-exact with Ramulator's default, Python/C++ mirrored, measured on real traffic | done 2026-09-30 |
+| 3 | C++ timing core, one constraint at a time | next |
 | 4 | Validation against Ramulator 2.1 | planned |
 | 5 | Sweeps and findings | planned |
 | 6 | Writeup | planned |
@@ -110,11 +110,36 @@ them line by line, so the two implementations cannot drift silently. A full
 8B step expands in 1.2 s in C++ and has a stable fingerprint
 (`RESULTS.md`, "Stream fingerprint").
 
+## Address mapping: which bits pick the bank
+
+An address is a big binary number, and a mapping policy says which of its bits
+pick the channel, which pick the bank, and which pick the row. Put the bank bits
+low and consecutive accesses spread across banks like cards dealt around a
+table; put them high and they pile onto one bank. Four policies live in
+`python/tokenwall/addrmap.py`, mirrored in `cpp/include/tokenwall/addrmap.h`:
+
+| Policy | Bit order (low to high, above the 32 B line) | What a streaming sweep does |
+|---|---|---|
+| `ramulator` | channel, column, pseudo channel, SID, bank group, bank, row | one 1 KiB row of one bank at a time; back-to-back reads share a bank group and pay tCCD_L |
+| `bank_low` | channel, pseudo channel, bank group, bank, SID, column, row | alternates bank groups every access (tCCD_S pace), keeps every bank open |
+| `bank_high` | channel, column, pseudo channel, row, SID, bank group, bank | walks all rows of one bank before touching another; the anti-pattern |
+| `bank_low_xor` | `bank_low` with low row bits XORed into the bank bits | breaks power-of-two strides that would alias onto one bank |
+
+`ramulator` reproduces Ramulator 2.1's `CacheLineInterleave` + `RoBaRaCoCh`
+bit for bit: `tests/test_addrmap.py` checks it against a transcription of the
+C++, and `scripts/ramulator2_mapping_check.py` feeds Ramulator the same traffic
+flat and pre-mapped and gets identical statistics. Every policy takes a channel
+interleave granularity (32 B to 1 KiB). `python -m tokenwall map --policy X`
+prints the bit layout and how often each field changes; `python -m tokenwall
+locality` reports ideal row-hit rate and bank spread for a trace under a
+policy before any timing is simulated. Measured bandwidth per policy is in
+`RESULTS.md` (Phase 2).
+
 ## Layout
 
 ```
-cpp/                 C++: shared trace format + expander (tw_expand), timing core (Phase 3), unit tests
-python/tokenwall/    trace generator, CLI (python -m tokenwall), address mapping (Phase 2)
+cpp/                 C++: trace format + expander, address mapping mirror (tw_expand), timing core (Phase 3), unit tests
+python/tokenwall/    trace generator, address mapping (addrmap.py), locality analysis, CLI (python -m tokenwall)
 configs/hbm3/        HBM3 parameters extracted from Ramulator 2.1, with provenance
 configs/models/      Llama 3 shapes imported from published config.json, raw files under raw/
 tests/               pytest suite incl. the Python-vs-C++ cross-expander check
@@ -135,7 +160,7 @@ git clone --recursive <this repo> tokenwall && cd tokenwall
 python3 -m venv .venv && .venv/bin/pip install -r requirements.txt && .venv/bin/pip install -e .
 scripts/setup_ramulator2.sh        # builds Ramulator 2.1 into external/, pip-installs it into .venv
 cmake -S . -B build && cmake --build build && ctest --test-dir build   # Tokenwall C++
-.venv/bin/python -m pytest -q      # 36 tests incl. the cross-expander check
+.venv/bin/python -m pytest -q      # 92 tests incl. Python-vs-C++ expander and mapper cross-checks
 ```
 
 `scripts/setup_ramulator2.sh` applies `patches/ramulator2/0001-apple-clang-build-fixes.patch`:
@@ -163,6 +188,15 @@ python -m tokenwall gen --model configs/models/llama3_8b.yaml --batch 1 --seq 40
 python -m tokenwall gen --model configs/models/llama3_70b.yaml --tp 8 --stacks 2 --batch 1 --seq 4096 --out traces/llama3_70b_tp8_b1_s4096
 python -m tokenwall gen --model configs/models/llama3_8b.yaml --n-kv-heads 32 --stacks 2 --batch 1 --seq 4096 --out traces/llama3_8b_mha32_tp1_b1_s4096
 python -m tokenwall export-ramulator traces/llama3_8b_tp1_b1_s4096.segs --out traces/slice.txt --max-requests 1000000
+```
+
+Phase 2 (mapping policies):
+
+```bash
+python -m tokenwall map --policy bank_low --stacks 1                  # bit layout and field periods
+python -m tokenwall locality traces/llama3_8b_tp1_b1_s4096.segs --policy bank_low --stacks 1
+python scripts/ramulator2_mapping_check.py                            # bit-exactness + 4 policies under Ramulator timing
+./build/cpp/tw_expand traces/x.segs --map bank_low --stacks 1 --ramulator-out x.txt   # pre-mapped export from C++
 ```
 
 `python -m tokenwall gen --help` lists every knob: `--kv-layout`, `--kv-order`,

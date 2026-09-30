@@ -1,0 +1,115 @@
+model llama3_8b: 32 layers, hidden 4096, 32 heads / 8 KV heads, dtype 2 B
+run: batch 32, past positions 4096, tp 1 (this shard: 32 heads / 8 KV heads), kv head_major/head_outer, 2 stack(s), layers 1
+footprint 31.21 GiB of 32.00 GiB (97.5%)
+bytes per decode step:
+  weights      416.00 MiB   44.8%
+  norm          16.00 KiB    0.0%
+  embed               0 B    0.0%
+  kv_read      512.00 MiB   55.2%
+  kv_write     128.00 KiB    0.0%
+  total        928.14 MiB  100.0%
+requests: 30,413,312 (30,409,216 reads, 4,096 writes) of 32 B; 585 segments in 11 groups
+floor at 1638.4 GB/s peak (Ramulator 2.1 preset): 0.594 ms per token
+wrote traces/llama3_8b_layer0_tp1_b32_s4096_head_major.segs and traces/llama3_8b_layer0_tp1_b32_s4096_head_major.meta.json
+=== head_major / ramulator ===
+[ramulator, interleave 32 B, 32 channels] 30,413,312 requests
+  ideal row hit rate            96.86%   (row switches 954,560)
+  distinct banks per  32 reqs   32.00 of 2048
+  per-channel back-to-back      same PC same BG 96.9%  same PC other BG 0.0%  other PC 3.1%
+  channel imbalance max/mean    1.000
+  other                 512  hit  87.50%
+  weights        13,631,488  hit  96.88%
+  kv_read        16,777,216  hit  96.87%
+  kv_write            4,096  hit   0.00%
+wrote results/phase2/locality_llama3_8b_layer0_tp1_b32_s4096_head_major_ramulator.json
+=== head_major / bank_low ===
+[bank_low, interleave 32 B, 32 channels] 30,413,312 requests
+  ideal row hit rate            96.85%   (row switches 958,960)
+  distinct banks per  32 reqs   32.00 of 2048
+  per-channel back-to-back      same PC same BG 0.0%  same PC other BG 0.0%  other PC 100.0%
+  channel imbalance max/mean    1.000
+  other                 512  hit   0.00%
+  weights        13,631,488  hit  96.88%
+  kv_read        16,777,216  hit  96.85%
+  kv_write            4,096  hit   0.00%
+wrote results/phase2/locality_llama3_8b_layer0_tp1_b32_s4096_head_major_bank_low.json
+=== head_major / bank_high ===
+[bank_high, interleave 32 B, 32 channels] 30,413,312 requests
+  ideal row hit rate            96.86%   (row switches 954,560)
+  distinct banks per  32 reqs   32.00 of 2048
+  per-channel back-to-back      same PC same BG 96.9%  same PC other BG 0.0%  other PC 3.1%
+  channel imbalance max/mean    1.000
+  other                 512  hit  87.50%
+  weights        13,631,488  hit  96.88%
+  kv_read        16,777,216  hit  96.87%
+  kv_write            4,096  hit   0.00%
+wrote results/phase2/locality_llama3_8b_layer0_tp1_b32_s4096_head_major_bank_high.json
+=== head_major / bank_low_xor ===
+[bank_low_xor, interleave 32 B, 32 channels] 30,413,312 requests
+  ideal row hit rate            96.85%   (row switches 958,960)
+  distinct banks per  32 reqs   32.00 of 2048
+  per-channel back-to-back      same PC same BG 0.0%  same PC other BG 0.0%  other PC 100.0%
+  channel imbalance max/mean    1.000
+  other                 512  hit   0.00%
+  weights        13,631,488  hit  96.88%
+  kv_read        16,777,216  hit  96.85%
+  kv_write            4,096  hit   0.00%
+wrote results/phase2/locality_llama3_8b_layer0_tp1_b32_s4096_head_major_bank_low_xor.json
+model llama3_8b: 32 layers, hidden 4096, 32 heads / 8 KV heads, dtype 2 B
+run: batch 32, past positions 4096, tp 1 (this shard: 32 heads / 8 KV heads), kv position_major/head_outer, 2 stack(s), layers 1
+footprint 31.21 GiB of 32.00 GiB (97.5%)
+bytes per decode step:
+  weights      416.00 MiB   44.8%
+  norm          16.00 KiB    0.0%
+  embed               0 B    0.0%
+  kv_read      512.00 MiB   55.2%
+  kv_write     128.00 KiB    0.0%
+  total        928.14 MiB  100.0%
+requests: 30,413,312 (30,409,216 reads, 4,096 writes) of 32 B; 585 segments in 11 groups
+floor at 1638.4 GB/s peak (Ramulator 2.1 preset): 0.594 ms per token
+wrote traces/llama3_8b_layer0_tp1_b32_s4096_position_major.segs and traces/llama3_8b_layer0_tp1_b32_s4096_position_major.meta.json
+=== position_major / ramulator ===
+[ramulator, interleave 32 B, 32 channels] 30,413,312 requests
+  ideal row hit rate            95.14%   (row switches 1,478,720)
+  distinct banks per  32 reqs   19.59 of 2048
+  per-channel back-to-back      same PC same BG 95.2%  same PC other BG 0.0%  other PC 4.8%
+  channel imbalance max/mean    1.000
+  other                 512  hit  87.50%
+  weights        13,631,488  hit  96.88%
+  kv_read        16,777,216  hit  93.74%
+  kv_write            4,096  hit  50.00%
+wrote results/phase2/locality_llama3_8b_layer0_tp1_b32_s4096_position_major_ramulator.json
+=== position_major / bank_low ===
+[bank_low, interleave 32 B, 32 channels] 30,413,312 requests
+  ideal row hit rate            96.85%   (row switches 958,848)
+  distinct banks per  32 reqs   32.00 of 2048
+  per-channel back-to-back      same PC same BG 0.0%  same PC other BG 55.2%  other PC 44.8%
+  channel imbalance max/mean    1.000
+  other                 512  hit   0.00%
+  weights        13,631,488  hit  96.88%
+  kv_read        16,777,216  hit  96.85%
+  kv_write            4,096  hit   0.00%
+wrote results/phase2/locality_llama3_8b_layer0_tp1_b32_s4096_position_major_bank_low.json
+=== position_major / bank_high ===
+[bank_high, interleave 32 B, 32 channels] 30,413,312 requests
+  ideal row hit rate            95.14%   (row switches 1,478,720)
+  distinct banks per  32 reqs   19.59 of 2048
+  per-channel back-to-back      same PC same BG 95.2%  same PC other BG 0.0%  other PC 4.8%
+  channel imbalance max/mean    1.000
+  other                 512  hit  87.50%
+  weights        13,631,488  hit  96.88%
+  kv_read        16,777,216  hit  93.74%
+  kv_write            4,096  hit  50.00%
+wrote results/phase2/locality_llama3_8b_layer0_tp1_b32_s4096_position_major_bank_high.json
+=== position_major / bank_low_xor ===
+[bank_low_xor, interleave 32 B, 32 channels] 30,413,312 requests
+  ideal row hit rate            96.85%   (row switches 958,848)
+  distinct banks per  32 reqs   32.00 of 2048
+  per-channel back-to-back      same PC same BG 0.0%  same PC other BG 55.1%  other PC 44.8%
+  channel imbalance max/mean    1.000
+  other                 512  hit   0.00%
+  weights        13,631,488  hit  96.88%
+  kv_read        16,777,216  hit  96.85%
+  kv_write            4,096  hit   0.00%
+wrote results/phase2/locality_llama3_8b_layer0_tp1_b32_s4096_position_major_bank_low_xor.json
+EXIT 0

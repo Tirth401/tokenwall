@@ -1,0 +1,105 @@
+[Ramulator::ReadWriteTrace] [[32minfo[0m] Loading trace file /Users/tirthshah/Documents/Tirth_grad/tokenwall/traces/llama3_8b_layer0_b1_s1024_reads13763072_ramulator_ch16.txt ...
+[Ramulator::ReadWriteTrace] [[32minfo[0m] Loaded 13763072 lines.
+[Ramulator::ReadWriteTrace] [[32minfo[0m] Loading trace file /Users/tirthshah/Documents/Tirth_grad/tokenwall/traces/llama3_8b_layer0_b1_s1024_reads13763072_bank_low_ch16.txt ...
+[Ramulator::ReadWriteTrace] [[32minfo[0m] Loaded 13763072 lines.
+[Ramulator::ReadWriteTrace] [[32minfo[0m] Loading trace file /Users/tirthshah/Documents/Tirth_grad/tokenwall/traces/llama3_8b_layer0_b1_s1024_reads13763072_bank_high_ch16.txt ...
+[Ramulator::ReadWriteTrace] [[32minfo[0m] Loaded 13763072 lines.
+[Ramulator::ReadWriteTrace] [[32minfo[0m] Loading trace file /Users/tirthshah/Documents/Tirth_grad/tokenwall/traces/llama3_8b_layer0_b1_s1024_reads13763072_bank_low_xor_ch16.txt ...
+[Ramulator::ReadWriteTrace] [[32minfo[0m] Loaded 13763072 lines.
+layer 0 slice: 13,763,072 reads; using the first 13,763,072
+=== Part A: `ramulator` policy vs Ramulator's own mapping (identical stats expected) ===
+
+=== Part B: mapping policies on the same traffic, 16 channels, Ramulator timing ===
+
+[ramulator, 16 channels]
+  channels                         16
+  requests_accepted                13763072
+  requests_served                  13762560
+  in_flight_at_end                 512
+  served_per_channel_min_max       [860160, 860160]
+  controller_ticks                 4090635
+  sim_time_us                      1278.323
+  achieved_GBps                    344.515
+  peak_GBps                        819.200
+  pct_of_peak                      42.055
+  row_hits                         13324063
+  row_misses                       333745
+  row_conflicts                    104752
+  row_hit_rate_pct                 96.814
+  avg_read_latency_ticks           198.185
+  avg_read_latency_ns              61.933
+  ramulator_total_throughput_MBps  345067.344
+  wall_seconds                     30.462
+  export_seconds                   9.134
+
+[bank_low, 16 channels]
+  channels                         16
+  requests_accepted                13763072
+  requests_served                  13762560
+  in_flight_at_end                 512
+  served_per_channel_min_max       [860160, 860160]
+  controller_ticks                 2052919
+  sim_time_us                      641.537
+  achieved_GBps                    686.479
+  peak_GBps                        819.200
+  pct_of_peak                      83.799
+  row_hits                         13175344
+  row_misses                       163152
+  row_conflicts                    424064
+  row_hit_rate_pct                 95.733
+  avg_read_latency_ticks           123.429
+  avg_read_latency_ns              38.572
+  ramulator_total_throughput_MBps  687579.312
+  wall_seconds                     19.780
+  export_seconds                   9.285
+
+[bank_high, 16 channels]
+  channels                         16
+  requests_accepted                13763072
+  requests_served                  13762560
+  in_flight_at_end                 512
+  served_per_channel_min_max       [860160, 860160]
+  controller_ticks                 5719661
+  sim_time_us                      1787.394
+  achieved_GBps                    246.393
+  peak_GBps                        819.200
+  pct_of_peak                      30.077
+  row_hits                         13320797
+  row_misses                       12881
+  row_conflicts                    428898
+  row_hit_rate_pct                 96.790
+  avg_read_latency_ticks           243.848
+  avg_read_latency_ns              76.203
+  ramulator_total_throughput_MBps  246788.156
+  wall_seconds                     39.143
+  export_seconds                   8.870
+
+[bank_low_xor, 16 channels]
+  channels                         16
+  requests_accepted                13763072
+  requests_served                  13762560
+  in_flight_at_end                 512
+  served_per_channel_min_max       [860160, 860160]
+  controller_ticks                 2054903
+  sim_time_us                      642.157
+  achieved_GBps                    685.816
+  peak_GBps                        819.200
+  pct_of_peak                      83.718
+  row_hits                         13171320
+  row_misses                       165368
+  row_conflicts                    425872
+  row_hit_rate_pct                 95.704
+  avg_read_latency_ticks           123.532
+  avg_read_latency_ns              38.604
+  ramulator_total_throughput_MBps  686915.438
+  wall_seconds                     18.237
+  export_seconds                   8.748
+
+=== summary ===
+  policy             GB/s % of 819.2  row hit %  read lat ns
+  ramulator         344.5       42.1       96.8         61.9
+  bank_low          686.5       83.8       95.7         38.6
+  bank_high         246.4       30.1       96.8         76.2
+  bank_low_xor      685.8       83.7       95.7         38.6
+wrote results/phase2/mapping_check_llama3_8b_layer0_b1_s1024_reads13763072.json
+EXIT 0

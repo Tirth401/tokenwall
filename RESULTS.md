@@ -172,3 +172,118 @@ One channel and a sequential mapping are not the deployment shape (a GPU
 spreads this over 16 to 80 channels), so this only shows the pipeline runs end
 to end. It matches the Phase 0 sequential smoke (42.4%) for the reason given
 there: consecutive accesses stay in one bank and pay tCCD_L.
+
+---
+
+## Phase 2, 2026-09-30
+
+### Test suite (toolchain check)
+
+```
+python -m pytest -q          -> 92 passed in 2.54s   (results/phase2/pytest.txt)
+ctest --test-dir build       -> 1/1 (10 C++ cases)
+```
+New this phase: 36 mapping tests (bijection and ranges for every policy at
+16 and 32 channels and three interleaves; bit-exactness against a literal
+transcription of Ramulator's C++ mapper), 2 locality tests against
+hand-computed answers, 17 Python-versus-C++ mapping cross-checks.
+
+### `ramulator` policy is bit-exact with Ramulator 2.1 (validation)
+
+```
+python scripts/ramulator2_mapping_check.py --requests 1800000 --seq 1024        (Part A)
+```
+The first 1.8 M reads of Llama 3 8B layer 0 (batch 1, 1024 past positions,
+read-only) fed to Ramulator twice: flat addresses mapped by Ramulator's
+`CacheLineInterleave` + `RoBaRaCoCh`, and the same addresses pre-mapped by our
+`ramulator` policy through pass-through mappers.
+
+| Channels | Interleave | Ticks | Served | Row hits | Misses | Conflicts | Result |
+|---:|---:|---:|---:|---:|---:|---:|---|
+| 16 | 32 B | 534,313 | 1,799,488 | 1,742,063 | 43,809 | 13,632 | identical |
+| 16 | 256 B | 589,121 | 1,799,540 | 1,741,888 | 48,135 | 9,525 | identical |
+| 32 | 32 B | 267,485 | 1,798,968 | 1,741,407 | 43,904 | 13,665 | identical |
+
+Every statistic equal in all three configurations. Raw:
+`results/phase2/mapping_check_llama3_8b_layer0_b1_s1024_reads1800000.json`.
+
+### Mapping policies on a full decode layer (measured, Ramulator 2.1 timing)
+
+```
+python scripts/ramulator2_mapping_check.py --part b --requests 20000000 --seq 1024
+```
+All 13,763,072 reads of Llama 3 8B layer 0 (batch 1, 1024 past positions),
+pre-mapped by each policy, one HBM3 stack = 16 channels (peak 819.2 GB/s),
+HBM34 controller, FR-FCFS, open-row policy, all-bank refresh, 32-entry queues,
+frontend limited to 16 requests per tick. Exports by `tw_expand`.
+
+| Policy | Achieved | % of peak | Row hits | Misses | Conflicts | Hit rate | Avg read latency | Ticks | Sim time | Wall |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
+| `ramulator` | 344.5 GB/s | 42.1% | 13,324,063 | 333,745 | 104,752 | 96.81% | 61.9 ns | 4,090,635 | 1278 us | 30.5 s |
+| `bank_low` | 686.5 GB/s | 83.8% | 13,175,344 | 163,152 | 424,064 | 95.73% | 38.6 ns | 2,052,919 | 642 us | 19.8 s |
+| `bank_high` | 246.4 GB/s | 30.1% | 13,320,797 | 12,881 | 428,898 | 96.79% | 76.2 ns | 5,719,661 | 1787 us | 39.1 s |
+| `bank_low_xor` | 685.8 GB/s | 83.7% | 13,171,320 | 165,368 | 425,872 | 95.70% | 38.6 ns | 2,054,903 | 642 us | 18.2 s |
+
+Stability check on the first 1.8 M reads (13% of the layer), same setup:
+344.9 / 687.7 / 246.7 / 687.5 GB/s, all within 2 GB/s of the full layer.
+Raw: `results/phase2/mapping_check_llama3_8b_layer0_b1_s1024_reads13763072.json`
+and `..._reads1800000.json`, logs alongside.
+
+What this is and is not: a measurement with **Ramulator 2.1's** timing model
+(Tokenwall's own core is Phase 3), on reads only, one layer of one model at
+batch 1, HBM3 timings per Ramulator's `HBM3_6400Mbps` preset. Within those
+qualifiers the number is stable enough to quote:
+
+> On a full Llama 3 8B decode layer, changing only the address mapping moved
+> Ramulator-simulated HBM3 bandwidth from 42% to 84% of peak while the
+> row-hit rate stayed near 96%.
+
+Reproduce live: the command above, about two minutes on this laptop.
+
+Derived, not measured: `bank_low` shows 148,719 more row switches than
+`ramulator` although its stream has the same ideal hit rate. Its 642 us run
+contains 164 all-bank refresh intervals, each of which closes every open row
+in the 1024 banks; 148,719 / (164 x 1024) = 0.89. Phase 3's stall breakdown
+should attribute this explicitly.
+
+### Static locality, full Llama 3 8B step (486 M requests, 16 channels)
+
+```
+python -m tokenwall locality traces/llama3_8b_tp1_b1_s4096.segs --policy <P> --stacks 1 --out results/phase2/locality_llama3_8b_tp1_b1_s4096_<P>.json
+```
+Ideal open-row hit rate (infinitely patient scheduler, no timing), distinct
+banks per 32 consecutive requests, and how back-to-back requests inside a
+channel pair up.
+
+| Policy | Ideal hit rate | Row switches | Distinct banks / 32 | Same PC, same bank group | Same PC, other group | Other PC |
+|---|---:|---:|---:|---:|---:|---:|
+| `ramulator` | 96.87% | 15,188,000 | 16.02 | 96.9% | 0.0% | 3.1% |
+| `bank_low` | 96.87% | 15,206,400 | 32.00 | 0.0% | 0.0% | 100.0% |
+| `bank_high` | 96.87% | 15,188,000 | 16.02 | 96.9% | 0.0% | 3.1% |
+| `bank_low_xor` | 96.87% | 15,206,144 | 32.00 | 0.0% | 0.0% | 100.0% |
+
+Channel balance max/mean = 1.000 for all four. Hit rate does not separate the
+policies; the pairing column does, and it predicted the measured ordering.
+
+### Static locality, KV-heavy slice (layer 0, batch 32, 4096 past positions, 32 channels, 30,413,312 requests)
+
+```
+python -m tokenwall gen --model configs/models/llama3_8b.yaml --batch 32 --seq 4096 --stacks 2 --layers 0:1 --kv-layout <L> --out traces/llama3_8b_layer0_tp1_b32_s4096_<L>
+python -m tokenwall locality traces/llama3_8b_layer0_tp1_b32_s4096_<L>.segs --policy <P> --stacks 2
+```
+
+| KV layout | Policy | Ideal hit rate | KV-read hit rate | Weights hit rate | Row switches | Distinct banks / 32 | Same PC, same bank group |
+|---|---|---:|---:|---:|---:|---:|---:|
+| head_major | `ramulator` | 96.86% | 96.87% | 96.88% | 954,560 | 32.00 | 96.9% |
+| head_major | `bank_low` | 96.85% | 96.85% | 96.88% | 958,960 | 32.00 | 0.0% |
+| head_major | `bank_high` | 96.86% | 96.87% | 96.88% | 954,560 | 32.00 | 96.9% |
+| head_major | `bank_low_xor` | 96.85% | 96.85% | 96.88% | 958,960 | 32.00 | 0.0% |
+| position_major | `ramulator` | 95.14% | 93.74% | 96.88% | 1,478,720 | 19.59 | 95.2% |
+| position_major | `bank_low` | 96.85% | 96.85% | 96.88% | 958,848 | 32.00 | 0.0% |
+| position_major | `bank_high` | 95.14% | 93.74% | 96.88% | 1,478,720 | 19.59 | 95.2% |
+| position_major | `bank_low_xor` | 96.85% | 96.85% | 96.88% | 958,848 | 32.00 | 0.0% |
+
+The position-major KV layout costs 3 points of KV-read hits under Ramulator's
+mapping and nothing under `bank_low`. With 32 channels the distinct-banks
+metric saturates at the channel count and stops discriminating. Raw:
+`results/phase2/locality_llama3_8b_layer0_tp1_b32_s4096_*.json`.
