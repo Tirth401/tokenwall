@@ -1,0 +1,12 @@
+  nWTRL         =    9 nCK |      7.497 ns
+  nFAW          =   26 nCK |     21.658 ns
+  nRFC          =  421 nCK |    350.693 ns
+  nREFI         = 9363 nCK |   7799.379 ns
+  nCS           =    2 nCK |      1.666 ns
+Controller cycles:     81302
+Avg read latency:      45.2 cycles
+Read requests:         6
+Write requests:        0
+Row hits:              3
+Row misses:            3
+Row conflicts:         0

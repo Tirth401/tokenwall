@@ -1,0 +1,26 @@
+tick = 0.3125 ns (2 ticks per CK); device reports 29 timing values
+
+A. State first, timing second
+  RD on a closed bank at clk 0 -> preq=ACT, timing_OK=True, ready=False
+
+B. One bank, one row: the activate -> read -> precharge -> activate cycle (pseudo channel 0)
+  ACT -> first legal RD               (tRCDRD)                    63 ticks =  31.5 CK =   19.688 ns
+  ACT -> first legal PREpb            (tRAS, since RD+tRTP is shorter)    92 ticks =  46.0 CK =   28.750 ns
+  PREpb -> next ACT in same bank      (tRP)                       50 ticks =  25.0 CK =   15.625 ns
+  ACT -> ACT same bank, total         (tRC = tRAS + tRP)         142 ticks =  71.0 CK =   44.375 ns
+
+C. Back-to-back reads: how close can two RDs be? (pseudo channel 1, all banks pre-opened)
+  RD -> RD, same bank                 (tCCD_L, bank-group local)     8 ticks =   4.0 CK =    2.500 ns
+  RD -> RD, other bank in same group  (tCCD_L)                     8 ticks =   4.0 CK =    2.500 ns
+  RD -> RD, other bank group          (tCCD_S)                     4 ticks =   2.0 CK =    1.250 ns
+  RD -> RD, other SID (other die)     (tCCD_R)                     6 ticks =   3.0 CK =    1.875 ns
+  data burst length itself            (nBL)                        4 ticks =   2.0 CK =    1.250 ns
+
+D. The four-activate window (fresh device, pseudo channel 0)
+  four ACTs to different bank groups issued at ticks [0, 8, 16, 24] (spacing = tRRD_S)
+  first ACT -> fifth ACT              (tFAW window of 4)          48 ticks =  24.0 CK =   15.000 ns
+
+E. Refresh: how long an all-bank refresh blocks a pseudo channel (fresh device)
+  REFab -> next ACT                   (tRFC)                    1118 ticks = 559.0 CK =  349.375 ns
+  refresh interval                    (tREFI)                  12480 ticks = 6240.0 CK = 3900.000 ns
+  refresh duty: tRFC / tREFI = 9.0% of time a pseudo channel is unavailable

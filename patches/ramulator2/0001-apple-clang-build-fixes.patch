@@ -1,0 +1,26 @@
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 6d1823c..365af82 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -45,7 +45,7 @@ message("Configuring fmt...")
+ FetchContent_Declare(
+   fmt
+   GIT_REPOSITORY https://github.com/fmtlib/fmt.git
+-  GIT_TAG        10.2.1
++  GIT_TAG        11.2.0
+   SOURCE_DIR     ${CMAKE_CURRENT_SOURCE_DIR}/ext/fmt
+ )
+ FetchContent_MakeAvailable(fmt)
+diff --git a/src/ramulator/base/param.h b/src/ramulator/base/param.h
+index cba2239..ebac6b1 100644
+--- a/src/ramulator/base/param.h
++++ b/src/ramulator/base/param.h
+@@ -34,7 +34,7 @@ struct ParamReader {
+  private:
+   T parse() const {
+     try {
+-      return config[name].as<T>();
++      return config[name].template as<T>();
+     } catch (const std::runtime_error& e) {
+       throw std::runtime_error("Failed to parse param \"" + name + "\" for \"" + impl_name + "\": " + e.what());
+     }

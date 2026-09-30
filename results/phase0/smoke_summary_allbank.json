@@ -1,0 +1,48 @@
+{
+  "date": "2026-09-30",
+  "command": "python scripts/ramulator2_hbm3_smoke.py --requests 20000 --refresh allbank",
+  "org_preset": "HBM3_16Gb_8hi",
+  "timing_preset": "HBM3_6400Mbps",
+  "controller": "HBM34 + FRFCFS + Open row policy + RoBaRaCoCh",
+  "refresh": "allbank",
+  "requests_per_run": 20000,
+  "access_bytes": 32,
+  "tick_ps": 312.5,
+  "peak_channel_GBps": 51.2,
+  "runs": {
+    "sequential": {
+      "requests_accepted": 20000,
+      "requests_served": 19968,
+      "in_flight_at_end": 32,
+      "controller_ticks": 94259,
+      "sim_time_us": 29.4559375,
+      "achieved_GBps": 21.692604419737105,
+      "pct_of_channel_peak": 42.368368007299026,
+      "row_hits": 19330,
+      "row_misses": 491,
+      "row_conflicts": 147,
+      "row_hit_rate_pct": 96.80488782051282,
+      "avg_read_latency_ticks": 196.839844,
+      "avg_read_latency_ns": 61.51245125,
+      "ramulator_total_throughput_MBps": 21727.369141,
+      "wall_seconds": 0.04175114631652832
+    },
+    "random": {
+      "requests_accepted": 20000,
+      "requests_served": 19957,
+      "in_flight_at_end": 43,
+      "controller_ticks": 136215,
+      "sim_time_us": 42.567187499999996,
+      "achieved_GBps": 15.002729508497596,
+      "pct_of_channel_peak": 29.302206071284367,
+      "row_hits": 0,
+      "row_misses": 520,
+      "row_conflicts": 19466,
+      "row_hit_rate_pct": 0.0,
+      "avg_read_latency_ticks": 325.986786,
+      "avg_read_latency_ns": 101.870870625,
+      "ramulator_total_throughput_MBps": 15026.772461,
+      "wall_seconds": 0.09499287605285645
+    }
+  }
+}
