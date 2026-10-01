@@ -1,0 +1,9 @@
+sweep,name,policy,refresh,stacks,disable,nonblocking,pct_of_peak,achieved_GBps,row_hit_rate_pct,sim_time_us,avg_read_latency_ns,bytes_per_step,kv_read_share_pct,requests,wall_s
+controller,ramulator/allbank/blocking,ramulator,allbank,1,,False,42.028,344.30,96.813,1315.7,61.95,453005312,3.70,14156416,32
+controller,ramulator/allbank/nonblocking,ramulator,allbank,1,,True,42.029,344.30,96.874,1315.7,61.94,453005312,3.70,14156416,34
+controller,ramulator/perbank/blocking,ramulator,perbank,1,,False,28.947,237.13,96.482,1910.3,83.53,453005312,3.70,14156416,35
+controller,ramulator/perbank/nonblocking,ramulator,perbank,1,,True,42.657,349.44,96.874,1296.4,61.25,453005312,3.70,14156416,34
+controller,bank_low/allbank/blocking,bank_low,allbank,1,,False,83.761,686.17,95.730,660.2,38.55,453005312,3.70,14156416,19
+controller,bank_low/allbank/nonblocking,bank_low,allbank,1,,True,84.734,694.14,96.804,652.6,38.04,453005312,3.70,14156416,20
+controller,bank_low/perbank/blocking,bank_low,perbank,1,,False,67.691,554.53,95.399,816.9,44.25,453005312,3.70,14156416,20
+controller,bank_low/perbank/nonblocking,bank_low,perbank,1,,True,92.154,754.92,95.805,600.1,36.39,453005312,3.70,14156416,21

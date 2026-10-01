@@ -12,6 +12,7 @@ Controller::Controller(const DramSpec& spec, int channel_id, const ControllerCon
   priority_.max_size = cfg.priority_buffer;
   active_.max_size = dev_.banks().size();
   active_per_bank_.assign(dev_.banks().size(), 0);
+  refresh_reserved_.assign(dev_.banks().size(), 0);
   st_.cmd_count.assign(spec.command_count, 0);
   nREFI_ = spec.t("nREFI");
   nBL_ = spec.t("nBL");
@@ -62,9 +63,21 @@ bool Controller::send(MemReq& req) {
   return true;
 }
 
+void Controller::reserve(const MemReq& r, int delta) {
+  if (spec_.targets_all[r.final_command]) {
+    for (size_t i = 0; i < refresh_reserved_.size(); i++)
+      if (dev_.bank_matches(dev_.banks()[i], r.av)) refresh_reserved_[i] += delta;
+  } else {
+    refresh_reserved_[dev_.flat_bank(r.av)] += delta;
+  }
+}
+
 bool Controller::priority_send(MemReq& req) {
   bool ok = priority_.enqueue(req);
-  if (ok && req.type == -1) st_.num_maint_reqs++;
+  if (ok && req.type == -1) {
+    st_.num_maint_reqs++;
+    reserve(req, +1);
+  }
   return ok;
 }
 
@@ -226,8 +239,10 @@ Controller::Candidate Controller::pick_priority_if(const Filter& filter) {
 Controller::Candidate Controller::pick_rw_if(const Filter& filter) {
   set_write_mode();
   ReqBuffer& buffer = write_mode_ ? write_ : read_;
+  const bool reserve_banks = !cfg_.refresh_blocks_scheduling && cfg_.reserve_refresh_banks;
   return pick_best_ready_from(buffer, [&](const MemReq& r) {
     if (would_close_active(r)) return false;
+    if (reserve_banks && spec_.is_opening[r.command] && refresh_reserved_[dev_.flat_bank(r.av)] > 0) return false;
     return !filter || filter(r);
   });
 }
@@ -285,6 +300,10 @@ void Controller::retire(ReqBuffer::iterator it, ReqBuffer& buffer) {
     st_.cls_served[it->cls]++;
   } else {
     st_.num_maint_served++;
+    reserve(*it, -1);
+    const Tick wait = clk_ - it->arrive;
+    st_.maint_wait_sum += uint64_t(wait);
+    if (wait > st_.max_maint_wait) st_.max_maint_wait = wait;
   }
   buffer.q.erase(it);
 }
@@ -333,7 +352,7 @@ std::optional<IssuedCmd> Controller::try_issue_slot(Slot slot) {
   Candidate cand;
   if (slot == Slot::Column) cand = pick_best_ready_from(active_, f);
   if (!cand.valid) cand = pick_priority_if(f);
-  if (!cand.valid && priority_.empty()) cand = pick_rw_if(f);
+  if (!cand.valid && (priority_.empty() || !cfg_.refresh_blocks_scheduling)) cand = pick_rw_if(f);
   if (!cand.valid) return std::nullopt;
 
   MemReq& r = *cand.it;
@@ -354,7 +373,7 @@ std::optional<IssuedCmd> Controller::try_issue_slot(Slot slot) {
 // ---- stall attribution (Tokenwall addition) ----
 std::string Controller::classify_pc(int pc) const {
   // Refresh in progress blocks all read/write scheduling in Ramulator's controller.
-  if (!priority_.empty()) {
+  if (!priority_.empty() && cfg_.refresh_blocks_scheduling) {
     const MemReq& p = priority_.q.front();
     const int cmd = dev_.preq(p.final_command, p.av);
     if (!dev_.check_timing(cmd, p.av, clk_)) {
@@ -381,6 +400,9 @@ std::string Controller::classify_pc(int pc) const {
     return "empty";
   }
   const int cmd = dev_.preq(oldest->final_command, oldest->av);
+  if (!cfg_.refresh_blocks_scheduling && cfg_.reserve_refresh_banks && spec_.is_opening[cmd] &&
+      refresh_reserved_[dev_.flat_bank(oldest->av)] > 0)
+    return "refresh:reserved_bank";
   if (dev_.check_timing(cmd, oldest->av, clk_)) return "arbitration";
   Binding b = dev_.binding(cmd, oldest->av, clk_);
   return spec_.commands[cmd] + ":" + (b.constraint_id >= 0 ? spec_.constraints[b.constraint_id].name : "?");

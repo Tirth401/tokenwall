@@ -1,0 +1,26 @@
+{
+  "config": {"segs": "/Users/tirthshah/Documents/Tirth_grad/tokenwall/traces/sweep_8b_b1_s4096.segs", "spec": "/Users/tirthshah/Documents/Tirth_grad/tokenwall/configs/hbm3/hbm3_16gb_8hi_6400.spec", "policy": "bank_low_xor", "stacks": 1, "interleave_log2": 0, "channels": 16, "frontend_ratio": 0, "max_requests": -1, "reads_only": false, "drain": true, "refresh": "perbank", "refresh_blocks_scheduling": true, "disabled": []},
+  "result": {
+    "channels": 16,
+    "requests_accepted": 14156416,
+    "requests_served": 14156416,
+    "in_flight_at_end": 0,
+    "served_per_channel_min_max": [884776, 884776],
+    "controller_ticks": 2610657,
+    "sim_time_us": 815.8303125,
+    "achieved_GBps": 555.269037027844,
+    "peak_GBps": 819.2,
+    "pct_of_peak": 67.781864871563,
+    "row_hits": 13504896,
+    "row_misses": 216936,
+    "row_conflicts": 434584,
+    "row_hit_rate_pct": 95.3977051818765,
+    "avg_read_latency_ticks": 141.424604952937,
+    "avg_read_latency_ns": 44.1951890477928,
+    "wall_seconds": 22.209212875,
+    "commands": {"ACT": 651520, "PREpb": 650568, "RD": 14156288, "REFpb": 214176, "WR": 128},
+    "slots": 41770528,
+    "slot_reasons": {"ACT:Bank:nRC": 1144, "ACT:Bank:nRFCpb": 1723532, "ACT:Bank:nRP": 56824, "ACT:BankGroup:nRRDL": 1952, "ACT:Channel:bus(ACT)": 2871, "ACT:PseudoChannel:nFAW": 54664, "ACT:PseudoChannel:nRRDS": 17232, "ACT:PseudoChannel:nRREFD": 4320, "PREpb:Bank:nRAS": 1648, "PREpb:Bank:nRTP": 2728, "PREpb:Channel:bus(ACT)": 752, "RD:Bank:nRCDRD": 467817, "RD:BankGroup:nCCDL": 55792, "RD:Channel:bus(RD/WR/RDA/WRA)": 71823, "RD:Sid:nCCDR": 27239, "WR:Bank:nRCDWR": 552, "WR:PseudoChannel:nRTW": 88, "arbitration": 146007, "data": 28312824, "empty": 2631, "mode_wait": 1456, "refresh:PREpb:Bank:nCWL+nBL+nWR": 688, "refresh:PREpb:Bank:nRAS": 85552, "refresh:PREpb:Bank:nRTP": 65432, "refresh:PREpb:Channel:bus(ACT)": 1952, "refresh:PREpb:PseudoChannel:nPPD": 432, "refresh:REFpb:Bank:nRC": 118800, "refresh:REFpb:Bank:nRP": 10323752, "refresh:REFpb:BankGroup:nRRDL": 80, "refresh:REFpb:PseudoChannel:nFAW": 12496, "refresh:arbitration": 207424, "refresh:wait_active": 24},
+    "classes": {"weights": {"served": 13631488, "row_hits": 13004776}, "kv_read": {"served": 524288, "row_hits": 500120}, "kv_write": {"served": 128, "row_hits": 0}, "other": {"served": 512, "row_hits": 0}}
+  }
+}

@@ -19,7 +19,8 @@ void usage() {
                "usage: tokenwall sim --segs FILE [--spec FILE] [--policy ramulator|bank_low|bank_high|bank_low_xor]\n"
                "         [--stacks N] [--interleave-log2 K] [--channels N] [--frontend-ratio R]\n"
                "         [--max-requests N] [--reads-only] [--refresh allbank|perbank|none] [--drain]\n"
-               "         [--disable SUBSTR,...] [--no-attribution] [--cmd-trace CSV] [--json OUT] [--label TEXT]\n",
+               "         [--disable SUBSTR,...] [--refresh-nonblocking] [--no-attribution] [--cmd-trace CSV]\n"
+               "         [--json OUT] [--label TEXT]\n",
                tokenwall::kVersion);
 }
 }  // namespace
@@ -53,6 +54,7 @@ int main(int argc, char** argv) {
     else if (a == "--drain") cfg.drain = true;
     else if (a == "--no-attribution") cfg.ctrl.attribute = false;
     else if (a == "--cmd-trace") cfg.cmd_trace_path = val();
+    else if (a == "--refresh-nonblocking") cfg.ctrl.refresh_blocks_scheduling = false;
     else if (a == "--refresh") {
       std::string r = val();
       if (r == "allbank") cfg.ctrl.refresh = tokenwall::Refresh::AllBank;

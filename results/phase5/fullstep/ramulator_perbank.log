@@ -1,0 +1,40 @@
+
+[full step 8b b1 s4096 ramulator_perbank]
+  channels                         16
+  requests_accepted                485839360
+  requests_served                  485839360
+  in_flight_at_end                 0
+  served_per_channel_min_max       [30364960, 30364960]
+  controller_ticks                 209852477
+  sim_time_us                      65578.899
+  achieved_GBps                    237.071
+  peak_GBps                        819.2
+  pct_of_peak                      28.939
+  row_hits                         468748872
+  row_misses                       16800392
+  row_conflicts                    290096
+  row_hit_rate_pct                 96.482
+  avg_read_latency_ticks           267.397
+  avg_read_latency_ns              83.562
+  wall_seconds                     1105.232
+  commands: ACT=17090488 PREpb=17090232 RD=485835264 REFpb=17218656 WR=4096
+  column-command slots per pseudo channel: 3357639648
+    data                                          28.94%
+    refresh:REFpb:Bank:nRP                        25.43%
+    RD:BankGroup:nCCDL                            20.85%
+    ACT:Bank:nRFCpb                               14.39%
+    RD:Channel:bus(RD/WR/RDA/WRA)                  5.15%
+    RD:Bank:nRCDRD                                 3.07%
+    refresh:arbitration                            0.50%
+    refresh:PREpb:Bank:nRTP                        0.41%
+    arbitration                                    0.39%
+    refresh:REFpb:Bank:nRC                         0.27%
+    mode_wait                                      0.18%
+    RD:Sid:nCCDR                                   0.18%
+    refresh:PREpb:Bank:nRAS                        0.10%
+    empty                                          0.07%
+  weights    served    469041152  row hits  96.48%
+  kv_read    served     16777216  row hits  96.47%
+  kv_write   served         4096  row hits   1.95%
+  other      served        16896  row hits  88.64%
+wrote results/phase5/fullstep/fullstep_8b_b1_s4096_ramulator_perbank.json

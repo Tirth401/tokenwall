@@ -548,3 +548,122 @@ tPPD instead produced identical traces: tPPD never binds on this traffic.
 - **The percentages do not depend on the model or batch**: 42% and 84% on
   the 8B layer, the batch-32 KV-heavy slice and the 70B shard alike. Weight
   sweeps and KV reads are both long sequential runs under these mappings.
+
+---
+
+## Phase 5, 2026-10-01
+
+All Phase 5 numbers are Tokenwall measurements (core validated identical to
+Ramulator 2.1 in Phases 3 and 4). HBM3 timings are Ramulator 2.1's
+`HBM3_6400Mbps` preset. Unless stated, each run is one decode layer, every
+request served (drained), KV-append writes included, frontend limited to one
+request per channel per tick. Peak is 51.2 GB/s per channel.
+
+```
+python scripts/sweep.py --sweeps all --workers 6        # 84 runs, 578 s wall
+python scripts/sweep.py --sweeps controller --workers 8 # rerun after the bank-reservation fix
+python scripts/plot_sweeps.py                           # results/phase5/plots/*.png
+```
+Raw: `results/phase5/sweep_*.json`, `sweeps.csv`, `runs/*.json`, `sweep_run.log`.
+
+### Mapping x refresh (Llama 3 8B layer, batch 1, 4096 past positions, 16 channels)
+
+| Mapping | No refresh | All-bank refresh | Per-bank refresh (Ramulator's blocking controller) |
+|---|---:|---:|---:|
+| `ramulator` | 39.5% | 42.0% | 28.9% |
+| `bank_low` | 94.0% | 83.8% | 67.7% |
+| `bank_high` | 33.5% | 30.1% | 31.3% |
+| `bank_low_xor` | 94.0% | 83.7% | 67.8% |
+
+### Batch, sequence length, GQA and model shape (percent of peak)
+
+| Sweep | Setting | KV share of bytes | `ramulator` | `bank_low` |
+|---|---|---:|---:|---:|
+| batch (2 stacks, 4096 past) | 1 / 4 / 16 / 32 | 3.5 / 13 / 37 / 55% | 42.0 / 42.0 / 41.9 / 41.9 | 83.8 / 83.8 / 83.7 / 83.7 |
+| past positions (batch 32, 4 stacks) | 512 / 1024 / 2048 / 4096 / 8192 | 13 / 23 / 38 / 55 / 71% | 41.9 / 41.9 / 41.9 / 41.9 / 42.0 | 83.6 / 83.7 / 83.8 / 83.7 / 83.7 |
+| KV heads (8B, batch 1, 2 stacks) | 8 (GQA) / 32 (MHA) | bytes per layer 0.42 / 0.52 GiB | 42.0 / 42.0 | 83.8 / 83.7 |
+| Llama 3 70B TP=8 shard | batch 1, 8; stacks 2, 4 | about 1% | 42.0 to 42.1 | 83.7 to 83.8 |
+
+### KV layout x kernel walk order (8B layer, batch 32, 55% KV reads, 2 stacks, all-bank refresh)
+
+| Layout | Walk order | Match | `ramulator` % peak | `bank_low` % peak | KV-read row hits, `ramulator` / `bank_low` |
+|---|---|---|---:|---:|---|
+| head-major | by head | yes | 41.9 | 83.7 | 96.8 / 95.7% |
+| head-major | by position | no | 21.9 | 34.2 | 84.4 / 49.3% |
+| position-major | by head | no | 16.5 | 17.9 | 93.6 / 95.1% |
+| position-major | by position | yes | 42.0 | 83.8 | 96.8 / 95.7% |
+
+### Ablation: percentage points of peak recovered when one rule is removed (8B layer, batch 1, 16 channels, all-bank refresh)
+
+| Rule removed | `ramulator` (base 42.0) | `bank_low` (base 83.8) |
+|---|---:|---:|
+| tCCD_L | +15.0 | +0.2 |
+| tRCD (read) | +3.8 | +0.4 |
+| tRP | +2.6 | +1.5 |
+| tCCD_R | 0.0 | +2.4 |
+| tFAW | 0.0 | +1.3 |
+| tRRD_S | 0.0 | +0.1 |
+| row-bus occupancy of ACT | 0.0 | +0.1 |
+| tRRD_L, tWTR_S/L, tRTW, tPPD, tRAS | 0.0 | 0.0 |
+
+Removing a rule is unphysical; the number is the rule's share of the loss on
+this traffic. Gains overlap, so they do not sum to the gap between mappings.
+
+### Controller experiment: scheduling during refresh (8B layer, batch 1, 16 channels)
+
+| Refresh | Scheduling while a refresh waits | `ramulator` | `bank_low` | Refreshes served (`bank_low`) | Longest refresh postponement |
+|---|---|---:|---:|---:|---:|
+| all-bank | blocking (Ramulator's rule) | 42.0% | 83.8% | 5,408 | 0.06 us |
+| all-bank | non-blocking, PC reserved from new row opens | 42.0% | 84.7% | 5,344 | 1.28 us |
+| per-bank | blocking (Ramulator's rule) | 28.9% | 67.7% | 214,464 | 0.06 us |
+| per-bank | non-blocking, bank reserved from new row opens | 42.7% | 92.2% | 157,536 | 0.15 us |
+
+Refresh counts scale with run length (per-bank non-blocking runs 0.73x as long
+and serves 0.73x the refreshes), so no refresh is skipped; tREFI is 3.9 us.
+
+Logged first attempt, superseded: without the reservation, "non-blocking"
+reached 92.4% (`bank_low`, per-bank) and 85.7% (all-bank), but the longest
+refresh postponement was 567 us and 584 us, more than a hundred tREFI, with
+only 34,560 of the expected refreshes served inside the run. The cause is a
+two-tick race: after the refresh's PREpb, a queued read's ACT is legal at
+tRP minus the ACT length (50 ticks) while the REFpb is legal at 52, so under
+load a read reopens the bank first, every time. Forbidding new row opens on a
+bank with a pending refresh removes the race. Numbers in
+`results/phase5/sweep_run.log` (first run) versus `sweep_controller.json` (fixed).
+
+### Full decode step anchors (8B, batch 1, 4096 past positions, 16 channels, 485,839,360 requests, drained)
+
+```
+./build/cpp/tokenwall sim --segs traces/llama3_8b_tp1_b1_s4096.segs --policy <P> --stacks 1 --refresh <R> [--refresh-nonblocking] --drain --json ...
+```
+
+| Mapping | Refresh | Scheduling | Step time | Tokens/s on one stack | % of peak | Wall |
+|---|---|---|---:|---:|---:|---:|
+| `ramulator` | all-bank | blocking | 45.15 ms | 22.1 | 42.0 | 742 s |
+| `ramulator` | per-bank | blocking | 65.58 ms | 15.2 | 28.9 | 2,136 s |
+| `bank_low` | none | | 20.18 ms | 49.6 | 94.0 | 623 s |
+| `bank_low` | all-bank | blocking | 22.66 ms | 44.1 | 83.7 | 395 s |
+| `bank_low` | per-bank | blocking | 28.04 ms | 35.7 | 67.7 | 687 s |
+| `bank_low` | per-bank | non-blocking, bank reserved | 20.59 ms | 48.6 | 92.2 | 674 s |
+
+The floor from Phase 1 is 18.98 ms (52.7 tokens/s). The per-bank non-blocking
+step served 5,405,984 refresh commands with a longest postponement of 2,222
+ticks (0.69 us, tREFI is 3.9 us) and an average of 97 ticks. Raw:
+`results/phase3/fullstep_*.json`, `results/phase5/fullstep/*.json`.
+
+### Findings (see docs/phase5_findings.md)
+
+- Mapping is the first-order knob: 42% versus 84% of peak in every refresh
+  mode; XOR hashing adds nothing; the bank-high anti-pattern gets 30%.
+- Batch, context length, GQA versus MHA and 8B versus 70B leave the fraction
+  of peak unchanged to the first decimal; they change bytes per step.
+- A KV layout that does not match the kernel's walk order costs 2 to 5x under
+  either mapping while row hits stay above 95% (channel parallelism loss);
+  this contradicts Phase 2's static analysis, which lacked a channel-spread
+  metric.
+- Refresh cost is a controller decision: all-bank 10 points, per-bank 26
+  points under Ramulator's blocking rule, 2 points with non-blocking
+  scheduling and bank reservation; the unreserved attempt starved refresh and
+  was caught by the postponement statistic.
+- Ablation: tCCD_L is 15 points under the default mapping; under bank_low the
+  leftovers are tCCD_R 2.4, tRP 1.5, tFAW 1.3; turnaround rules cost nothing.

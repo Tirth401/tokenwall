@@ -1,0 +1,26 @@
+{
+  "config": {"segs": "traces/llama3_8b_tp1_b1_s4096.segs", "spec": "configs/hbm3/hbm3_16gb_8hi_6400.spec", "policy": "bank_low", "stacks": 1, "interleave_log2": 0, "channels": 16, "frontend_ratio": 0, "max_requests": -1, "reads_only": false, "drain": true, "refresh": "none", "refresh_blocks_scheduling": true, "disabled": []},
+  "result": {
+    "channels": 16,
+    "requests_accepted": 485839360,
+    "requests_served": 485839360,
+    "in_flight_at_end": 0,
+    "served_per_channel_min_max": [30364960, 30364960],
+    "controller_ticks": 64573503,
+    "sim_time_us": 20179.2196875,
+    "achieved_GBps": 770.439083411659,
+    "peak_GBps": 819.2,
+    "pct_of_peak": 94.0477396742748,
+    "row_hits": 470632960,
+    "row_misses": 1568,
+    "row_conflicts": 15204832,
+    "row_hit_rate_pct": 96.8700765619319,
+    "avg_read_latency_ticks": 114.313399844108,
+    "avg_read_latency_ns": 35.7229374512839,
+    "wall_seconds": 623.250475417,
+    "commands": {"ACT": 15206400, "PREpb": 15205376, "RD": 485835264, "WR": 4096},
+    "slots": 1033176064,
+    "slot_reasons": {"ACT:Bank:nRC": 20328, "ACT:Bank:nRP": 49320, "ACT:Channel:bus(ACT)": 2175, "ACT:PseudoChannel:nFAW": 18408, "ACT:PseudoChannel:nRRDS": 6912, "PREpb:Bank:nCWL+nBL+nWR": 85344, "PREpb:Bank:nRAS": 9784, "PREpb:Channel:bus(ACT)": 384, "PREpb:PseudoChannel:nPPD": 224, "RD:Bank:nRCDRD": 32787722, "RD:BankGroup:nCCDL": 512, "RD:Channel:bus(RD/WR/RDA/WRA)": 14246728, "RD:Sid:nCCDR": 14238432, "WR:Bank:nRCDWR": 26640, "WR:Channel:bus(RD/WR/RDA/WRA)": 144, "WR:PseudoChannel:nRTW": 4176, "arbitration": 80, "data": 971678704, "empty": 47},
+    "classes": {"weights": {"served": 469041152, "row_hits": 454383616}, "kv_read": {"served": 16777216, "row_hits": 16249344}, "kv_write": {"served": 4096, "row_hits": 0}, "other": {"served": 16896, "row_hits": 0}}
+  }
+}

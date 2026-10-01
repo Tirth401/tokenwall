@@ -1,0 +1,26 @@
+{
+  "config": {"segs": "/Users/tirthshah/Documents/Tirth_grad/tokenwall/traces/sweep_8b_b1_s4096.segs", "spec": "/Users/tirthshah/Documents/Tirth_grad/tokenwall/configs/hbm3/hbm3_16gb_8hi_6400.spec", "policy": "bank_low_xor", "stacks": 1, "interleave_log2": 0, "channels": 16, "frontend_ratio": 0, "max_requests": -1, "reads_only": false, "drain": true, "refresh": "allbank", "refresh_blocks_scheduling": true, "disabled": []},
+  "result": {
+    "channels": 16,
+    "requests_accepted": 14156416,
+    "requests_served": 14156416,
+    "in_flight_at_end": 0,
+    "served_per_channel_min_max": [884776, 884776],
+    "controller_ticks": 2113581,
+    "sim_time_us": 660.4940625,
+    "achieved_GBps": 685.858265379941,
+    "peak_GBps": 819.2,
+    "pct_of_peak": 83.7229327856373,
+    "row_hits": 13549904,
+    "row_misses": 169352,
+    "row_conflicts": 437160,
+    "row_hit_rate_pct": 95.715638760545,
+    "avg_read_latency_ticks": 123.453508292569,
+    "avg_read_latency_ns": 38.5792213414279,
+    "wall_seconds": 21.485881584,
+    "commands": {"ACT": 606512, "PREab": 5408, "PREpb": 438560, "RD": 14156288, "REFab": 5408, "WR": 128},
+    "slots": 33817312,
+    "slot_reasons": {"ACT:Bank:nRC": 5824, "ACT:Bank:nRP": 4096, "ACT:BankGroup:nRRDL": 24, "ACT:Channel:bus(ACT)": 278, "ACT:PseudoChannel:nFAW": 3576, "ACT:PseudoChannel:nRFC": 2950064, "ACT:PseudoChannel:nRRDS": 3581, "PREpb:Bank:nRAS": 2928, "PREpb:Channel:bus(ACT)": 104, "RD:Bank:nRCDRD": 1356756, "RD:BankGroup:nCCDL": 1984, "RD:Channel:bus(RD/WR/RDA/WRA)": 421492, "RD:Sid:nCCDR": 415168, "WR:Bank:nRCDWR": 704, "data": 28312816, "empty": 47, "mode_wait": 176, "refresh:PREab:PseudoChannel:nRAS": 10696, "refresh:PREab:PseudoChannel:nRTP": 40374, "refresh:REFab:PseudoChannel:nRC": 9152, "refresh:REFab:PseudoChannel:nRP": 272064, "refresh:arbitration": 5408},
+    "classes": {"weights": {"served": 13631488, "row_hits": 13048312}, "kv_read": {"served": 524288, "row_hits": 501592}, "kv_write": {"served": 128, "row_hits": 0}, "other": {"served": 512, "row_hits": 0}}
+  }
+}

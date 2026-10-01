@@ -1,0 +1,26 @@
+{
+  "config": {"segs": "/Users/tirthshah/Documents/Tirth_grad/tokenwall/traces/sweep_8b_b1_s4096.segs", "spec": "/Users/tirthshah/Documents/Tirth_grad/tokenwall/configs/hbm3/hbm3_16gb_8hi_6400.spec", "policy": "bank_high", "stacks": 1, "interleave_log2": 0, "channels": 16, "frontend_ratio": 0, "max_requests": -1, "reads_only": false, "drain": true, "refresh": "allbank", "refresh_blocks_scheduling": true, "disabled": []},
+  "result": {
+    "channels": 16,
+    "requests_accepted": 14156416,
+    "requests_served": 14156416,
+    "in_flight_at_end": 0,
+    "served_per_channel_min_max": [884776, 884776],
+    "controller_ticks": 5882787,
+    "sim_time_us": 1838.3709375,
+    "achieved_GBps": 246.416706639217,
+    "peak_GBps": 819.2,
+    "pct_of_peak": 30.0801643846701,
+    "row_hits": 13700848,
+    "row_misses": 13944,
+    "row_conflicts": 441624,
+    "row_hit_rate_pct": 96.7818973389875,
+    "avg_read_latency_ticks": 246.929392224854,
+    "avg_read_latency_ns": 77.165435070267,
+    "wall_seconds": 53.454287041,
+    "commands": {"ACT": 455568, "PREab": 13801, "PREpb": 441624, "RD": 14156288, "REFab": 15072, "WR": 128},
+    "slots": 94124608,
+    "slot_reasons": {"ACT:Bank:nRC": 63050, "ACT:Bank:nRP": 10963102, "ACT:Channel:bus(ACT)": 2322, "ACT:PseudoChannel:nRFC": 7956927, "PREpb:Bank:nCWL+nBL+nWR": 4928, "PREpb:Bank:nRAS": 29146, "PREpb:Bank:nRTP": 2299785, "PREpb:Channel:bus(ACT)": 71015, "RD:Bank:nRCDRD": 14477310, "RD:BankGroup:nCCDL": 22869686, "RD:Channel:bus(RD/WR/RDA/WRA)": 4619430, "RD:Sid:nCCDR": 2, "WR:Bank:nRCDWR": 2048, "data": 28312824, "empty": 243481, "mode_wait": 1341672, "refresh:PREab:PseudoChannel:nRAS": 53056, "refresh:PREab:PseudoChannel:nRTP": 85131, "refresh:REFab:PseudoChannel:nRC": 154336, "refresh:REFab:PseudoChannel:nRP": 562523, "refresh:arbitration": 12834},
+    "classes": {"weights": {"served": 13631488, "row_hits": 13192942}, "kv_read": {"served": 524288, "row_hits": 507426}, "kv_write": {"served": 128, "row_hits": 0}, "other": {"served": 512, "row_hits": 480}}
+  }
+}

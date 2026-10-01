@@ -44,8 +44,8 @@ ground truth the C++ core is validated against.
 | 2 | Four address-mapping policies, bit-exact with Ramulator's default, Python/C++ mirrored, measured on real traffic | done 2026-09-30 |
 | 3 | C++ timing core: timing tree, bank state machine, HBM3 controller, stall attribution; cycle-exact with Ramulator on first run | done 2026-09-30 |
 | 4 | Validation against Ramulator 2.1: writes, per-bank refresh, interleaves, 32 channels, KV-heavy and 70B slices, command-level diff; 30 cases identical | done 2026-09-30 |
-| 5 | Sweeps and findings | next |
-| 6 | Writeup | planned |
+| 5 | Sweeps: mapping, refresh, batch, context, KV layout, GQA, 70B, rule ablation, controller experiment; 92 runs, 7 plots | done 2026-10-01 |
+| 6 | Writeup | next |
 
 `PROGRESS.md` is the session log with open design questions. `RESULTS.md` has
 every measured number, the command that produced it, and the date. Nothing in
@@ -113,6 +113,46 @@ them line by line, so the two implementations cannot drift silently. A full
 8B step expands in 1.2 s in C++ and has a stable fingerprint
 (`RESULTS.md`, "Stream fingerprint").
 
+## Findings (Phase 5)
+
+Every figure: HBM3 per Ramulator 2.1's preset, Tokenwall core validated
+identical to Ramulator 2.1, one decode layer per run. Details and the honest
+caveats are in `docs/phase5_findings.md`; every number is in `RESULTS.md`.
+
+1. **Address mapping is the first-order knob.** Ramulator's default mapping
+   reaches 42% of peak on a Llama 3 8B decode step; a bank-group-interleaved
+   mapping reaches 84%, 45 ms versus 23 ms per token on one stack against a
+   19 ms floor. XOR hashing adds nothing; the bank-bits-high anti-pattern
+   gets 30%.
+
+   ![mapping and refresh](results/phase5/plots/mapping_refresh.png)
+
+2. **Batch size, context length, GQA versus MHA and 8B versus 70B do not move
+   the fraction of peak**; they move bytes per step. KV reads under a matched
+   layout are long sequential runs like weight sweeps. (`batch_seq.png`,
+   `gqa_70b.png`)
+
+3. **The KV-cache layout must match the attention kernel's walk order, under
+   either mapping.** A mismatch costs 2 to 5x while the row-hit rate stays
+   above 95%: one head's stream lands on a quarter of the channels. Phase 2's
+   static analysis missed this; timing simulation did not.
+
+   ![kv layout](results/phase5/plots/kv_layout.png)
+
+4. **Refresh cost is a controller decision.** All-bank refresh costs 10 points
+   under `bank_low`. Per-bank refresh costs 26 points under Ramulator's rule
+   that nothing is scheduled while a refresh waits, and 2 points once the
+   controller keeps scheduling other banks and reserves the target bank. The
+   first non-blocking attempt starved refresh (longest postponement 567 µs);
+   measuring postponement caught it.
+
+   ![controller](results/phase5/plots/controller.png)
+
+5. **Rule ablation ranks the losses.** Under the default mapping tCCD_L alone
+   is 15 points, tRCD 4, tRP 3; under `bank_low` the leftovers are tCCD_R
+   (2.4), tRP (1.5) and tFAW (1.3). Write turnarounds cost nothing on decode
+   traffic. (`ablation.png`, `attribution.png`)
+
 ## Address mapping: which bits pick the bank
 
 An address is a big binary number, and a mapping policy says which of its bits
@@ -174,7 +214,10 @@ slot per pseudo channel. Tokenwall labels each slot `data` (a burst is on the
 wires), `empty` (nothing queued), `arbitration` (ready but lost the bus), or
 the command and rule that blocked the oldest request, e.g.
 `RD:BankGroup:nCCDL`, `ACT:PseudoChannel:nRFC`. `--disable nFAW` removes a
-rule for ablation.
+rule for ablation; `--refresh perbank` selects per-bank refresh;
+`--refresh-nonblocking` keeps scheduling other banks while a refresh waits
+(with the target bank reserved); every run reports the longest refresh
+postponement so a refresh-starving configuration cannot pass unnoticed.
 
 ```bash
 ./build/cpp/tokenwall sim --segs traces/llama3_8b_tp1_b1_s4096.segs --policy bank_low --stacks 1 --refresh allbank --drain --json out.json
@@ -237,6 +280,14 @@ python -m tokenwall gen --model configs/models/llama3_8b.yaml --batch 1 --seq 40
 python -m tokenwall gen --model configs/models/llama3_70b.yaml --tp 8 --stacks 2 --batch 1 --seq 4096 --out traces/llama3_70b_tp8_b1_s4096
 python -m tokenwall gen --model configs/models/llama3_8b.yaml --n-kv-heads 32 --stacks 2 --batch 1 --seq 4096 --out traces/llama3_8b_mha32_tp1_b1_s4096
 python -m tokenwall export-ramulator traces/llama3_8b_tp1_b1_s4096.segs --out traces/slice.txt --max-requests 1000000
+```
+
+Phase 5 (sweeps, about 10 minutes, plus optional full-step anchors of 7 to 35 minutes each):
+
+```bash
+python scripts/sweep.py --sweeps all --workers 6
+python scripts/plot_sweeps.py                                    # results/phase5/plots/*.png
+./build/cpp/tokenwall sim --segs traces/llama3_8b_tp1_b1_s4096.segs --policy bank_low --stacks 1 --refresh perbank --refresh-nonblocking --drain
 ```
 
 Phase 4 (validation matrix, about 15 minutes in total):

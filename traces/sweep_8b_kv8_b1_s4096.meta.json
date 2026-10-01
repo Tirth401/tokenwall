@@ -1,0 +1,60 @@
+{
+ "model": "llama3_8b",
+ "model_source": "/Users/tirthshah/Documents/Tirth_grad/tokenwall/configs/models/llama3_8b.yaml",
+ "run": {
+  "batch": 1,
+  "seq_len": 4096,
+  "tp": 1,
+  "stacks": 2,
+  "kv_layout": "head_major",
+  "kv_order": "head_outer",
+  "kv_capacity": null,
+  "request_bytes": 32,
+  "alignment": 2097152,
+  "small_alignment": 512,
+  "weight_streams": 1,
+  "chunk_bytes": 4096,
+  "kv_chunk_bytes": 0,
+  "layers": [
+   0,
+   1
+  ],
+  "include_embed": false,
+  "include_lm_head": false,
+  "seed": 1
+ },
+ "shard": {
+  "heads": 32,
+  "kv_heads": 8,
+  "intermediate": 14336,
+  "vocab": 128256,
+  "kv_capacity_positions": 4097,
+  "layers_emitted": 1
+ },
+ "footprint_bytes": 16867393536,
+ "capacity_bytes": 34359738368,
+ "capacity_utilization": 0.49090576171875,
+ "bytes": {
+  "weights": 436207616,
+  "norm": 16384,
+  "embed": 0,
+  "kv_read": 16777216,
+  "kv_write": 4096,
+  "total_read": 453001216,
+  "total_write": 4096,
+  "total": 453005312
+ },
+ "requests": {
+  "total": 14156416,
+  "write": 128,
+  "read": 14156288
+ },
+ "segments": 27,
+ "groups": 11,
+ "derived": {
+  "peak_GBps_ramulator_preset": 1638.4,
+  "time_at_peak_ms": 0.2764925,
+  "note": "time_at_peak is a floor: every byte at 100% of HBM3 peak per Ramulator 2.1's preset"
+ },
+ "hbm_source": "/Users/tirthshah/Documents/Tirth_grad/tokenwall/configs/hbm3/hbm3_16gb_8hi_6400.yaml"
+}

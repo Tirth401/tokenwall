@@ -1,0 +1,26 @@
+{
+  "config": {"segs": "/Users/tirthshah/Documents/Tirth_grad/tokenwall/traces/sweep_70b_tp8_b8_s4096.segs", "spec": "/Users/tirthshah/Documents/Tirth_grad/tokenwall/configs/hbm3/hbm3_16gb_8hi_6400.spec", "policy": "bank_low", "stacks": 2, "interleave_log2": 0, "channels": 32, "frontend_ratio": 0, "max_requests": -1, "reads_only": false, "drain": true, "refresh": "allbank", "refresh_blocks_scheduling": true, "disabled": []},
+  "result": {
+    "channels": 32,
+    "requests_accepted": 7210112,
+    "requests_served": 7210112,
+    "in_flight_at_end": 0,
+    "served_per_channel_min_max": [225316, 225316],
+    "controller_ticks": 538371,
+    "sim_time_us": 168.2409375,
+    "achieved_GBps": 1371.38788827779,
+    "peak_GBps": 1638.4,
+    "pct_of_peak": 83.7028740403922,
+    "row_hits": 6901424,
+    "row_misses": 86024,
+    "row_conflicts": 222664,
+    "row_hit_rate_pct": 95.7186795433968,
+    "avg_read_latency_ticks": 123.043327419312,
+    "avg_read_latency_ns": 38.451039818535,
+    "wall_seconds": 11.332644166,
+    "commands": {"ACT": 308688, "PREab": 2752, "PREpb": 222664, "RD": 7209984, "REFab": 2752, "WR": 128},
+    "slots": 17227904,
+    "slot_reasons": {"ACT:Bank:nRC": 1760, "ACT:Bank:nRP": 2687, "ACT:Channel:bus(ACT)": 253, "ACT:PseudoChannel:nFAW": 1464, "ACT:PseudoChannel:nRFC": 1501216, "ACT:PseudoChannel:nRRDS": 64, "PREpb:Bank:nCWL+nBL+nWR": 2816, "PREpb:Bank:nRAS": 744, "RD:Bank:nRCDRD": 695216, "RD:BankGroup:nCCDL": 736, "RD:Channel:bus(RD/WR/RDA/WRA)": 214327, "RD:Sid:nCCDR": 211184, "WR:Bank:nRCDWR": 1280, "WR:PseudoChannel:nRTW": 1152, "data": 14420192, "empty": 991, "refresh:PREab:PseudoChannel:nRAS": 5872, "refresh:PREab:PseudoChannel:nRTP": 20094, "refresh:REFab:PseudoChannel:nRC": 4992, "refresh:REFab:PseudoChannel:nRP": 138112, "refresh:arbitration": 2752},
+    "classes": {"weights": {"served": 6684672, "row_hits": 6398752}, "kv_read": {"served": 524288, "row_hits": 502672}, "kv_write": {"served": 128, "row_hits": 0}, "other": {"served": 1024, "row_hits": 0}}
+  }
+}

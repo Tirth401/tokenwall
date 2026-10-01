@@ -1,0 +1,4403 @@
+{
+ "date": "2026-10-01",
+ "command": "python scripts/sweep.py --sweeps all --workers 6",
+ "provenance": "HBM3 per Ramulator 2.1 preset HBM3_6400Mbps; Tokenwall core validated identical to Ramulator 2.1",
+ "cases": [
+  {
+   "sweep": "ablation",
+   "name": "ramulator/baseline",
+   "segs": "/Users/tirthshah/Documents/Tirth_grad/tokenwall/traces/sweep_8b_b1_s4096.segs",
+   "policy": "ramulator",
+   "refresh": "allbank",
+   "stacks": 1,
+   "disable": null,
+   "nonblocking": false,
+   "gen": {
+    "model": "llama3_8b",
+    "model_source": "/Users/tirthshah/Documents/Tirth_grad/tokenwall/configs/models/llama3_8b.yaml",
+    "run": {
+     "batch": 1,
+     "seq_len": 4096,
+     "tp": 1,
+     "stacks": 1,
+     "kv_layout": "head_major",
+     "kv_order": "head_outer",
+     "kv_capacity": null,
+     "request_bytes": 32,
+     "alignment": 2097152,
+     "small_alignment": 512,
+     "weight_streams": 1,
+     "chunk_bytes": 4096,
+     "kv_chunk_bytes": 0,
+     "layers": [
+      0,
+      1
+     ],
+     "include_embed": false,
+     "include_lm_head": false,
+     "seed": 1
+    },
+    "shard": {
+     "heads": 32,
+     "kv_heads": 8,
+     "intermediate": 14336,
+     "vocab": 128256,
+     "kv_capacity_positions": 4097,
+     "layers_emitted": 1
+    },
+    "footprint_bytes": 16867393536,
+    "capacity_bytes": 17179869184,
+    "capacity_utilization": 0.9818115234375,
+    "bytes": {
+     "weights": 436207616,
+     "norm": 16384,
+     "embed": 0,
+     "kv_read": 16777216,
+     "kv_write": 4096,
+     "total_read": 453001216,
+     "total_write": 4096,
+     "total": 453005312
+    },
+    "requests": {
+     "total": 14156416,
+     "write": 128,
+     "read": 14156288
+    },
+    "segments": 27,
+    "groups": 11,
+    "derived": {
+     "peak_GBps_ramulator_preset": 819.2,
+     "time_at_peak_ms": 0.552985,
+     "note": "time_at_peak is a floor: every byte at 100% of HBM3 peak per Ramulator 2.1's preset"
+    },
+    "hbm_source": "/Users/tirthshah/Documents/Tirth_grad/tokenwall/configs/hbm3/hbm3_16gb_8hi_6400.yaml"
+   },
+   "rule": "baseline",
+   "result": {
+    "channels": 16,
+    "requests_accepted": 14156416,
+    "requests_served": 14156416,
+    "in_flight_at_end": 0,
+    "served_per_channel_min_max": [
+     884776,
+     884776
+    ],
+    "controller_ticks": 4210363,
+    "sim_time_us": 1315.7384375,
+    "achieved_GBps": 344.297391555075,
+    "peak_GBps": 819.2,
+    "pct_of_peak": 42.0284901800629,
+    "row_hits": 13705199,
+    "row_misses": 343169,
+    "row_conflicts": 108048,
+    "row_hit_rate_pct": 96.8126325194173,
+    "avg_read_latency_ticks": 198.234910168541,
+    "avg_read_latency_ns": 61.9484094276692,
+    "wall_seconds": 39.370803542,
+    "commands": {
+     "ACT": 451217,
+     "PREab": 10784,
+     "PREpb": 108048,
+     "RD": 14156288,
+     "REFab": 10784,
+     "WR": 128
+    },
+    "slots": 67365824,
+    "slot_reasons": {
+     "ACT:Bank:nRP": 375034,
+     "ACT:Channel:bus(ACT)": 16,
+     "ACT:PseudoChannel:nRFC": 5856907,
+     "PREpb:Bank:nCWL+nBL+nWR": 4928,
+     "PREpb:Bank:nRTP": 512,
+     "PREpb:Channel:bus(ACT)": 24,
+     "RD:Bank:nRCDRD": 4310742,
+     "RD:BankGroup:nCCDL": 21939159,
+     "RD:Channel:bus(RD/WR/RDA/WRA)": 5840083,
+     "RD:Sid:nCCDR": 12738,
+     "WR:Bank:nRCDWR": 2048,
+     "data": 28312816,
+     "empty": 12942,
+     "mode_wait": 1008,
+     "refresh:PREab:PseudoChannel:nRAS": 60567,
+     "refresh:PREab:PseudoChannel:nRTP": 76672,
+     "refresh:REFab:PseudoChannel:nRC": 158548,
+     "refresh:REFab:PseudoChannel:nRP": 396234,
+     "refresh:arbitration": 4846
+    },
+    "classes": {
+     "weights": {
+      "served": 13631488,
+      "row_hits": 13197199
+     },
+     "kv_read": {
+      "served": 524288,
+      "row_hits": 507520
+     },
+     "kv_write": {
+      "served": 128,
+      "row_hits": 0
+     },
+     "other": {
+      "served": 512,
+      "row_hits": 480
+     }
+    }
+   },
+   "wall": 39.383981704711914,
+   "pct_of_peak": 42.0284901800629,
+   "achieved_GBps": 344.297391555075,
+   "row_hit_rate_pct": 96.8126325194173,
+   "sim_time_us": 1315.7384375,
+   "avg_read_latency_ns": 61.9484094276692,
+   "attribution": {
+    "data": 42.02845644699603,
+    "RD:BankGroup:nCCDL": 32.56719460597706,
+    "ACT:PseudoChannel:nRFC": 8.694181488821394,
+    "RD:Channel:bus(RD/WR/RDA/WRA)": 8.669207401070311,
+    "RD:Bank:nRCDRD": 6.399004337867225,
+    "refresh:REFab:PseudoChannel:nRP": 0.588182518186076,
+    "ACT:Bank:nRP": 0.556712555018996,
+    "refresh:REFab:PseudoChannel:nRC": 0.23535376038746295,
+    "refresh:PREab:PseudoChannel:nRTP": 0.11381438754463985,
+    "refresh:PREab:PseudoChannel:nRAS": 0.08990760656323302,
+    "empty": 0.01921152185416748,
+    "RD:Sid:nCCDR": 0.018908697680295575,
+    "PREpb:Bank:nCWL+nBL+nWR": 0.007315282004121259,
+    "refresh:arbitration": 0.007193558561682553,
+    "WR:Bank:nRCDWR": 0.003040117196517926,
+    "mode_wait": 0.0014963076826611666,
+    "PREpb:Bank:nRTP": 0.0007600292991294814,
+    "PREpb:Channel:bus(ACT)": 3.5626373396694445e-05,
+    "ACT:Channel:bus(ACT)": 2.3750915597796295e-05
+   }
+  },
+  {
+   "sweep": "ablation",
+   "name": "ramulator/nFAW",
+   "segs": "/Users/tirthshah/Documents/Tirth_grad/tokenwall/traces/sweep_8b_b1_s4096.segs",
+   "policy": "ramulator",
+   "refresh": "allbank",
+   "stacks": 1,
+   "disable": "nFAW",
+   "nonblocking": false,
+   "gen": {
+    "model": "llama3_8b",
+    "model_source": "/Users/tirthshah/Documents/Tirth_grad/tokenwall/configs/models/llama3_8b.yaml",
+    "run": {
+     "batch": 1,
+     "seq_len": 4096,
+     "tp": 1,
+     "stacks": 1,
+     "kv_layout": "head_major",
+     "kv_order": "head_outer",
+     "kv_capacity": null,
+     "request_bytes": 32,
+     "alignment": 2097152,
+     "small_alignment": 512,
+     "weight_streams": 1,
+     "chunk_bytes": 4096,
+     "kv_chunk_bytes": 0,
+     "layers": [
+      0,
+      1
+     ],
+     "include_embed": false,
+     "include_lm_head": false,
+     "seed": 1
+    },
+    "shard": {
+     "heads": 32,
+     "kv_heads": 8,
+     "intermediate": 14336,
+     "vocab": 128256,
+     "kv_capacity_positions": 4097,
+     "layers_emitted": 1
+    },
+    "footprint_bytes": 16867393536,
+    "capacity_bytes": 17179869184,
+    "capacity_utilization": 0.9818115234375,
+    "bytes": {
+     "weights": 436207616,
+     "norm": 16384,
+     "embed": 0,
+     "kv_read": 16777216,
+     "kv_write": 4096,
+     "total_read": 453001216,
+     "total_write": 4096,
+     "total": 453005312
+    },
+    "requests": {
+     "total": 14156416,
+     "write": 128,
+     "read": 14156288
+    },
+    "segments": 27,
+    "groups": 11,
+    "derived": {
+     "peak_GBps_ramulator_preset": 819.2,
+     "time_at_peak_ms": 0.552985,
+     "note": "time_at_peak is a floor: every byte at 100% of HBM3 peak per Ramulator 2.1's preset"
+    },
+    "hbm_source": "/Users/tirthshah/Documents/Tirth_grad/tokenwall/configs/hbm3/hbm3_16gb_8hi_6400.yaml"
+   },
+   "rule": "nFAW",
+   "result": {
+    "channels": 16,
+    "requests_accepted": 14156416,
+    "requests_served": 14156416,
+    "in_flight_at_end": 0,
+    "served_per_channel_min_max": [
+     884776,
+     884776
+    ],
+    "controller_ticks": 4210363,
+    "sim_time_us": 1315.7384375,
+    "achieved_GBps": 344.297391555075,
+    "peak_GBps": 819.2,
+    "pct_of_peak": 42.0284901800629,
+    "row_hits": 13705199,
+    "row_misses": 343169,
+    "row_conflicts": 108048,
+    "row_hit_rate_pct": 96.8126325194173,
+    "avg_read_latency_ticks": 198.234910168541,
+    "avg_read_latency_ns": 61.9484094276692,
+    "wall_seconds": 38.996854042,
+    "commands": {
+     "ACT": 451217,
+     "PREab": 10784,
+     "PREpb": 108048,
+     "RD": 14156288,
+     "REFab": 10784,
+     "WR": 128
+    },
+    "slots": 67365824,
+    "slot_reasons": {
+     "ACT:Bank:nRP": 375034,
+     "ACT:Channel:bus(ACT)": 16,
+     "ACT:PseudoChannel:nRFC": 5856907,
+     "PREpb:Bank:nCWL+nBL+nWR": 4928,
+     "PREpb:Bank:nRTP": 512,
+     "PREpb:Channel:bus(ACT)": 24,
+     "RD:Bank:nRCDRD": 4310742,
+     "RD:BankGroup:nCCDL": 21939159,
+     "RD:Channel:bus(RD/WR/RDA/WRA)": 5840083,
+     "RD:Sid:nCCDR": 12738,
+     "WR:Bank:nRCDWR": 2048,
+     "data": 28312816,
+     "empty": 12942,
+     "mode_wait": 1008,
+     "refresh:PREab:PseudoChannel:nRAS": 60567,
+     "refresh:PREab:PseudoChannel:nRTP": 76672,
+     "refresh:REFab:PseudoChannel:nRC": 158548,
+     "refresh:REFab:PseudoChannel:nRP": 396234,
+     "refresh:arbitration": 4846
+    },
+    "classes": {
+     "weights": {
+      "served": 13631488,
+      "row_hits": 13197199
+     },
+     "kv_read": {
+      "served": 524288,
+      "row_hits": 507520
+     },
+     "kv_write": {
+      "served": 128,
+      "row_hits": 0
+     },
+     "other": {
+      "served": 512,
+      "row_hits": 480
+     }
+    }
+   },
+   "wall": 39.012901067733765,
+   "pct_of_peak": 42.0284901800629,
+   "achieved_GBps": 344.297391555075,
+   "row_hit_rate_pct": 96.8126325194173,
+   "sim_time_us": 1315.7384375,
+   "avg_read_latency_ns": 61.9484094276692,
+   "attribution": {
+    "data": 42.02845644699603,
+    "RD:BankGroup:nCCDL": 32.56719460597706,
+    "ACT:PseudoChannel:nRFC": 8.694181488821394,
+    "RD:Channel:bus(RD/WR/RDA/WRA)": 8.669207401070311,
+    "RD:Bank:nRCDRD": 6.399004337867225,
+    "refresh:REFab:PseudoChannel:nRP": 0.588182518186076,
+    "ACT:Bank:nRP": 0.556712555018996,
+    "refresh:REFab:PseudoChannel:nRC": 0.23535376038746295,
+    "refresh:PREab:PseudoChannel:nRTP": 0.11381438754463985,
+    "refresh:PREab:PseudoChannel:nRAS": 0.08990760656323302,
+    "empty": 0.01921152185416748,
+    "RD:Sid:nCCDR": 0.018908697680295575,
+    "PREpb:Bank:nCWL+nBL+nWR": 0.007315282004121259,
+    "refresh:arbitration": 0.007193558561682553,
+    "WR:Bank:nRCDWR": 0.003040117196517926,
+    "mode_wait": 0.0014963076826611666,
+    "PREpb:Bank:nRTP": 0.0007600292991294814,
+    "PREpb:Channel:bus(ACT)": 3.5626373396694445e-05,
+    "ACT:Channel:bus(ACT)": 2.3750915597796295e-05
+   }
+  },
+  {
+   "sweep": "ablation",
+   "name": "ramulator/nCCDL",
+   "segs": "/Users/tirthshah/Documents/Tirth_grad/tokenwall/traces/sweep_8b_b1_s4096.segs",
+   "policy": "ramulator",
+   "refresh": "allbank",
+   "stacks": 1,
+   "disable": "nCCDL",
+   "nonblocking": false,
+   "gen": {
+    "model": "llama3_8b",
+    "model_source": "/Users/tirthshah/Documents/Tirth_grad/tokenwall/configs/models/llama3_8b.yaml",
+    "run": {
+     "batch": 1,
+     "seq_len": 4096,
+     "tp": 1,
+     "stacks": 1,
+     "kv_layout": "head_major",
+     "kv_order": "head_outer",
+     "kv_capacity": null,
+     "request_bytes": 32,
+     "alignment": 2097152,
+     "small_alignment": 512,
+     "weight_streams": 1,
+     "chunk_bytes": 4096,
+     "kv_chunk_bytes": 0,
+     "layers": [
+      0,
+      1
+     ],
+     "include_embed": false,
+     "include_lm_head": false,
+     "seed": 1
+    },
+    "shard": {
+     "heads": 32,
+     "kv_heads": 8,
+     "intermediate": 14336,
+     "vocab": 128256,
+     "kv_capacity_positions": 4097,
+     "layers_emitted": 1
+    },
+    "footprint_bytes": 16867393536,
+    "capacity_bytes": 17179869184,
+    "capacity_utilization": 0.9818115234375,
+    "bytes": {
+     "weights": 436207616,
+     "norm": 16384,
+     "embed": 0,
+     "kv_read": 16777216,
+     "kv_write": 4096,
+     "total_read": 453001216,
+     "total_write": 4096,
+     "total": 453005312
+    },
+    "requests": {
+     "total": 14156416,
+     "write": 128,
+     "read": 14156288
+    },
+    "segments": 27,
+    "groups": 11,
+    "derived": {
+     "peak_GBps_ramulator_preset": 819.2,
+     "time_at_peak_ms": 0.552985,
+     "note": "time_at_peak is a floor: every byte at 100% of HBM3 peak per Ramulator 2.1's preset"
+    },
+    "hbm_source": "/Users/tirthshah/Documents/Tirth_grad/tokenwall/configs/hbm3/hbm3_16gb_8hi_6400.yaml"
+   },
+   "rule": "nCCDL",
+   "result": {
+    "channels": 16,
+    "requests_accepted": 14156416,
+    "requests_served": 14156416,
+    "in_flight_at_end": 0,
+    "served_per_channel_min_max": [
+     884776,
+     884776
+    ],
+    "controller_ticks": 3103245,
+    "sim_time_us": 969.7640625,
+    "achieved_GBps": 467.129407571752,
+    "peak_GBps": 819.2,
+    "pct_of_peak": 57.0226327602236,
+    "row_hits": 13706768,
+    "row_misses": 254128,
+    "row_conflicts": 195520,
+    "row_hit_rate_pct": 96.82371583316,
+    "avg_read_latency_ticks": 158.188740155611,
+    "avg_read_latency_ns": 49.4339812986286,
+    "wall_seconds": 28.80611325,
+    "commands": {
+     "ACT": 449648,
+     "PREab": 7936,
+     "PREpb": 195520,
+     "RD": 14156288,
+     "REFab": 7936,
+     "WR": 128
+    },
+    "slots": 49651936,
+    "slot_reasons": {
+     "ACT:Bank:nRC": 400,
+     "ACT:Bank:nRP": 4437089,
+     "ACT:Channel:bus(ACT)": 40,
+     "ACT:PseudoChannel:nRFC": 4327824,
+     "PREpb:Bank:nCWL+nBL+nWR": 4928,
+     "PREpb:Bank:nRAS": 128,
+     "PREpb:Bank:nRTP": 384,
+     "PREpb:Channel:bus(ACT)": 8,
+     "RD:Bank:nRCDRD": 11587800,
+     "RD:Channel:bus(RD/WR/RDA/WRA)": 432080,
+     "RD:Sid:nCCDR": 1440,
+     "WR:Bank:nRCDWR": 2048,
+     "data": 28312816,
+     "empty": 15326,
+     "mode_wait": 12480,
+     "refresh:PREab:PseudoChannel:nRAS": 67251,
+     "refresh:PREab:PseudoChannel:nRTP": 33534,
+     "refresh:REFab:PseudoChannel:nRC": 119808,
+     "refresh:REFab:PseudoChannel:nRP": 289992,
+     "refresh:arbitration": 6560
+    },
+    "classes": {
+     "weights": {
+      "served": 13631488,
+      "row_hits": 13198656
+     },
+     "kv_read": {
+      "served": 524288,
+      "row_hits": 507632
+     },
+     "kv_write": {
+      "served": 128,
+      "row_hits": 0
+     },
+     "other": {
+      "served": 512,
+      "row_hits": 480
+     }
+    }
+   },
+   "wall": 28.818915128707886,
+   "pct_of_peak": 57.0226327602236,
+   "achieved_GBps": 467.129407571752,
+   "row_hit_rate_pct": 96.82371583316,
+   "sim_time_us": 969.7640625,
+   "avg_read_latency_ns": 49.4339812986286,
+   "attribution": {
+    "data": 57.022582160743944,
+    "RD:Bank:nRCDRD": 23.33806278973694,
+    "ACT:Bank:nRP": 8.936386689936924,
+    "ACT:PseudoChannel:nRFC": 8.716324777346044,
+    "RD:Channel:bus(RD/WR/RDA/WRA)": 0.8702178299754515,
+    "refresh:REFab:PseudoChannel:nRP": 0.5840497337304229,
+    "refresh:REFab:PseudoChannel:nRC": 0.2412957271192809,
+    "refresh:PREab:PseudoChannel:nRAS": 0.13544486966228267,
+    "refresh:PREab:PseudoChannel:nRTP": 0.06753815198666172,
+    "empty": 0.030866872945296636,
+    "mode_wait": 0.025134971574925096,
+    "refresh:arbitration": 0.013211972238101652,
+    "PREpb:Bank:nCWL+nBL+nWR": 0.009925091339842217,
+    "WR:Bank:nRCDWR": 0.004124713284090272,
+    "RD:Sid:nCCDR": 0.0029001890278759724,
+    "ACT:Bank:nRC": 0.0008056080632988812,
+    "PREpb:Bank:nRTP": 0.000773383740766926,
+    "PREpb:Bank:nRAS": 0.000257794580255642,
+    "ACT:Channel:bus(ACT)": 8.056080632988813e-05,
+    "PREpb:Channel:bus(ACT)": 1.6112161265977623e-05
+   }
+  },
+  {
+   "sweep": "ablation",
+   "name": "ramulator/nCCDR",
+   "segs": "/Users/tirthshah/Documents/Tirth_grad/tokenwall/traces/sweep_8b_b1_s4096.segs",
+   "policy": "ramulator",
+   "refresh": "allbank",
+   "stacks": 1,
+   "disable": "nCCDR",
+   "nonblocking": false,
+   "gen": {
+    "model": "llama3_8b",
+    "model_source": "/Users/tirthshah/Documents/Tirth_grad/tokenwall/configs/models/llama3_8b.yaml",
+    "run": {
+     "batch": 1,
+     "seq_len": 4096,
+     "tp": 1,
+     "stacks": 1,
+     "kv_layout": "head_major",
+     "kv_order": "head_outer",
+     "kv_capacity": null,
+     "request_bytes": 32,
+     "alignment": 2097152,
+     "small_alignment": 512,
+     "weight_streams": 1,
+     "chunk_bytes": 4096,
+     "kv_chunk_bytes": 0,
+     "layers": [
+      0,
+      1
+     ],
+     "include_embed": false,
+     "include_lm_head": false,
+     "seed": 1
+    },
+    "shard": {
+     "heads": 32,
+     "kv_heads": 8,
+     "intermediate": 14336,
+     "vocab": 128256,
+     "kv_capacity_positions": 4097,
+     "layers_emitted": 1
+    },
+    "footprint_bytes": 16867393536,
+    "capacity_bytes": 17179869184,
+    "capacity_utilization": 0.9818115234375,
+    "bytes": {
+     "weights": 436207616,
+     "norm": 16384,
+     "embed": 0,
+     "kv_read": 16777216,
+     "kv_write": 4096,
+     "total_read": 453001216,
+     "total_write": 4096,
+     "total": 453005312
+    },
+    "requests": {
+     "total": 14156416,
+     "write": 128,
+     "read": 14156288
+    },
+    "segments": 27,
+    "groups": 11,
+    "derived": {
+     "peak_GBps_ramulator_preset": 819.2,
+     "time_at_peak_ms": 0.552985,
+     "note": "time_at_peak is a floor: every byte at 100% of HBM3 peak per Ramulator 2.1's preset"
+    },
+    "hbm_source": "/Users/tirthshah/Documents/Tirth_grad/tokenwall/configs/hbm3/hbm3_16gb_8hi_6400.yaml"
+   },
+   "rule": "nCCDR",
+   "result": {
+    "channels": 16,
+    "requests_accepted": 14156416,
+    "requests_served": 14156416,
+    "in_flight_at_end": 0,
+    "served_per_channel_min_max": [
+     884776,
+     884776
+    ],
+    "controller_ticks": 4209701,
+    "sim_time_us": 1315.5315625,
+    "achieved_GBps": 344.351534325122,
+    "peak_GBps": 819.2,
+    "pct_of_peak": 42.0350994049221,
+    "row_hits": 13703136,
+    "row_misses": 340704,
+    "row_conflicts": 112576,
+    "row_hit_rate_pct": 96.7980596218704,
+    "avg_read_latency_ticks": 198.218432331979,
+    "avg_read_latency_ns": 61.9432601037433,
+    "wall_seconds": 39.112499,
+    "commands": {
+     "ACT": 453280,
+     "PREab": 10784,
+     "PREpb": 112576,
+     "RD": 14156288,
+     "REFab": 10784,
+     "WR": 128
+    },
+    "slots": 67355232,
+    "slot_reasons": {
+     "ACT:Bank:nRP": 377504,
+     "ACT:Channel:bus(ACT)": 16,
+     "ACT:PseudoChannel:nRFC": 5880432,
+     "PREpb:Bank:nCWL+nBL+nWR": 4928,
+     "PREpb:Bank:nRTP": 512,
+     "PREpb:Channel:bus(ACT)": 24,
+     "RD:Bank:nRCDRD": 4439630,
+     "RD:BankGroup:nCCDL": 21657567,
+     "RD:Channel:bus(RD/WR/RDA/WRA)": 6010688,
+     "WR:Bank:nRCDWR": 2048,
+     "data": 28312816,
+     "empty": 12942,
+     "mode_wait": 1008,
+     "refresh:PREab:PseudoChannel:nRAS": 7192,
+     "refresh:PREab:PseudoChannel:nRTP": 77685,
+     "refresh:REFab:PseudoChannel:nRC": 18304,
+     "refresh:REFab:PseudoChannel:nRP": 541792,
+     "refresh:arbitration": 10144
+    },
+    "classes": {
+     "weights": {
+      "served": 13631488,
+      "row_hits": 13195152
+     },
+     "kv_read": {
+      "served": 524288,
+      "row_hits": 507504
+     },
+     "kv_write": {
+      "served": 128,
+      "row_hits": 0
+     },
+     "other": {
+      "served": 512,
+      "row_hits": 480
+     }
+    }
+   },
+   "wall": 39.13139510154724,
+   "pct_of_peak": 42.0350994049221,
+   "achieved_GBps": 344.351534325122,
+   "row_hit_rate_pct": 96.7980596218704,
+   "sim_time_us": 1315.5315625,
+   "avg_read_latency_ns": 61.9432601037433,
+   "attribution": {
+    "data": 42.035065664980564,
+    "RD:BankGroup:nCCDL": 32.15424601313822,
+    "RD:Channel:bus(RD/WR/RDA/WRA)": 8.923862069096577,
+    "ACT:PseudoChannel:nRFC": 8.730475458832952,
+    "RD:Bank:nRCDRD": 6.591366205968973,
+    "refresh:REFab:PseudoChannel:nRP": 0.8043799774900932,
+    "ACT:Bank:nRP": 0.5604672254710666,
+    "refresh:PREab:PseudoChannel:nRTP": 0.11533625182970196,
+    "refresh:REFab:PseudoChannel:nRC": 0.027175320248321616,
+    "empty": 0.01921454297715135,
+    "refresh:arbitration": 0.015060448459297118,
+    "refresh:PREab:PseudoChannel:nRAS": 0.010677715429738256,
+    "PREpb:Bank:nCWL+nBL+nWR": 0.007316432374548127,
+    "WR:Bank:nRCDWR": 0.0030405952725394815,
+    "mode_wait": 0.001496542985703026,
+    "PREpb:Bank:nRTP": 0.0007601488181348704,
+    "PREpb:Channel:bus(ACT)": 3.5631975850072046e-05,
+    "ACT:Channel:bus(ACT)": 2.37546505667147e-05
+   }
+  },
+  {
+   "sweep": "ablation",
+   "name": "ramulator/nRRDS",
+   "segs": "/Users/tirthshah/Documents/Tirth_grad/tokenwall/traces/sweep_8b_b1_s4096.segs",
+   "policy": "ramulator",
+   "refresh": "allbank",
+   "stacks": 1,
+   "disable": "nRRDS",
+   "nonblocking": false,
+   "gen": {
+    "model": "llama3_8b",
+    "model_source": "/Users/tirthshah/Documents/Tirth_grad/tokenwall/configs/models/llama3_8b.yaml",
+    "run": {
+     "batch": 1,
+     "seq_len": 4096,
+     "tp": 1,
+     "stacks": 1,
+     "kv_layout": "head_major",
+     "kv_order": "head_outer",
+     "kv_capacity": null,
+     "request_bytes": 32,
+     "alignment": 2097152,
+     "small_alignment": 512,
+     "weight_streams": 1,
+     "chunk_bytes": 4096,
+     "kv_chunk_bytes": 0,
+     "layers": [
+      0,
+      1
+     ],
+     "include_embed": false,
+     "include_lm_head": false,
+     "seed": 1
+    },
+    "shard": {
+     "heads": 32,
+     "kv_heads": 8,
+     "intermediate": 14336,
+     "vocab": 128256,
+     "kv_capacity_positions": 4097,
+     "layers_emitted": 1
+    },
+    "footprint_bytes": 16867393536,
+    "capacity_bytes": 17179869184,
+    "capacity_utilization": 0.9818115234375,
+    "bytes": {
+     "weights": 436207616,
+     "norm": 16384,
+     "embed": 0,
+     "kv_read": 16777216,
+     "kv_write": 4096,
+     "total_read": 453001216,
+     "total_write": 4096,
+     "total": 453005312
+    },
+    "requests": {
+     "total": 14156416,
+     "write": 128,
+     "read": 14156288
+    },
+    "segments": 27,
+    "groups": 11,
+    "derived": {
+     "peak_GBps_ramulator_preset": 819.2,
+     "time_at_peak_ms": 0.552985,
+     "note": "time_at_peak is a floor: every byte at 100% of HBM3 peak per Ramulator 2.1's preset"
+    },
+    "hbm_source": "/Users/tirthshah/Documents/Tirth_grad/tokenwall/configs/hbm3/hbm3_16gb_8hi_6400.yaml"
+   },
+   "rule": "nRRDS",
+   "result": {
+    "channels": 16,
+    "requests_accepted": 14156416,
+    "requests_served": 14156416,
+    "in_flight_at_end": 0,
+    "served_per_channel_min_max": [
+     884776,
+     884776
+    ],
+    "controller_ticks": 4210363,
+    "sim_time_us": 1315.7384375,
+    "achieved_GBps": 344.297391555075,
+    "peak_GBps": 819.2,
+    "pct_of_peak": 42.0284901800629,
+    "row_hits": 13705183,
+    "row_misses": 343185,
+    "row_conflicts": 108048,
+    "row_hit_rate_pct": 96.8125194964601,
+    "avg_read_latency_ticks": 198.235185947051,
+    "avg_read_latency_ns": 61.9484956084533,
+    "wall_seconds": 38.9223895,
+    "commands": {
+     "ACT": 451233,
+     "PREab": 10784,
+     "PREpb": 108048,
+     "RD": 14156288,
+     "REFab": 10784,
+     "WR": 128
+    },
+    "slots": 67365824,
+    "slot_reasons": {
+     "ACT:Bank:nRP": 375162,
+     "ACT:Channel:bus(ACT)": 16,
+     "ACT:PseudoChannel:nRFC": 5856627,
+     "PREpb:Bank:nCWL+nBL+nWR": 4928,
+     "PREpb:Bank:nRTP": 512,
+     "PREpb:Channel:bus(ACT)": 24,
+     "RD:Bank:nRCDRD": 4309918,
+     "RD:BankGroup:nCCDL": 21939239,
+     "RD:Channel:bus(RD/WR/RDA/WRA)": 5840243,
+     "RD:Sid:nCCDR": 12570,
+     "WR:Bank:nRCDWR": 2048,
+     "data": 28312816,
+     "empty": 12942,
+     "mode_wait": 1008,
+     "refresh:PREab:PseudoChannel:nRAS": 61383,
+     "refresh:PREab:PseudoChannel:nRTP": 76808,
+     "refresh:REFab:PseudoChannel:nRC": 159796,
+     "refresh:REFab:PseudoChannel:nRP": 394986,
+     "refresh:arbitration": 4798
+    },
+    "classes": {
+     "weights": {
+      "served": 13631488,
+      "row_hits": 13197183
+     },
+     "kv_read": {
+      "served": 524288,
+      "row_hits": 507520
+     },
+     "kv_write": {
+      "served": 128,
+      "row_hits": 0
+     },
+     "other": {
+      "served": 512,
+      "row_hits": 480
+     }
+    }
+   },
+   "wall": 38.94381618499756,
+   "pct_of_peak": 42.0284901800629,
+   "achieved_GBps": 344.297391555075,
+   "row_hit_rate_pct": 96.8125194964601,
+   "sim_time_us": 1315.7384375,
+   "avg_read_latency_ns": 61.9484956084533,
+   "attribution": {
+    "data": 42.02845644699603,
+    "RD:BankGroup:nCCDL": 32.56731336055505,
+    "ACT:PseudoChannel:nRFC": 8.693765847798433,
+    "RD:Channel:bus(RD/WR/RDA/WRA)": 8.66944491022629,
+    "RD:Bank:nRCDRD": 6.397781165713938,
+    "refresh:REFab:PseudoChannel:nRP": 0.5863299467694479,
+    "ACT:Bank:nRP": 0.5569025623437783,
+    "refresh:REFab:PseudoChannel:nRC": 0.23720633180409104,
+    "refresh:PREab:PseudoChannel:nRTP": 0.11401627032722111,
+    "refresh:PREab:PseudoChannel:nRAS": 0.09111890325872063,
+    "empty": 0.01921152185416748,
+    "RD:Sid:nCCDR": 0.018659313066518714,
+    "PREpb:Bank:nCWL+nBL+nWR": 0.007315282004121259,
+    "refresh:arbitration": 0.007122305814889164,
+    "WR:Bank:nRCDWR": 0.003040117196517926,
+    "mode_wait": 0.0014963076826611666,
+    "PREpb:Bank:nRTP": 0.0007600292991294814,
+    "PREpb:Channel:bus(ACT)": 3.5626373396694445e-05,
+    "ACT:Channel:bus(ACT)": 2.3750915597796295e-05
+   }
+  },
+  {
+   "sweep": "ablation",
+   "name": "ramulator/nRRDL",
+   "segs": "/Users/tirthshah/Documents/Tirth_grad/tokenwall/traces/sweep_8b_b1_s4096.segs",
+   "policy": "ramulator",
+   "refresh": "allbank",
+   "stacks": 1,
+   "disable": "nRRDL",
+   "nonblocking": false,
+   "gen": {
+    "model": "llama3_8b",
+    "model_source": "/Users/tirthshah/Documents/Tirth_grad/tokenwall/configs/models/llama3_8b.yaml",
+    "run": {
+     "batch": 1,
+     "seq_len": 4096,
+     "tp": 1,
+     "stacks": 1,
+     "kv_layout": "head_major",
+     "kv_order": "head_outer",
+     "kv_capacity": null,
+     "request_bytes": 32,
+     "alignment": 2097152,
+     "small_alignment": 512,
+     "weight_streams": 1,
+     "chunk_bytes": 4096,
+     "kv_chunk_bytes": 0,
+     "layers": [
+      0,
+      1
+     ],
+     "include_embed": false,
+     "include_lm_head": false,
+     "seed": 1
+    },
+    "shard": {
+     "heads": 32,
+     "kv_heads": 8,
+     "intermediate": 14336,
+     "vocab": 128256,
+     "kv_capacity_positions": 4097,
+     "layers_emitted": 1
+    },
+    "footprint_bytes": 16867393536,
+    "capacity_bytes": 17179869184,
+    "capacity_utilization": 0.9818115234375,
+    "bytes": {
+     "weights": 436207616,
+     "norm": 16384,
+     "embed": 0,
+     "kv_read": 16777216,
+     "kv_write": 4096,
+     "total_read": 453001216,
+     "total_write": 4096,
+     "total": 453005312
+    },
+    "requests": {
+     "total": 14156416,
+     "write": 128,
+     "read": 14156288
+    },
+    "segments": 27,
+    "groups": 11,
+    "derived": {
+     "peak_GBps_ramulator_preset": 819.2,
+     "time_at_peak_ms": 0.552985,
+     "note": "time_at_peak is a floor: every byte at 100% of HBM3 peak per Ramulator 2.1's preset"
+    },
+    "hbm_source": "/Users/tirthshah/Documents/Tirth_grad/tokenwall/configs/hbm3/hbm3_16gb_8hi_6400.yaml"
+   },
+   "rule": "nRRDL",
+   "result": {
+    "channels": 16,
+    "requests_accepted": 14156416,
+    "requests_served": 14156416,
+    "in_flight_at_end": 0,
+    "served_per_channel_min_max": [
+     884776,
+     884776
+    ],
+    "controller_ticks": 4210363,
+    "sim_time_us": 1315.7384375,
+    "achieved_GBps": 344.297391555075,
+    "peak_GBps": 819.2,
+    "pct_of_peak": 42.0284901800629,
+    "row_hits": 13705199,
+    "row_misses": 343169,
+    "row_conflicts": 108048,
+    "row_hit_rate_pct": 96.8126325194173,
+    "avg_read_latency_ticks": 198.234910168541,
+    "avg_read_latency_ns": 61.9484094276692,
+    "wall_seconds": 39.182520667,
+    "commands": {
+     "ACT": 451217,
+     "PREab": 10784,
+     "PREpb": 108048,
+     "RD": 14156288,
+     "REFab": 10784,
+     "WR": 128
+    },
+    "slots": 67365824,
+    "slot_reasons": {
+     "ACT:Bank:nRP": 375034,
+     "ACT:Channel:bus(ACT)": 16,
+     "ACT:PseudoChannel:nRFC": 5856907,
+     "PREpb:Bank:nCWL+nBL+nWR": 4928,
+     "PREpb:Bank:nRTP": 512,
+     "PREpb:Channel:bus(ACT)": 24,
+     "RD:Bank:nRCDRD": 4310742,
+     "RD:BankGroup:nCCDL": 21939159,
+     "RD:Channel:bus(RD/WR/RDA/WRA)": 5840083,
+     "RD:Sid:nCCDR": 12738,
+     "WR:Bank:nRCDWR": 2048,
+     "data": 28312816,
+     "empty": 12942,
+     "mode_wait": 1008,
+     "refresh:PREab:PseudoChannel:nRAS": 60567,
+     "refresh:PREab:PseudoChannel:nRTP": 76672,
+     "refresh:REFab:PseudoChannel:nRC": 158548,
+     "refresh:REFab:PseudoChannel:nRP": 396234,
+     "refresh:arbitration": 4846
+    },
+    "classes": {
+     "weights": {
+      "served": 13631488,
+      "row_hits": 13197199
+     },
+     "kv_read": {
+      "served": 524288,
+      "row_hits": 507520
+     },
+     "kv_write": {
+      "served": 128,
+      "row_hits": 0
+     },
+     "other": {
+      "served": 512,
+      "row_hits": 480
+     }
+    }
+   },
+   "wall": 39.2003538608551,
+   "pct_of_peak": 42.0284901800629,
+   "achieved_GBps": 344.297391555075,
+   "row_hit_rate_pct": 96.8126325194173,
+   "sim_time_us": 1315.7384375,
+   "avg_read_latency_ns": 61.9484094276692,
+   "attribution": {
+    "data": 42.02845644699603,
+    "RD:BankGroup:nCCDL": 32.56719460597706,
+    "ACT:PseudoChannel:nRFC": 8.694181488821394,
+    "RD:Channel:bus(RD/WR/RDA/WRA)": 8.669207401070311,
+    "RD:Bank:nRCDRD": 6.399004337867225,
+    "refresh:REFab:PseudoChannel:nRP": 0.588182518186076,
+    "ACT:Bank:nRP": 0.556712555018996,
+    "refresh:REFab:PseudoChannel:nRC": 0.23535376038746295,
+    "refresh:PREab:PseudoChannel:nRTP": 0.11381438754463985,
+    "refresh:PREab:PseudoChannel:nRAS": 0.08990760656323302,
+    "empty": 0.01921152185416748,
+    "RD:Sid:nCCDR": 0.018908697680295575,
+    "PREpb:Bank:nCWL+nBL+nWR": 0.007315282004121259,
+    "refresh:arbitration": 0.007193558561682553,
+    "WR:Bank:nRCDWR": 0.003040117196517926,
+    "mode_wait": 0.0014963076826611666,
+    "PREpb:Bank:nRTP": 0.0007600292991294814,
+    "PREpb:Channel:bus(ACT)": 3.5626373396694445e-05,
+    "ACT:Channel:bus(ACT)": 2.3750915597796295e-05
+   }
+  },
+  {
+   "sweep": "ablation",
+   "name": "ramulator/nWTR",
+   "segs": "/Users/tirthshah/Documents/Tirth_grad/tokenwall/traces/sweep_8b_b1_s4096.segs",
+   "policy": "ramulator",
+   "refresh": "allbank",
+   "stacks": 1,
+   "disable": "nWTR",
+   "nonblocking": false,
+   "gen": {
+    "model": "llama3_8b",
+    "model_source": "/Users/tirthshah/Documents/Tirth_grad/tokenwall/configs/models/llama3_8b.yaml",
+    "run": {
+     "batch": 1,
+     "seq_len": 4096,
+     "tp": 1,
+     "stacks": 1,
+     "kv_layout": "head_major",
+     "kv_order": "head_outer",
+     "kv_capacity": null,
+     "request_bytes": 32,
+     "alignment": 2097152,
+     "small_alignment": 512,
+     "weight_streams": 1,
+     "chunk_bytes": 4096,
+     "kv_chunk_bytes": 0,
+     "layers": [
+      0,
+      1
+     ],
+     "include_embed": false,
+     "include_lm_head": false,
+     "seed": 1
+    },
+    "shard": {
+     "heads": 32,
+     "kv_heads": 8,
+     "intermediate": 14336,
+     "vocab": 128256,
+     "kv_capacity_positions": 4097,
+     "layers_emitted": 1
+    },
+    "footprint_bytes": 16867393536,
+    "capacity_bytes": 17179869184,
+    "capacity_utilization": 0.9818115234375,
+    "bytes": {
+     "weights": 436207616,
+     "norm": 16384,
+     "embed": 0,
+     "kv_read": 16777216,
+     "kv_write": 4096,
+     "total_read": 453001216,
+     "total_write": 4096,
+     "total": 453005312
+    },
+    "requests": {
+     "total": 14156416,
+     "write": 128,
+     "read": 14156288
+    },
+    "segments": 27,
+    "groups": 11,
+    "derived": {
+     "peak_GBps_ramulator_preset": 819.2,
+     "time_at_peak_ms": 0.552985,
+     "note": "time_at_peak is a floor: every byte at 100% of HBM3 peak per Ramulator 2.1's preset"
+    },
+    "hbm_source": "/Users/tirthshah/Documents/Tirth_grad/tokenwall/configs/hbm3/hbm3_16gb_8hi_6400.yaml"
+   },
+   "rule": "nWTR",
+   "result": {
+    "channels": 16,
+    "requests_accepted": 14156416,
+    "requests_served": 14156416,
+    "in_flight_at_end": 0,
+    "served_per_channel_min_max": [
+     884776,
+     884776
+    ],
+    "controller_ticks": 4210363,
+    "sim_time_us": 1315.7384375,
+    "achieved_GBps": 344.297391555075,
+    "peak_GBps": 819.2,
+    "pct_of_peak": 42.0284901800629,
+    "row_hits": 13705199,
+    "row_misses": 343169,
+    "row_conflicts": 108048,
+    "row_hit_rate_pct": 96.8126325194173,
+    "avg_read_latency_ticks": 198.234910168541,
+    "avg_read_latency_ns": 61.9484094276692,
+    "wall_seconds": 38.904900792,
+    "commands": {
+     "ACT": 451217,
+     "PREab": 10784,
+     "PREpb": 108048,
+     "RD": 14156288,
+     "REFab": 10784,
+     "WR": 128
+    },
+    "slots": 67365824,
+    "slot_reasons": {
+     "ACT:Bank:nRP": 375034,
+     "ACT:Channel:bus(ACT)": 16,
+     "ACT:PseudoChannel:nRFC": 5856907,
+     "PREpb:Bank:nCWL+nBL+nWR": 4928,
+     "PREpb:Bank:nRTP": 512,
+     "PREpb:Channel:bus(ACT)": 24,
+     "RD:Bank:nRCDRD": 4310742,
+     "RD:BankGroup:nCCDL": 21939159,
+     "RD:Channel:bus(RD/WR/RDA/WRA)": 5840083,
+     "RD:Sid:nCCDR": 12738,
+     "WR:Bank:nRCDWR": 2048,
+     "data": 28312816,
+     "empty": 12942,
+     "mode_wait": 1008,
+     "refresh:PREab:PseudoChannel:nRAS": 60567,
+     "refresh:PREab:PseudoChannel:nRTP": 76672,
+     "refresh:REFab:PseudoChannel:nRC": 158548,
+     "refresh:REFab:PseudoChannel:nRP": 396234,
+     "refresh:arbitration": 4846
+    },
+    "classes": {
+     "weights": {
+      "served": 13631488,
+      "row_hits": 13197199
+     },
+     "kv_read": {
+      "served": 524288,
+      "row_hits": 507520
+     },
+     "kv_write": {
+      "served": 128,
+      "row_hits": 0
+     },
+     "other": {
+      "served": 512,
+      "row_hits": 480
+     }
+    }
+   },
+   "wall": 38.92093300819397,
+   "pct_of_peak": 42.0284901800629,
+   "achieved_GBps": 344.297391555075,
+   "row_hit_rate_pct": 96.8126325194173,
+   "sim_time_us": 1315.7384375,
+   "avg_read_latency_ns": 61.9484094276692,
+   "attribution": {
+    "data": 42.02845644699603,
+    "RD:BankGroup:nCCDL": 32.56719460597706,
+    "ACT:PseudoChannel:nRFC": 8.694181488821394,
+    "RD:Channel:bus(RD/WR/RDA/WRA)": 8.669207401070311,
+    "RD:Bank:nRCDRD": 6.399004337867225,
+    "refresh:REFab:PseudoChannel:nRP": 0.588182518186076,
+    "ACT:Bank:nRP": 0.556712555018996,
+    "refresh:REFab:PseudoChannel:nRC": 0.23535376038746295,
+    "refresh:PREab:PseudoChannel:nRTP": 0.11381438754463985,
+    "refresh:PREab:PseudoChannel:nRAS": 0.08990760656323302,
+    "empty": 0.01921152185416748,
+    "RD:Sid:nCCDR": 0.018908697680295575,
+    "PREpb:Bank:nCWL+nBL+nWR": 0.007315282004121259,
+    "refresh:arbitration": 0.007193558561682553,
+    "WR:Bank:nRCDWR": 0.003040117196517926,
+    "mode_wait": 0.0014963076826611666,
+    "PREpb:Bank:nRTP": 0.0007600292991294814,
+    "PREpb:Channel:bus(ACT)": 3.5626373396694445e-05,
+    "ACT:Channel:bus(ACT)": 2.3750915597796295e-05
+   }
+  },
+  {
+   "sweep": "ablation",
+   "name": "ramulator/nRTW",
+   "segs": "/Users/tirthshah/Documents/Tirth_grad/tokenwall/traces/sweep_8b_b1_s4096.segs",
+   "policy": "ramulator",
+   "refresh": "allbank",
+   "stacks": 1,
+   "disable": "nRTW",
+   "nonblocking": false,
+   "gen": {
+    "model": "llama3_8b",
+    "model_source": "/Users/tirthshah/Documents/Tirth_grad/tokenwall/configs/models/llama3_8b.yaml",
+    "run": {
+     "batch": 1,
+     "seq_len": 4096,
+     "tp": 1,
+     "stacks": 1,
+     "kv_layout": "head_major",
+     "kv_order": "head_outer",
+     "kv_capacity": null,
+     "request_bytes": 32,
+     "alignment": 2097152,
+     "small_alignment": 512,
+     "weight_streams": 1,
+     "chunk_bytes": 4096,
+     "kv_chunk_bytes": 0,
+     "layers": [
+      0,
+      1
+     ],
+     "include_embed": false,
+     "include_lm_head": false,
+     "seed": 1
+    },
+    "shard": {
+     "heads": 32,
+     "kv_heads": 8,
+     "intermediate": 14336,
+     "vocab": 128256,
+     "kv_capacity_positions": 4097,
+     "layers_emitted": 1
+    },
+    "footprint_bytes": 16867393536,
+    "capacity_bytes": 17179869184,
+    "capacity_utilization": 0.9818115234375,
+    "bytes": {
+     "weights": 436207616,
+     "norm": 16384,
+     "embed": 0,
+     "kv_read": 16777216,
+     "kv_write": 4096,
+     "total_read": 453001216,
+     "total_write": 4096,
+     "total": 453005312
+    },
+    "requests": {
+     "total": 14156416,
+     "write": 128,
+     "read": 14156288
+    },
+    "segments": 27,
+    "groups": 11,
+    "derived": {
+     "peak_GBps_ramulator_preset": 819.2,
+     "time_at_peak_ms": 0.552985,
+     "note": "time_at_peak is a floor: every byte at 100% of HBM3 peak per Ramulator 2.1's preset"
+    },
+    "hbm_source": "/Users/tirthshah/Documents/Tirth_grad/tokenwall/configs/hbm3/hbm3_16gb_8hi_6400.yaml"
+   },
+   "rule": "nRTW",
+   "result": {
+    "channels": 16,
+    "requests_accepted": 14156416,
+    "requests_served": 14156416,
+    "in_flight_at_end": 0,
+    "served_per_channel_min_max": [
+     884776,
+     884776
+    ],
+    "controller_ticks": 4210363,
+    "sim_time_us": 1315.7384375,
+    "achieved_GBps": 344.297391555075,
+    "peak_GBps": 819.2,
+    "pct_of_peak": 42.0284901800629,
+    "row_hits": 13705199,
+    "row_misses": 343169,
+    "row_conflicts": 108048,
+    "row_hit_rate_pct": 96.8126325194173,
+    "avg_read_latency_ticks": 198.234910168541,
+    "avg_read_latency_ns": 61.9484094276692,
+    "wall_seconds": 39.049186875,
+    "commands": {
+     "ACT": 451217,
+     "PREab": 10784,
+     "PREpb": 108048,
+     "RD": 14156288,
+     "REFab": 10784,
+     "WR": 128
+    },
+    "slots": 67365824,
+    "slot_reasons": {
+     "ACT:Bank:nRP": 375034,
+     "ACT:Channel:bus(ACT)": 16,
+     "ACT:PseudoChannel:nRFC": 5856907,
+     "PREpb:Bank:nCWL+nBL+nWR": 4928,
+     "PREpb:Bank:nRTP": 512,
+     "PREpb:Channel:bus(ACT)": 24,
+     "RD:Bank:nRCDRD": 4310742,
+     "RD:BankGroup:nCCDL": 21939159,
+     "RD:Channel:bus(RD/WR/RDA/WRA)": 5840083,
+     "RD:Sid:nCCDR": 12738,
+     "WR:Bank:nRCDWR": 2048,
+     "data": 28312816,
+     "empty": 12942,
+     "mode_wait": 1008,
+     "refresh:PREab:PseudoChannel:nRAS": 60567,
+     "refresh:PREab:PseudoChannel:nRTP": 76672,
+     "refresh:REFab:PseudoChannel:nRC": 158548,
+     "refresh:REFab:PseudoChannel:nRP": 396234,
+     "refresh:arbitration": 4846
+    },
+    "classes": {
+     "weights": {
+      "served": 13631488,
+      "row_hits": 13197199
+     },
+     "kv_read": {
+      "served": 524288,
+      "row_hits": 507520
+     },
+     "kv_write": {
+      "served": 128,
+      "row_hits": 0
+     },
+     "other": {
+      "served": 512,
+      "row_hits": 480
+     }
+    }
+   },
+   "wall": 39.0661461353302,
+   "pct_of_peak": 42.0284901800629,
+   "achieved_GBps": 344.297391555075,
+   "row_hit_rate_pct": 96.8126325194173,
+   "sim_time_us": 1315.7384375,
+   "avg_read_latency_ns": 61.9484094276692,
+   "attribution": {
+    "data": 42.02845644699603,
+    "RD:BankGroup:nCCDL": 32.56719460597706,
+    "ACT:PseudoChannel:nRFC": 8.694181488821394,
+    "RD:Channel:bus(RD/WR/RDA/WRA)": 8.669207401070311,
+    "RD:Bank:nRCDRD": 6.399004337867225,
+    "refresh:REFab:PseudoChannel:nRP": 0.588182518186076,
+    "ACT:Bank:nRP": 0.556712555018996,
+    "refresh:REFab:PseudoChannel:nRC": 0.23535376038746295,
+    "refresh:PREab:PseudoChannel:nRTP": 0.11381438754463985,
+    "refresh:PREab:PseudoChannel:nRAS": 0.08990760656323302,
+    "empty": 0.01921152185416748,
+    "RD:Sid:nCCDR": 0.018908697680295575,
+    "PREpb:Bank:nCWL+nBL+nWR": 0.007315282004121259,
+    "refresh:arbitration": 0.007193558561682553,
+    "WR:Bank:nRCDWR": 0.003040117196517926,
+    "mode_wait": 0.0014963076826611666,
+    "PREpb:Bank:nRTP": 0.0007600292991294814,
+    "PREpb:Channel:bus(ACT)": 3.5626373396694445e-05,
+    "ACT:Channel:bus(ACT)": 2.3750915597796295e-05
+   }
+  },
+  {
+   "sweep": "ablation",
+   "name": "ramulator/nPPD",
+   "segs": "/Users/tirthshah/Documents/Tirth_grad/tokenwall/traces/sweep_8b_b1_s4096.segs",
+   "policy": "ramulator",
+   "refresh": "allbank",
+   "stacks": 1,
+   "disable": "nPPD",
+   "nonblocking": false,
+   "gen": {
+    "model": "llama3_8b",
+    "model_source": "/Users/tirthshah/Documents/Tirth_grad/tokenwall/configs/models/llama3_8b.yaml",
+    "run": {
+     "batch": 1,
+     "seq_len": 4096,
+     "tp": 1,
+     "stacks": 1,
+     "kv_layout": "head_major",
+     "kv_order": "head_outer",
+     "kv_capacity": null,
+     "request_bytes": 32,
+     "alignment": 2097152,
+     "small_alignment": 512,
+     "weight_streams": 1,
+     "chunk_bytes": 4096,
+     "kv_chunk_bytes": 0,
+     "layers": [
+      0,
+      1
+     ],
+     "include_embed": false,
+     "include_lm_head": false,
+     "seed": 1
+    },
+    "shard": {
+     "heads": 32,
+     "kv_heads": 8,
+     "intermediate": 14336,
+     "vocab": 128256,
+     "kv_capacity_positions": 4097,
+     "layers_emitted": 1
+    },
+    "footprint_bytes": 16867393536,
+    "capacity_bytes": 17179869184,
+    "capacity_utilization": 0.9818115234375,
+    "bytes": {
+     "weights": 436207616,
+     "norm": 16384,
+     "embed": 0,
+     "kv_read": 16777216,
+     "kv_write": 4096,
+     "total_read": 453001216,
+     "total_write": 4096,
+     "total": 453005312
+    },
+    "requests": {
+     "total": 14156416,
+     "write": 128,
+     "read": 14156288
+    },
+    "segments": 27,
+    "groups": 11,
+    "derived": {
+     "peak_GBps_ramulator_preset": 819.2,
+     "time_at_peak_ms": 0.552985,
+     "note": "time_at_peak is a floor: every byte at 100% of HBM3 peak per Ramulator 2.1's preset"
+    },
+    "hbm_source": "/Users/tirthshah/Documents/Tirth_grad/tokenwall/configs/hbm3/hbm3_16gb_8hi_6400.yaml"
+   },
+   "rule": "nPPD",
+   "result": {
+    "channels": 16,
+    "requests_accepted": 14156416,
+    "requests_served": 14156416,
+    "in_flight_at_end": 0,
+    "served_per_channel_min_max": [
+     884776,
+     884776
+    ],
+    "controller_ticks": 4210363,
+    "sim_time_us": 1315.7384375,
+    "achieved_GBps": 344.297391555075,
+    "peak_GBps": 819.2,
+    "pct_of_peak": 42.0284901800629,
+    "row_hits": 13705199,
+    "row_misses": 343169,
+    "row_conflicts": 108048,
+    "row_hit_rate_pct": 96.8126325194173,
+    "avg_read_latency_ticks": 198.234910168541,
+    "avg_read_latency_ns": 61.9484094276692,
+    "wall_seconds": 38.913185834,
+    "commands": {
+     "ACT": 451217,
+     "PREab": 10784,
+     "PREpb": 108048,
+     "RD": 14156288,
+     "REFab": 10784,
+     "WR": 128
+    },
+    "slots": 67365824,
+    "slot_reasons": {
+     "ACT:Bank:nRP": 375034,
+     "ACT:Channel:bus(ACT)": 16,
+     "ACT:PseudoChannel:nRFC": 5856907,
+     "PREpb:Bank:nCWL+nBL+nWR": 4928,
+     "PREpb:Bank:nRTP": 512,
+     "PREpb:Channel:bus(ACT)": 24,
+     "RD:Bank:nRCDRD": 4310742,
+     "RD:BankGroup:nCCDL": 21939159,
+     "RD:Channel:bus(RD/WR/RDA/WRA)": 5840083,
+     "RD:Sid:nCCDR": 12738,
+     "WR:Bank:nRCDWR": 2048,
+     "data": 28312816,
+     "empty": 12942,
+     "mode_wait": 1008,
+     "refresh:PREab:PseudoChannel:nRAS": 60567,
+     "refresh:PREab:PseudoChannel:nRTP": 76672,
+     "refresh:REFab:PseudoChannel:nRC": 158548,
+     "refresh:REFab:PseudoChannel:nRP": 396234,
+     "refresh:arbitration": 4846
+    },
+    "classes": {
+     "weights": {
+      "served": 13631488,
+      "row_hits": 13197199
+     },
+     "kv_read": {
+      "served": 524288,
+      "row_hits": 507520
+     },
+     "kv_write": {
+      "served": 128,
+      "row_hits": 0
+     },
+     "other": {
+      "served": 512,
+      "row_hits": 480
+     }
+    }
+   },
+   "wall": 38.928916931152344,
+   "pct_of_peak": 42.0284901800629,
+   "achieved_GBps": 344.297391555075,
+   "row_hit_rate_pct": 96.8126325194173,
+   "sim_time_us": 1315.7384375,
+   "avg_read_latency_ns": 61.9484094276692,
+   "attribution": {
+    "data": 42.02845644699603,
+    "RD:BankGroup:nCCDL": 32.56719460597706,
+    "ACT:PseudoChannel:nRFC": 8.694181488821394,
+    "RD:Channel:bus(RD/WR/RDA/WRA)": 8.669207401070311,
+    "RD:Bank:nRCDRD": 6.399004337867225,
+    "refresh:REFab:PseudoChannel:nRP": 0.588182518186076,
+    "ACT:Bank:nRP": 0.556712555018996,
+    "refresh:REFab:PseudoChannel:nRC": 0.23535376038746295,
+    "refresh:PREab:PseudoChannel:nRTP": 0.11381438754463985,
+    "refresh:PREab:PseudoChannel:nRAS": 0.08990760656323302,
+    "empty": 0.01921152185416748,
+    "RD:Sid:nCCDR": 0.018908697680295575,
+    "PREpb:Bank:nCWL+nBL+nWR": 0.007315282004121259,
+    "refresh:arbitration": 0.007193558561682553,
+    "WR:Bank:nRCDWR": 0.003040117196517926,
+    "mode_wait": 0.0014963076826611666,
+    "PREpb:Bank:nRTP": 0.0007600292991294814,
+    "PREpb:Channel:bus(ACT)": 3.5626373396694445e-05,
+    "ACT:Channel:bus(ACT)": 2.3750915597796295e-05
+   }
+  },
+  {
+   "sweep": "ablation",
+   "name": "ramulator/bus(ACT)",
+   "segs": "/Users/tirthshah/Documents/Tirth_grad/tokenwall/traces/sweep_8b_b1_s4096.segs",
+   "policy": "ramulator",
+   "refresh": "allbank",
+   "stacks": 1,
+   "disable": "bus(ACT)",
+   "nonblocking": false,
+   "gen": {
+    "model": "llama3_8b",
+    "model_source": "/Users/tirthshah/Documents/Tirth_grad/tokenwall/configs/models/llama3_8b.yaml",
+    "run": {
+     "batch": 1,
+     "seq_len": 4096,
+     "tp": 1,
+     "stacks": 1,
+     "kv_layout": "head_major",
+     "kv_order": "head_outer",
+     "kv_capacity": null,
+     "request_bytes": 32,
+     "alignment": 2097152,
+     "small_alignment": 512,
+     "weight_streams": 1,
+     "chunk_bytes": 4096,
+     "kv_chunk_bytes": 0,
+     "layers": [
+      0,
+      1
+     ],
+     "include_embed": false,
+     "include_lm_head": false,
+     "seed": 1
+    },
+    "shard": {
+     "heads": 32,
+     "kv_heads": 8,
+     "intermediate": 14336,
+     "vocab": 128256,
+     "kv_capacity_positions": 4097,
+     "layers_emitted": 1
+    },
+    "footprint_bytes": 16867393536,
+    "capacity_bytes": 17179869184,
+    "capacity_utilization": 0.9818115234375,
+    "bytes": {
+     "weights": 436207616,
+     "norm": 16384,
+     "embed": 0,
+     "kv_read": 16777216,
+     "kv_write": 4096,
+     "total_read": 453001216,
+     "total_write": 4096,
+     "total": 453005312
+    },
+    "requests": {
+     "total": 14156416,
+     "write": 128,
+     "read": 14156288
+    },
+    "segments": 27,
+    "groups": 11,
+    "derived": {
+     "peak_GBps_ramulator_preset": 819.2,
+     "time_at_peak_ms": 0.552985,
+     "note": "time_at_peak is a floor: every byte at 100% of HBM3 peak per Ramulator 2.1's preset"
+    },
+    "hbm_source": "/Users/tirthshah/Documents/Tirth_grad/tokenwall/configs/hbm3/hbm3_16gb_8hi_6400.yaml"
+   },
+   "rule": "bus(ACT)",
+   "result": {
+    "channels": 16,
+    "requests_accepted": 14156416,
+    "requests_served": 14156416,
+    "in_flight_at_end": 0,
+    "served_per_channel_min_max": [
+     884776,
+     884776
+    ],
+    "controller_ticks": 4210359,
+    "sim_time_us": 1315.7371875,
+    "achieved_GBps": 344.297718650595,
+    "peak_GBps": 819.2,
+    "pct_of_peak": 42.0285301087152,
+    "row_hits": 13705215,
+    "row_misses": 343153,
+    "row_conflicts": 108048,
+    "row_hit_rate_pct": 96.8127455423746,
+    "avg_read_latency_ticks": 198.234734981374,
+    "avg_read_latency_ns": 61.9483546816793,
+    "wall_seconds": 38.820878208,
+    "commands": {
+     "ACT": 451201,
+     "PREab": 10784,
+     "PREpb": 108048,
+     "RD": 14156288,
+     "REFab": 10784,
+     "WR": 128
+    },
+    "slots": 67365760,
+    "slot_reasons": {
+     "ACT:Bank:nRP": 375034,
+     "ACT:PseudoChannel:nRFC": 5857067,
+     "PREpb:Bank:nCWL+nBL+nWR": 4928,
+     "PREpb:Bank:nRTP": 512,
+     "RD:Bank:nRCDRD": 4310950,
+     "RD:BankGroup:nCCDL": 21938679,
+     "RD:Channel:bus(RD/WR/RDA/WRA)": 5840555,
+     "RD:Sid:nCCDR": 12722,
+     "WR:Bank:nRCDWR": 2048,
+     "data": 28312816,
+     "empty": 12942,
+     "mode_wait": 1008,
+     "refresh:PREab:PseudoChannel:nRAS": 60183,
+     "refresh:PREab:PseudoChannel:nRTP": 76592,
+     "refresh:REFab:PseudoChannel:nRC": 156884,
+     "refresh:REFab:PseudoChannel:nRP": 397930,
+     "refresh:arbitration": 4910
+    },
+    "classes": {
+     "weights": {
+      "served": 13631488,
+      "row_hits": 13197215
+     },
+     "kv_read": {
+      "served": 524288,
+      "row_hits": 507520
+     },
+     "kv_write": {
+      "served": 128,
+      "row_hits": 0
+     },
+     "other": {
+      "served": 512,
+      "row_hits": 480
+     }
+    }
+   },
+   "wall": 38.835334062576294,
+   "pct_of_peak": 42.0285301087152,
+   "achieved_GBps": 344.297718650595,
+   "row_hit_rate_pct": 96.8127455423746,
+   "sim_time_us": 1315.7371875,
+   "avg_read_latency_ns": 61.9483546816793,
+   "attribution": {
+    "data": 42.028496375606835,
+    "RD:BankGroup:nCCDL": 32.56651301788921,
+    "ACT:PseudoChannel:nRFC": 8.69442725800169,
+    "RD:Channel:bus(RD/WR/RDA/WRA)": 8.669916289818447,
+    "RD:Bank:nRCDRD": 6.399319179357585,
+    "refresh:REFab:PseudoChannel:nRP": 0.5907006764267189,
+    "ACT:Bank:nRP": 0.5567130839168147,
+    "refresh:REFab:PseudoChannel:nRC": 0.23288388641351335,
+    "refresh:PREab:PseudoChannel:nRTP": 0.11369574098176878,
+    "refresh:PREab:PseudoChannel:nRAS": 0.08933766946294379,
+    "empty": 0.01921154010583418,
+    "RD:Sid:nCCDR": 0.01888496470610589,
+    "PREpb:Bank:nCWL+nBL+nWR": 0.0073152889539136795,
+    "refresh:arbitration": 0.007288569148481365,
+    "WR:Bank:nRCDWR": 0.003040120084743347,
+    "mode_wait": 0.0014963091042096163,
+    "PREpb:Bank:nRTP": 0.0007600300211858368
+   }
+  },
+  {
+   "sweep": "ablation",
+   "name": "ramulator/nRCDRD",
+   "segs": "/Users/tirthshah/Documents/Tirth_grad/tokenwall/traces/sweep_8b_b1_s4096.segs",
+   "policy": "ramulator",
+   "refresh": "allbank",
+   "stacks": 1,
+   "disable": "nRCDRD",
+   "nonblocking": false,
+   "gen": {
+    "model": "llama3_8b",
+    "model_source": "/Users/tirthshah/Documents/Tirth_grad/tokenwall/configs/models/llama3_8b.yaml",
+    "run": {
+     "batch": 1,
+     "seq_len": 4096,
+     "tp": 1,
+     "stacks": 1,
+     "kv_layout": "head_major",
+     "kv_order": "head_outer",
+     "kv_capacity": null,
+     "request_bytes": 32,
+     "alignment": 2097152,
+     "small_alignment": 512,
+     "weight_streams": 1,
+     "chunk_bytes": 4096,
+     "kv_chunk_bytes": 0,
+     "layers": [
+      0,
+      1
+     ],
+     "include_embed": false,
+     "include_lm_head": false,
+     "seed": 1
+    },
+    "shard": {
+     "heads": 32,
+     "kv_heads": 8,
+     "intermediate": 14336,
+     "vocab": 128256,
+     "kv_capacity_positions": 4097,
+     "layers_emitted": 1
+    },
+    "footprint_bytes": 16867393536,
+    "capacity_bytes": 17179869184,
+    "capacity_utilization": 0.9818115234375,
+    "bytes": {
+     "weights": 436207616,
+     "norm": 16384,
+     "embed": 0,
+     "kv_read": 16777216,
+     "kv_write": 4096,
+     "total_read": 453001216,
+     "total_write": 4096,
+     "total": 453005312
+    },
+    "requests": {
+     "total": 14156416,
+     "write": 128,
+     "read": 14156288
+    },
+    "segments": 27,
+    "groups": 11,
+    "derived": {
+     "peak_GBps_ramulator_preset": 819.2,
+     "time_at_peak_ms": 0.552985,
+     "note": "time_at_peak is a floor: every byte at 100% of HBM3 peak per Ramulator 2.1's preset"
+    },
+    "hbm_source": "/Users/tirthshah/Documents/Tirth_grad/tokenwall/configs/hbm3/hbm3_16gb_8hi_6400.yaml"
+   },
+   "rule": "nRCDRD",
+   "result": {
+    "channels": 16,
+    "requests_accepted": 14156416,
+    "requests_served": 14156416,
+    "in_flight_at_end": 0,
+    "served_per_channel_min_max": [
+     884776,
+     884776
+    ],
+    "controller_ticks": 3864339,
+    "sim_time_us": 1207.6059375,
+    "achieved_GBps": 375.126767708527,
+    "peak_GBps": 819.2,
+    "pct_of_peak": 45.7918417612947,
+    "row_hits": 13703872,
+    "row_misses": 315483,
+    "row_conflicts": 137061,
+    "row_hit_rate_pct": 96.8032586779027,
+    "avg_read_latency_ticks": 183.702714722956,
+    "avg_read_latency_ns": 57.4070983509236,
+    "wall_seconds": 36.213413458,
+    "commands": {
+     "ACT": 452544,
+     "PREab": 9888,
+     "PREpb": 137061,
+     "RD": 14156288,
+     "REFab": 9888,
+     "WR": 128
+    },
+    "slots": 61829440,
+    "slot_reasons": {
+     "ACT:Bank:nRC": 800,
+     "ACT:Bank:nRP": 72612,
+     "ACT:Channel:bus(ACT)": 46,
+     "ACT:PseudoChannel:nRFC": 5393417,
+     "ACT:PseudoChannel:nRRDS": 761,
+     "PREpb:Bank:nCWL+nBL+nWR": 4928,
+     "PREpb:Bank:nRAS": 752,
+     "PREpb:Bank:nRTP": 256,
+     "PREpb:Channel:bus(ACT)": 32,
+     "RD:BankGroup:nCCDL": 20233996,
+     "RD:Channel:bus(RD/WR/RDA/WRA)": 6697531,
+     "RD:Sid:nCCDR": 460444,
+     "WR:Bank:nRCDWR": 2048,
+     "arbitration": 19825,
+     "data": 28312816,
+     "empty": 11950,
+     "mode_wait": 1584,
+     "refresh:PREab:PseudoChannel:nRAS": 41278,
+     "refresh:PREab:PseudoChannel:nRTP": 50428,
+     "refresh:REFab:PseudoChannel:nRC": 89856,
+     "refresh:REFab:PseudoChannel:nRP": 424320,
+     "refresh:arbitration": 9760
+    },
+    "classes": {
+     "weights": {
+      "served": 13631488,
+      "row_hits": 13195888
+     },
+     "kv_read": {
+      "served": 524288,
+      "row_hits": 507504
+     },
+     "kv_write": {
+      "served": 128,
+      "row_hits": 0
+     },
+     "other": {
+      "served": 512,
+      "row_hits": 480
+     }
+    }
+   },
+   "wall": 36.2327880859375,
+   "pct_of_peak": 45.7918417612947,
+   "achieved_GBps": 375.126767708527,
+   "row_hit_rate_pct": 96.8032586779027,
+   "sim_time_us": 1207.6059375,
+   "avg_read_latency_ns": 57.4070983509236,
+   "attribution": {
+    "data": 45.79180403380655,
+    "RD:BankGroup:nCCDL": 32.72550422581864,
+    "RD:Channel:bus(RD/WR/RDA/WRA)": 10.832268576263994,
+    "ACT:PseudoChannel:nRFC": 8.723056524529415,
+    "RD:Sid:nCCDR": 0.7447002592939544,
+    "refresh:REFab:PseudoChannel:nRP": 0.6862750172086307,
+    "refresh:REFab:PseudoChannel:nRC": 0.14532882717359238,
+    "ACT:Bank:nRP": 0.11743920048442942,
+    "refresh:PREab:PseudoChannel:nRTP": 0.0815598523939405,
+    "refresh:PREab:PseudoChannel:nRAS": 0.06676107692387316,
+    "arbitration": 0.03206401351847922,
+    "empty": 0.019327362499158975,
+    "refresh:arbitration": 0.015785360501405155,
+    "PREpb:Bank:nCWL+nBL+nWR": 0.007970313171201292,
+    "WR:Bank:nRCDWR": 0.003312337941278459,
+    "mode_wait": 0.002561886376457558,
+    "ACT:Bank:nRC": 0.001293882008311898,
+    "ACT:PseudoChannel:nRRDS": 0.001230805260406693,
+    "PREpb:Bank:nRAS": 0.0012162490878131842,
+    "PREpb:Bank:nRTP": 0.0004140422426598074,
+    "ACT:Channel:bus(ACT)": 7.439821547793414e-05,
+    "PREpb:Channel:bus(ACT)": 5.175528033247592e-05
+   }
+  },
+  {
+   "sweep": "ablation",
+   "name": "ramulator/nRP",
+   "segs": "/Users/tirthshah/Documents/Tirth_grad/tokenwall/traces/sweep_8b_b1_s4096.segs",
+   "policy": "ramulator",
+   "refresh": "allbank",
+   "stacks": 1,
+   "disable": "nRP",
+   "nonblocking": false,
+   "gen": {
+    "model": "llama3_8b",
+    "model_source": "/Users/tirthshah/Documents/Tirth_grad/tokenwall/configs/models/llama3_8b.yaml",
+    "run": {
+     "batch": 1,
+     "seq_len": 4096,
+     "tp": 1,
+     "stacks": 1,
+     "kv_layout": "head_major",
+     "kv_order": "head_outer",
+     "kv_capacity": null,
+     "request_bytes": 32,
+     "alignment": 2097152,
+     "small_alignment": 512,
+     "weight_streams": 1,
+     "chunk_bytes": 4096,
+     "kv_chunk_bytes": 0,
+     "layers": [
+      0,
+      1
+     ],
+     "include_embed": false,
+     "include_lm_head": false,
+     "seed": 1
+    },
+    "shard": {
+     "heads": 32,
+     "kv_heads": 8,
+     "intermediate": 14336,
+     "vocab": 128256,
+     "kv_capacity_positions": 4097,
+     "layers_emitted": 1
+    },
+    "footprint_bytes": 16867393536,
+    "capacity_bytes": 17179869184,
+    "capacity_utilization": 0.9818115234375,
+    "bytes": {
+     "weights": 436207616,
+     "norm": 16384,
+     "embed": 0,
+     "kv_read": 16777216,
+     "kv_write": 4096,
+     "total_read": 453001216,
+     "total_write": 4096,
+     "total": 453005312
+    },
+    "requests": {
+     "total": 14156416,
+     "write": 128,
+     "read": 14156288
+    },
+    "segments": 27,
+    "groups": 11,
+    "derived": {
+     "peak_GBps_ramulator_preset": 819.2,
+     "time_at_peak_ms": 0.552985,
+     "note": "time_at_peak is a floor: every byte at 100% of HBM3 peak per Ramulator 2.1's preset"
+    },
+    "hbm_source": "/Users/tirthshah/Documents/Tirth_grad/tokenwall/configs/hbm3/hbm3_16gb_8hi_6400.yaml"
+   },
+   "rule": "nRP",
+   "result": {
+    "channels": 16,
+    "requests_accepted": 14156416,
+    "requests_served": 14156416,
+    "in_flight_at_end": 0,
+    "served_per_channel_min_max": [
+     884776,
+     884776
+    ],
+    "controller_ticks": 3965411,
+    "sim_time_us": 1239.1909375,
+    "achieved_GBps": 365.565384874355,
+    "peak_GBps": 819.2,
+    "pct_of_peak": 44.6246807707953,
+    "row_hits": 13700496,
+    "row_misses": 325504,
+    "row_conflicts": 130416,
+    "row_hit_rate_pct": 96.7794108339286,
+    "avg_read_latency_ticks": 189.341109477287,
+    "avg_read_latency_ns": 59.1690967116521,
+    "wall_seconds": 36.706725417,
+    "commands": {
+     "ACT": 455920,
+     "PREab": 10144,
+     "PREpb": 130416,
+     "RD": 14156288,
+     "REFab": 10144,
+     "WR": 128
+    },
+    "slots": 63446592,
+    "slot_reasons": {
+     "ACT:Bank:nRC": 1616,
+     "ACT:Channel:bus(ACT)": 4928,
+     "ACT:PseudoChannel:nRFC": 5567968,
+     "PREpb:Bank:nCWL+nBL+nWR": 4928,
+     "PREpb:Bank:nRTP": 512,
+     "RD:Bank:nRCDRD": 1260740,
+     "RD:BankGroup:nCCDL": 20927678,
+     "RD:Channel:bus(RD/WR/RDA/WRA)": 6898376,
+     "RD:Sid:nCCDR": 15820,
+     "WR:Bank:nRCDWR": 2048,
+     "data": 28312824,
+     "empty": 10006,
+     "mode_wait": 1008,
+     "refresh:PREab:PseudoChannel:nRAS": 142894,
+     "refresh:PREab:PseudoChannel:nRTP": 40954,
+     "refresh:REFab:PseudoChannel:nRC": 249136,
+     "refresh:arbitration": 5156
+    },
+    "classes": {
+     "weights": {
+      "served": 13631488,
+      "row_hits": 13192528
+     },
+     "kv_read": {
+      "served": 524288,
+      "row_hits": 507488
+     },
+     "kv_write": {
+      "served": 128,
+      "row_hits": 0
+     },
+     "other": {
+      "served": 512,
+      "row_hits": 480
+     }
+    }
+   },
+   "wall": 36.720168113708496,
+   "pct_of_peak": 44.6246807707953,
+   "achieved_GBps": 365.565384874355,
+   "row_hit_rate_pct": 96.7794108339286,
+   "sim_time_us": 1239.1909375,
+   "avg_read_latency_ns": 59.1690967116521,
+   "attribution": {
+    "data": 44.62465690828595,
+    "RD:BankGroup:nCCDL": 32.984715711759584,
+    "RD:Channel:bus(RD/WR/RDA/WRA)": 10.87272898755539,
+    "ACT:PseudoChannel:nRFC": 8.775834642150677,
+    "RD:Bank:nRCDRD": 1.9870886051688954,
+    "refresh:REFab:PseudoChannel:nRC": 0.3926704211315243,
+    "refresh:PREab:PseudoChannel:nRAS": 0.22521934669083565,
+    "refresh:PREab:PseudoChannel:nRTP": 0.06454877828583763,
+    "RD:Sid:nCCDR": 0.02493435738833695,
+    "empty": 0.01577074462880528,
+    "refresh:arbitration": 0.008126520018600841,
+    "ACT:Channel:bus(ACT)": 0.007767162655481953,
+    "PREpb:Bank:nCWL+nBL+nWR": 0.007767162655481953,
+    "WR:Bank:nRCDWR": 0.0032279117529275645,
+    "ACT:Bank:nRC": 0.0025470241175444067,
+    "mode_wait": 0.0015887378158940357,
+    "PREpb:Bank:nRTP": 0.0008069779382318911
+   }
+  },
+  {
+   "sweep": "ablation",
+   "name": "ramulator/nRAS",
+   "segs": "/Users/tirthshah/Documents/Tirth_grad/tokenwall/traces/sweep_8b_b1_s4096.segs",
+   "policy": "ramulator",
+   "refresh": "allbank",
+   "stacks": 1,
+   "disable": "nRAS",
+   "nonblocking": false,
+   "gen": {
+    "model": "llama3_8b",
+    "model_source": "/Users/tirthshah/Documents/Tirth_grad/tokenwall/configs/models/llama3_8b.yaml",
+    "run": {
+     "batch": 1,
+     "seq_len": 4096,
+     "tp": 1,
+     "stacks": 1,
+     "kv_layout": "head_major",
+     "kv_order": "head_outer",
+     "kv_capacity": null,
+     "request_bytes": 32,
+     "alignment": 2097152,
+     "small_alignment": 512,
+     "weight_streams": 1,
+     "chunk_bytes": 4096,
+     "kv_chunk_bytes": 0,
+     "layers": [
+      0,
+      1
+     ],
+     "include_embed": false,
+     "include_lm_head": false,
+     "seed": 1
+    },
+    "shard": {
+     "heads": 32,
+     "kv_heads": 8,
+     "intermediate": 14336,
+     "vocab": 128256,
+     "kv_capacity_positions": 4097,
+     "layers_emitted": 1
+    },
+    "footprint_bytes": 16867393536,
+    "capacity_bytes": 17179869184,
+    "capacity_utilization": 0.9818115234375,
+    "bytes": {
+     "weights": 436207616,
+     "norm": 16384,
+     "embed": 0,
+     "kv_read": 16777216,
+     "kv_write": 4096,
+     "total_read": 453001216,
+     "total_write": 4096,
+     "total": 453005312
+    },
+    "requests": {
+     "total": 14156416,
+     "write": 128,
+     "read": 14156288
+    },
+    "segments": 27,
+    "groups": 11,
+    "derived": {
+     "peak_GBps_ramulator_preset": 819.2,
+     "time_at_peak_ms": 0.552985,
+     "note": "time_at_peak is a floor: every byte at 100% of HBM3 peak per Ramulator 2.1's preset"
+    },
+    "hbm_source": "/Users/tirthshah/Documents/Tirth_grad/tokenwall/configs/hbm3/hbm3_16gb_8hi_6400.yaml"
+   },
+   "rule": "nRAS",
+   "result": {
+    "channels": 16,
+    "requests_accepted": 14156416,
+    "requests_served": 14156416,
+    "in_flight_at_end": 0,
+    "served_per_channel_min_max": [
+     884776,
+     884776
+    ],
+    "controller_ticks": 4210363,
+    "sim_time_us": 1315.7384375,
+    "achieved_GBps": 344.297391555075,
+    "peak_GBps": 819.2,
+    "pct_of_peak": 42.0284901800629,
+    "row_hits": 13705199,
+    "row_misses": 343169,
+    "row_conflicts": 108048,
+    "row_hit_rate_pct": 96.8126325194173,
+    "avg_read_latency_ticks": 198.234910168541,
+    "avg_read_latency_ns": 61.9484094276692,
+    "wall_seconds": 39.235435125,
+    "commands": {
+     "ACT": 451217,
+     "PREab": 10784,
+     "PREpb": 108048,
+     "RD": 14156288,
+     "REFab": 10784,
+     "WR": 128
+    },
+    "slots": 67365824,
+    "slot_reasons": {
+     "ACT:Bank:nRP": 375034,
+     "ACT:Channel:bus(ACT)": 16,
+     "ACT:PseudoChannel:nRFC": 5856907,
+     "PREpb:Bank:nCWL+nBL+nWR": 4928,
+     "PREpb:Bank:nRTP": 512,
+     "PREpb:Channel:bus(ACT)": 24,
+     "RD:Bank:nRCDRD": 4310742,
+     "RD:BankGroup:nCCDL": 21939159,
+     "RD:Channel:bus(RD/WR/RDA/WRA)": 5840083,
+     "RD:Sid:nCCDR": 12738,
+     "WR:Bank:nRCDWR": 2048,
+     "data": 28312816,
+     "empty": 12942,
+     "mode_wait": 1008,
+     "refresh:PREab:PseudoChannel:nRTP": 112065,
+     "refresh:REFab:PseudoChannel:nRC": 182380,
+     "refresh:REFab:PseudoChannel:nRP": 396234,
+     "refresh:arbitration": 4990,
+     "refresh:wait_active": 1198
+    },
+    "classes": {
+     "weights": {
+      "served": 13631488,
+      "row_hits": 13197199
+     },
+     "kv_read": {
+      "served": 524288,
+      "row_hits": 507520
+     },
+     "kv_write": {
+      "served": 128,
+      "row_hits": 0
+     },
+     "other": {
+      "served": 512,
+      "row_hits": 480
+     }
+    }
+   },
+   "wall": 39.256030797958374,
+   "pct_of_peak": 42.0284901800629,
+   "achieved_GBps": 344.297391555075,
+   "row_hit_rate_pct": 96.8126325194173,
+   "sim_time_us": 1315.7384375,
+   "avg_read_latency_ns": 61.9484094276692,
+   "attribution": {
+    "data": 42.02845644699603,
+    "RD:BankGroup:nCCDL": 32.56719460597706,
+    "ACT:PseudoChannel:nRFC": 8.694181488821394,
+    "RD:Channel:bus(RD/WR/RDA/WRA)": 8.669207401070311,
+    "RD:Bank:nRCDRD": 6.399004337867225,
+    "refresh:REFab:PseudoChannel:nRP": 0.588182518186076,
+    "ACT:Bank:nRP": 0.556712555018996,
+    "refresh:REFab:PseudoChannel:nRC": 0.27073074917038054,
+    "refresh:PREab:PseudoChannel:nRTP": 0.16635289727919012,
+    "empty": 0.01921152185416748,
+    "RD:Sid:nCCDR": 0.018908697680295575,
+    "refresh:arbitration": 0.00740731680206272,
+    "PREpb:Bank:nCWL+nBL+nWR": 0.007315282004121259,
+    "WR:Bank:nRCDWR": 0.003040117196517926,
+    "refresh:wait_active": 0.0017783498053849977,
+    "mode_wait": 0.0014963076826611666,
+    "PREpb:Bank:nRTP": 0.0007600292991294814,
+    "PREpb:Channel:bus(ACT)": 3.5626373396694445e-05,
+    "ACT:Channel:bus(ACT)": 2.3750915597796295e-05
+   }
+  },
+  {
+   "sweep": "ablation",
+   "name": "bank_low/baseline",
+   "segs": "/Users/tirthshah/Documents/Tirth_grad/tokenwall/traces/sweep_8b_b1_s4096.segs",
+   "policy": "bank_low",
+   "refresh": "allbank",
+   "stacks": 1,
+   "disable": null,
+   "nonblocking": false,
+   "gen": {
+    "model": "llama3_8b",
+    "model_source": "/Users/tirthshah/Documents/Tirth_grad/tokenwall/configs/models/llama3_8b.yaml",
+    "run": {
+     "batch": 1,
+     "seq_len": 4096,
+     "tp": 1,
+     "stacks": 1,
+     "kv_layout": "head_major",
+     "kv_order": "head_outer",
+     "kv_capacity": null,
+     "request_bytes": 32,
+     "alignment": 2097152,
+     "small_alignment": 512,
+     "weight_streams": 1,
+     "chunk_bytes": 4096,
+     "kv_chunk_bytes": 0,
+     "layers": [
+      0,
+      1
+     ],
+     "include_embed": false,
+     "include_lm_head": false,
+     "seed": 1
+    },
+    "shard": {
+     "heads": 32,
+     "kv_heads": 8,
+     "intermediate": 14336,
+     "vocab": 128256,
+     "kv_capacity_positions": 4097,
+     "layers_emitted": 1
+    },
+    "footprint_bytes": 16867393536,
+    "capacity_bytes": 17179869184,
+    "capacity_utilization": 0.9818115234375,
+    "bytes": {
+     "weights": 436207616,
+     "norm": 16384,
+     "embed": 0,
+     "kv_read": 16777216,
+     "kv_write": 4096,
+     "total_read": 453001216,
+     "total_write": 4096,
+     "total": 453005312
+    },
+    "requests": {
+     "total": 14156416,
+     "write": 128,
+     "read": 14156288
+    },
+    "segments": 27,
+    "groups": 11,
+    "derived": {
+     "peak_GBps_ramulator_preset": 819.2,
+     "time_at_peak_ms": 0.552985,
+     "note": "time_at_peak is a floor: every byte at 100% of HBM3 peak per Ramulator 2.1's preset"
+    },
+    "hbm_source": "/Users/tirthshah/Documents/Tirth_grad/tokenwall/configs/hbm3/hbm3_16gb_8hi_6400.yaml"
+   },
+   "rule": "baseline",
+   "result": {
+    "channels": 16,
+    "requests_accepted": 14156416,
+    "requests_served": 14156416,
+    "in_flight_at_end": 0,
+    "served_per_channel_min_max": [
+     884776,
+     884776
+    ],
+    "controller_ticks": 2112621,
+    "sim_time_us": 660.1940625,
+    "achieved_GBps": 686.169927497644,
+    "peak_GBps": 819.2,
+    "pct_of_peak": 83.7609774777397,
+    "row_hits": 13551912,
+    "row_misses": 167696,
+    "row_conflicts": 436808,
+    "row_hit_rate_pct": 95.7298231416765,
+    "avg_read_latency_ticks": 123.359564173885,
+    "avg_read_latency_ns": 38.5498638043391,
+    "wall_seconds": 20.805037459,
+    "commands": {
+     "ACT": 604504,
+     "PREab": 5408,
+     "PREpb": 436824,
+     "RD": 14156288,
+     "REFab": 5408,
+     "WR": 128
+    },
+    "slots": 33801952,
+    "slot_reasons": {
+     "ACT:Bank:nRC": 1144,
+     "ACT:Bank:nRP": 2263,
+     "ACT:Channel:bus(ACT)": 165,
+     "ACT:PseudoChannel:nFAW": 776,
+     "ACT:PseudoChannel:nRFC": 2950064,
+     "ACT:PseudoChannel:nRRDS": 32,
+     "PREpb:Bank:nCWL+nBL+nWR": 1280,
+     "PREpb:Bank:nRAS": 496,
+     "RD:Bank:nRCDRD": 1357216,
+     "RD:BankGroup:nCCDL": 1456,
+     "RD:Channel:bus(RD/WR/RDA/WRA)": 418855,
+     "RD:Sid:nCCDR": 413640,
+     "WR:Bank:nRCDWR": 1152,
+     "data": 28312816,
+     "empty": 47,
+     "mode_wait": 176,
+     "refresh:PREab:PseudoChannel:nRAS": 15072,
+     "refresh:PREab:PseudoChannel:nRTP": 38678,
+     "refresh:REFab:PseudoChannel:nRC": 12480,
+     "refresh:REFab:PseudoChannel:nRP": 268736,
+     "refresh:arbitration": 5408
+    },
+    "classes": {
+     "weights": {
+      "served": 13631488,
+      "row_hits": 13050032
+     },
+     "kv_read": {
+      "served": 524288,
+      "row_hits": 501880
+     },
+     "kv_write": {
+      "served": 128,
+      "row_hits": 0
+     },
+     "other": {
+      "served": 512,
+      "row_hits": 0
+     }
+    }
+   },
+   "wall": 20.821924924850464,
+   "pct_of_peak": 83.7609774777397,
+   "achieved_GBps": 686.169927497644,
+   "row_hit_rate_pct": 95.7298231416765,
+   "sim_time_us": 660.1940625,
+   "avg_read_latency_ns": 38.5498638043391,
+   "attribution": {
+    "data": 83.76089049531814,
+    "ACT:PseudoChannel:nRFC": 8.727495974196993,
+    "RD:Bank:nRCDRD": 4.015200068919096,
+    "RD:Channel:bus(RD/WR/RDA/WRA)": 1.2391444139084038,
+    "RD:Sid:nCCDR": 1.2237163108213396,
+    "refresh:REFab:PseudoChannel:nRP": 0.79503100886008,
+    "refresh:PREab:PseudoChannel:nRTP": 0.11442534442981281,
+    "refresh:PREab:PseudoChannel:nRAS": 0.04458914088748484,
+    "refresh:REFab:PseudoChannel:nRC": 0.036920944683904645,
+    "refresh:arbitration": 0.015999076029692014,
+    "ACT:Bank:nRP": 0.006694879632986876,
+    "RD:BankGroup:nCCDL": 0.004307443546455542,
+    "PREpb:Bank:nCWL+nBL+nWR": 0.0037867635573235535,
+    "WR:Bank:nRCDWR": 0.003408087201591198,
+    "ACT:Bank:nRC": 0.0033844199293579257,
+    "ACT:PseudoChannel:nFAW": 0.0022957254066274043,
+    "PREpb:Bank:nRAS": 0.0014673708784628768,
+    "mode_wait": 0.0005206799891319886,
+    "ACT:Channel:bus(ACT)": 0.0004881374898112393,
+    "empty": 0.00013904522437047423,
+    "ACT:PseudoChannel:nRRDS": 9.466908893308884e-05
+   }
+  },
+  {
+   "sweep": "ablation",
+   "name": "bank_low/nFAW",
+   "segs": "/Users/tirthshah/Documents/Tirth_grad/tokenwall/traces/sweep_8b_b1_s4096.segs",
+   "policy": "bank_low",
+   "refresh": "allbank",
+   "stacks": 1,
+   "disable": "nFAW",
+   "nonblocking": false,
+   "gen": {
+    "model": "llama3_8b",
+    "model_source": "/Users/tirthshah/Documents/Tirth_grad/tokenwall/configs/models/llama3_8b.yaml",
+    "run": {
+     "batch": 1,
+     "seq_len": 4096,
+     "tp": 1,
+     "stacks": 1,
+     "kv_layout": "head_major",
+     "kv_order": "head_outer",
+     "kv_capacity": null,
+     "request_bytes": 32,
+     "alignment": 2097152,
+     "small_alignment": 512,
+     "weight_streams": 1,
+     "chunk_bytes": 4096,
+     "kv_chunk_bytes": 0,
+     "layers": [
+      0,
+      1
+     ],
+     "include_embed": false,
+     "include_lm_head": false,
+     "seed": 1
+    },
+    "shard": {
+     "heads": 32,
+     "kv_heads": 8,
+     "intermediate": 14336,
+     "vocab": 128256,
+     "kv_capacity_positions": 4097,
+     "layers_emitted": 1
+    },
+    "footprint_bytes": 16867393536,
+    "capacity_bytes": 17179869184,
+    "capacity_utilization": 0.9818115234375,
+    "bytes": {
+     "weights": 436207616,
+     "norm": 16384,
+     "embed": 0,
+     "kv_read": 16777216,
+     "kv_write": 4096,
+     "total_read": 453001216,
+     "total_write": 4096,
+     "total": 453005312
+    },
+    "requests": {
+     "total": 14156416,
+     "write": 128,
+     "read": 14156288
+    },
+    "segments": 27,
+    "groups": 11,
+    "derived": {
+     "peak_GBps_ramulator_preset": 819.2,
+     "time_at_peak_ms": 0.552985,
+     "note": "time_at_peak is a floor: every byte at 100% of HBM3 peak per Ramulator 2.1's preset"
+    },
+    "hbm_source": "/Users/tirthshah/Documents/Tirth_grad/tokenwall/configs/hbm3/hbm3_16gb_8hi_6400.yaml"
+   },
+   "rule": "nFAW",
+   "result": {
+    "channels": 16,
+    "requests_accepted": 14156416,
+    "requests_served": 14156416,
+    "in_flight_at_end": 0,
+    "served_per_channel_min_max": [
+     884776,
+     884776
+    ],
+    "controller_ticks": 2079437,
+    "sim_time_us": 649.8240625,
+    "achieved_GBps": 697.119940830138,
+    "peak_GBps": 819.2,
+    "pct_of_peak": 85.0976490271165,
+    "row_hits": 13550736,
+    "row_misses": 167312,
+    "row_conflicts": 438368,
+    "row_hit_rate_pct": 95.7215159543206,
+    "avg_read_latency_ticks": 122.210847999136,
+    "avg_read_latency_ns": 38.1908899997302,
+    "wall_seconds": 20.447240625,
+    "commands": {
+     "ACT": 605680,
+     "PREab": 5312,
+     "PREpb": 438416,
+     "RD": 14156288,
+     "REFab": 5312,
+     "WR": 128
+    },
+    "slots": 33271008,
+    "slot_reasons": {
+     "ACT:Bank:nRC": 384,
+     "ACT:Bank:nRP": 2961,
+     "ACT:Channel:bus(ACT)": 191,
+     "ACT:PseudoChannel:nRFC": 2897696,
+     "ACT:PseudoChannel:nRRDS": 464,
+     "PREpb:Bank:nCWL+nBL+nWR": 1280,
+     "PREpb:Bank:nRAS": 360,
+     "PREpb:Channel:bus(ACT)": 24,
+     "RD:Bank:nRCDRD": 876593,
+     "RD:BankGroup:nCCDL": 129,
+     "RD:Channel:bus(RD/WR/RDA/WRA)": 422092,
+     "RD:Sid:nCCDR": 423249,
+     "WR:Bank:nRCDWR": 1152,
+     "data": 28312816,
+     "empty": 47,
+     "refresh:PREab:PseudoChannel:nRAS": 10736,
+     "refresh:PREab:PseudoChannel:nRTP": 39298,
+     "refresh:REFab:PseudoChannel:nRC": 10816,
+     "refresh:REFab:PseudoChannel:nRP": 265408,
+     "refresh:arbitration": 5312
+    },
+    "classes": {
+     "weights": {
+      "served": 13631488,
+      "row_hits": 13049088
+     },
+     "kv_read": {
+      "served": 524288,
+      "row_hits": 501648
+     },
+     "kv_write": {
+      "served": 128,
+      "row_hits": 0
+     },
+     "other": {
+      "served": 512,
+      "row_hits": 0
+     }
+    }
+   },
+   "wall": 20.46896195411682,
+   "pct_of_peak": 85.0976490271165,
+   "achieved_GBps": 697.119940830138,
+   "row_hit_rate_pct": 95.7215159543206,
+   "sim_time_us": 649.8240625,
+   "avg_read_latency_ns": 38.1908899997302,
+   "attribution": {
+    "data": 85.09756001381142,
+    "ACT:PseudoChannel:nRFC": 8.709372436206321,
+    "RD:Bank:nRCDRD": 2.6347052665191266,
+    "RD:Sid:nCCDR": 1.2721255695048375,
+    "RD:Channel:bus(RD/WR/RDA/WRA)": 1.2686480674105216,
+    "refresh:REFab:PseudoChannel:nRP": 0.7977155366017165,
+    "refresh:PREab:PseudoChannel:nRTP": 0.11811484641523334,
+    "refresh:REFab:PseudoChannel:nRC": 0.03250878362326744,
+    "refresh:PREab:PseudoChannel:nRAS": 0.03226833404025511,
+    "refresh:arbitration": 0.01596585231201892,
+    "ACT:Bank:nRP": 0.008899640191243981,
+    "PREpb:Bank:nCWL+nBL+nWR": 0.00384719332819733,
+    "WR:Bank:nRCDWR": 0.0034624739953775974,
+    "ACT:PseudoChannel:nRRDS": 0.0013946075814715321,
+    "ACT:Bank:nRC": 0.001154157998459199,
+    "PREpb:Bank:nRAS": 0.001082023123555499,
+    "ACT:Channel:bus(ACT)": 0.0005740733794419453,
+    "RD:BankGroup:nCCDL": 0.00038772495260738717,
+    "empty": 0.00014126413001974572,
+    "PREpb:Channel:bus(ACT)": 7.213487490369994e-05
+   }
+  },
+  {
+   "sweep": "ablation",
+   "name": "bank_low/nCCDL",
+   "segs": "/Users/tirthshah/Documents/Tirth_grad/tokenwall/traces/sweep_8b_b1_s4096.segs",
+   "policy": "bank_low",
+   "refresh": "allbank",
+   "stacks": 1,
+   "disable": "nCCDL",
+   "nonblocking": false,
+   "gen": {
+    "model": "llama3_8b",
+    "model_source": "/Users/tirthshah/Documents/Tirth_grad/tokenwall/configs/models/llama3_8b.yaml",
+    "run": {
+     "batch": 1,
+     "seq_len": 4096,
+     "tp": 1,
+     "stacks": 1,
+     "kv_layout": "head_major",
+     "kv_order": "head_outer",
+     "kv_capacity": null,
+     "request_bytes": 32,
+     "alignment": 2097152,
+     "small_alignment": 512,
+     "weight_streams": 1,
+     "chunk_bytes": 4096,
+     "kv_chunk_bytes": 0,
+     "layers": [
+      0,
+      1
+     ],
+     "include_embed": false,
+     "include_lm_head": false,
+     "seed": 1
+    },
+    "shard": {
+     "heads": 32,
+     "kv_heads": 8,
+     "intermediate": 14336,
+     "vocab": 128256,
+     "kv_capacity_positions": 4097,
+     "layers_emitted": 1
+    },
+    "footprint_bytes": 16867393536,
+    "capacity_bytes": 17179869184,
+    "capacity_utilization": 0.9818115234375,
+    "bytes": {
+     "weights": 436207616,
+     "norm": 16384,
+     "embed": 0,
+     "kv_read": 16777216,
+     "kv_write": 4096,
+     "total_read": 453001216,
+     "total_write": 4096,
+     "total": 453005312
+    },
+    "requests": {
+     "total": 14156416,
+     "write": 128,
+     "read": 14156288
+    },
+    "segments": 27,
+    "groups": 11,
+    "derived": {
+     "peak_GBps_ramulator_preset": 819.2,
+     "time_at_peak_ms": 0.552985,
+     "note": "time_at_peak is a floor: every byte at 100% of HBM3 peak per Ramulator 2.1's preset"
+    },
+    "hbm_source": "/Users/tirthshah/Documents/Tirth_grad/tokenwall/configs/hbm3/hbm3_16gb_8hi_6400.yaml"
+   },
+   "rule": "nCCDL",
+   "result": {
+    "channels": 16,
+    "requests_accepted": 14156416,
+    "requests_served": 14156416,
+    "in_flight_at_end": 0,
+    "served_per_channel_min_max": [
+     884776,
+     884776
+    ],
+    "controller_ticks": 2108813,
+    "sim_time_us": 659.0040625,
+    "achieved_GBps": 687.408982399103,
+    "peak_GBps": 819.2,
+    "pct_of_peak": 83.9122292967655,
+    "row_hits": 13555328,
+    "row_misses": 165248,
+    "row_conflicts": 435840,
+    "row_hit_rate_pct": 95.7539535430437,
+    "avg_read_latency_ticks": 123.267753029608,
+    "avg_read_latency_ns": 38.5211728217524,
+    "wall_seconds": 20.896849875,
+    "commands": {
+     "ACT": 601088,
+     "PREab": 5376,
+     "PREpb": 435952,
+     "RD": 14156288,
+     "REFab": 5376,
+     "WR": 128
+    },
+    "slots": 33741024,
+    "slot_reasons": {
+     "ACT:Bank:nRC": 744,
+     "ACT:Bank:nRP": 1984,
+     "ACT:Channel:bus(ACT)": 135,
+     "ACT:PseudoChannel:nFAW": 1024,
+     "ACT:PseudoChannel:nRFC": 2932608,
+     "PREpb:Bank:nCWL+nBL+nWR": 1280,
+     "PREpb:Bank:nRAS": 368,
+     "PREpb:PseudoChannel:nPPD": 16,
+     "RD:Bank:nRCDRD": 1319855,
+     "RD:Channel:bus(RD/WR/RDA/WRA)": 414567,
+     "RD:Sid:nCCDR": 414018,
+     "WR:Bank:nRCDWR": 1152,
+     "data": 28312816,
+     "empty": 47,
+     "refresh:PREab:PseudoChannel:nRAS": 16824,
+     "refresh:PREab:PseudoChannel:nRTP": 38658,
+     "refresh:REFab:PseudoChannel:nRC": 13312,
+     "refresh:REFab:PseudoChannel:nRP": 266240,
+     "refresh:arbitration": 5376
+    },
+    "classes": {
+     "weights": {
+      "served": 13631488,
+      "row_hits": 13052896
+     },
+     "kv_read": {
+      "served": 524288,
+      "row_hits": 502432
+     },
+     "kv_write": {
+      "served": 128,
+      "row_hits": 0
+     },
+     "other": {
+      "served": 512,
+      "row_hits": 0
+     }
+    }
+   },
+   "wall": 20.908561944961548,
+   "pct_of_peak": 83.9122292967655,
+   "achieved_GBps": 687.408982399103,
+   "row_hit_rate_pct": 95.7539535430437,
+   "sim_time_us": 659.0040625,
+   "avg_read_latency_ns": 38.5211728217524,
+   "attribution": {
+    "data": 83.91214208555141,
+    "ACT:PseudoChannel:nRFC": 8.691520447038004,
+    "RD:Bank:nRCDRD": 3.9117218256327964,
+    "RD:Channel:bus(RD/WR/RDA/WRA)": 1.228673439193784,
+    "RD:Sid:nCCDR": 1.2270463397909914,
+    "refresh:REFab:PseudoChannel:nRP": 0.7890691165745296,
+    "refresh:PREab:PseudoChannel:nRTP": 0.11457269346656462,
+    "refresh:PREab:PseudoChannel:nRAS": 0.04986215000469458,
+    "refresh:REFab:PseudoChannel:nRC": 0.03945345582872648,
+    "refresh:arbitration": 0.01593312639237031,
+    "ACT:Bank:nRP": 0.005880082359089042,
+    "PREpb:Bank:nCWL+nBL+nWR": 0.003793601521992931,
+    "WR:Bank:nRCDWR": 0.0034142413697936377,
+    "ACT:PseudoChannel:nFAW": 0.0030348812175943446,
+    "ACT:Bank:nRC": 0.002205030884658391,
+    "PREpb:Bank:nRAS": 0.0010906604375729675,
+    "ACT:Channel:bus(ACT)": 0.0004001064105226919,
+    "empty": 0.00013929630588567791,
+    "PREpb:PseudoChannel:nPPD": 4.7420019024911634e-05
+   }
+  },
+  {
+   "sweep": "ablation",
+   "name": "bank_low/nCCDR",
+   "segs": "/Users/tirthshah/Documents/Tirth_grad/tokenwall/traces/sweep_8b_b1_s4096.segs",
+   "policy": "bank_low",
+   "refresh": "allbank",
+   "stacks": 1,
+   "disable": "nCCDR",
+   "nonblocking": false,
+   "gen": {
+    "model": "llama3_8b",
+    "model_source": "/Users/tirthshah/Documents/Tirth_grad/tokenwall/configs/models/llama3_8b.yaml",
+    "run": {
+     "batch": 1,
+     "seq_len": 4096,
+     "tp": 1,
+     "stacks": 1,
+     "kv_layout": "head_major",
+     "kv_order": "head_outer",
+     "kv_capacity": null,
+     "request_bytes": 32,
+     "alignment": 2097152,
+     "small_alignment": 512,
+     "weight_streams": 1,
+     "chunk_bytes": 4096,
+     "kv_chunk_bytes": 0,
+     "layers": [
+      0,
+      1
+     ],
+     "include_embed": false,
+     "include_lm_head": false,
+     "seed": 1
+    },
+    "shard": {
+     "heads": 32,
+     "kv_heads": 8,
+     "intermediate": 14336,
+     "vocab": 128256,
+     "kv_capacity_positions": 4097,
+     "layers_emitted": 1
+    },
+    "footprint_bytes": 16867393536,
+    "capacity_bytes": 17179869184,
+    "capacity_utilization": 0.9818115234375,
+    "bytes": {
+     "weights": 436207616,
+     "norm": 16384,
+     "embed": 0,
+     "kv_read": 16777216,
+     "kv_write": 4096,
+     "total_read": 453001216,
+     "total_write": 4096,
+     "total": 453005312
+    },
+    "requests": {
+     "total": 14156416,
+     "write": 128,
+     "read": 14156288
+    },
+    "segments": 27,
+    "groups": 11,
+    "derived": {
+     "peak_GBps_ramulator_preset": 819.2,
+     "time_at_peak_ms": 0.552985,
+     "note": "time_at_peak is a floor: every byte at 100% of HBM3 peak per Ramulator 2.1's preset"
+    },
+    "hbm_source": "/Users/tirthshah/Documents/Tirth_grad/tokenwall/configs/hbm3/hbm3_16gb_8hi_6400.yaml"
+   },
+   "rule": "nCCDR",
+   "result": {
+    "channels": 16,
+    "requests_accepted": 14156416,
+    "requests_served": 14156416,
+    "in_flight_at_end": 0,
+    "served_per_channel_min_max": [
+     884776,
+     884776
+    ],
+    "controller_ticks": 2053489,
+    "sim_time_us": 641.7153125,
+    "achieved_GBps": 705.928786762432,
+    "peak_GBps": 819.2,
+    "pct_of_peak": 86.1729476028359,
+    "row_hits": 13554824,
+    "row_misses": 159864,
+    "row_conflicts": 441728,
+    "row_hit_rate_pct": 95.7503933198911,
+    "avg_read_latency_ticks": 120.989028267862,
+    "avg_read_latency_ns": 37.809071333707,
+    "wall_seconds": 21.78732175,
+    "commands": {
+     "ACT": 601592,
+     "PREab": 5248,
+     "PREpb": 441728,
+     "RD": 14156288,
+     "REFab": 5248,
+     "WR": 128
+    },
+    "slots": 32855840,
+    "slot_reasons": {
+     "ACT:Bank:nRC": 736,
+     "ACT:Bank:nRP": 3761,
+     "ACT:Channel:bus(ACT)": 95,
+     "ACT:PseudoChannel:nFAW": 624,
+     "ACT:PseudoChannel:nRFC": 2862784,
+     "PREpb:Bank:nCWL+nBL+nWR": 1280,
+     "PREpb:Bank:nRAS": 336,
+     "RD:Bank:nRCDRD": 1332424,
+     "RD:BankGroup:nCCDL": 497,
+     "RD:Channel:bus(RD/WR/RDA/WRA)": 4552,
+     "WR:Bank:nRCDWR": 1152,
+     "data": 28312816,
+     "empty": 47,
+     "refresh:PREab:PseudoChannel:nRAS": 20240,
+     "refresh:PREab:PseudoChannel:nRTP": 36352,
+     "refresh:REFab:PseudoChannel:nRC": 16640,
+     "refresh:REFab:PseudoChannel:nRP": 256256,
+     "refresh:arbitration": 5248
+    },
+    "classes": {
+     "weights": {
+      "served": 13631488,
+      "row_hits": 13052896
+     },
+     "kv_read": {
+      "served": 524288,
+      "row_hits": 501928
+     },
+     "kv_write": {
+      "served": 128,
+      "row_hits": 0
+     },
+     "other": {
+      "served": 512,
+      "row_hits": 0
+     }
+    }
+   },
+   "wall": 21.805591821670532,
+   "pct_of_peak": 86.1729476028359,
+   "achieved_GBps": 705.928786762432,
+   "row_hit_rate_pct": 95.7503933198911,
+   "sim_time_us": 641.7153125,
+   "avg_read_latency_ns": 37.809071333707,
+   "attribution": {
+    "data": 86.17285694111001,
+    "ACT:PseudoChannel:nRFC": 8.713166365553278,
+    "RD:Bank:nRCDRD": 4.055364282270671,
+    "refresh:REFab:PseudoChannel:nRP": 0.7799404915534042,
+    "refresh:PREab:PseudoChannel:nRTP": 0.1106409088916917,
+    "refresh:PREab:PseudoChannel:nRAS": 0.06160244267077025,
+    "refresh:REFab:PseudoChannel:nRC": 0.05064548646450677,
+    "refresh:arbitration": 0.01597280726957521,
+    "RD:Channel:bus(RD/WR/RDA/WRA)": 0.013854462403030938,
+    "ACT:Bank:nRP": 0.011446975636599155,
+    "PREpb:Bank:nCWL+nBL+nWR": 0.003895806651115905,
+    "WR:Bank:nRCDWR": 0.0035062259860043146,
+    "ACT:Bank:nRC": 0.0022400888243916455,
+    "ACT:PseudoChannel:nFAW": 0.0018992057424190038,
+    "RD:BankGroup:nCCDL": 0.0015126686762535976,
+    "PREpb:Bank:nRAS": 0.0010226492459179252,
+    "ACT:Channel:bus(ACT)": 0.00028914189988750856,
+    "empty": 0.00014304915047066215
+   }
+  },
+  {
+   "sweep": "ablation",
+   "name": "bank_low/nRRDS",
+   "segs": "/Users/tirthshah/Documents/Tirth_grad/tokenwall/traces/sweep_8b_b1_s4096.segs",
+   "policy": "bank_low",
+   "refresh": "allbank",
+   "stacks": 1,
+   "disable": "nRRDS",
+   "nonblocking": false,
+   "gen": {
+    "model": "llama3_8b",
+    "model_source": "/Users/tirthshah/Documents/Tirth_grad/tokenwall/configs/models/llama3_8b.yaml",
+    "run": {
+     "batch": 1,
+     "seq_len": 4096,
+     "tp": 1,
+     "stacks": 1,
+     "kv_layout": "head_major",
+     "kv_order": "head_outer",
+     "kv_capacity": null,
+     "request_bytes": 32,
+     "alignment": 2097152,
+     "small_alignment": 512,
+     "weight_streams": 1,
+     "chunk_bytes": 4096,
+     "kv_chunk_bytes": 0,
+     "layers": [
+      0,
+      1
+     ],
+     "include_embed": false,
+     "include_lm_head": false,
+     "seed": 1
+    },
+    "shard": {
+     "heads": 32,
+     "kv_heads": 8,
+     "intermediate": 14336,
+     "vocab": 128256,
+     "kv_capacity_positions": 4097,
+     "layers_emitted": 1
+    },
+    "footprint_bytes": 16867393536,
+    "capacity_bytes": 17179869184,
+    "capacity_utilization": 0.9818115234375,
+    "bytes": {
+     "weights": 436207616,
+     "norm": 16384,
+     "embed": 0,
+     "kv_read": 16777216,
+     "kv_write": 4096,
+     "total_read": 453001216,
+     "total_write": 4096,
+     "total": 453005312
+    },
+    "requests": {
+     "total": 14156416,
+     "write": 128,
+     "read": 14156288
+    },
+    "segments": 27,
+    "groups": 11,
+    "derived": {
+     "peak_GBps_ramulator_preset": 819.2,
+     "time_at_peak_ms": 0.552985,
+     "note": "time_at_peak is a floor: every byte at 100% of HBM3 peak per Ramulator 2.1's preset"
+    },
+    "hbm_source": "/Users/tirthshah/Documents/Tirth_grad/tokenwall/configs/hbm3/hbm3_16gb_8hi_6400.yaml"
+   },
+   "rule": "nRRDS",
+   "result": {
+    "channels": 16,
+    "requests_accepted": 14156416,
+    "requests_served": 14156416,
+    "in_flight_at_end": 0,
+    "served_per_channel_min_max": [
+     884776,
+     884776
+    ],
+    "controller_ticks": 2110555,
+    "sim_time_us": 659.5484375,
+    "achieved_GBps": 686.841611993054,
+    "peak_GBps": 819.2,
+    "pct_of_peak": 83.8429702139959,
+    "row_hits": 13556072,
+    "row_misses": 165952,
+    "row_conflicts": 434392,
+    "row_hit_rate_pct": 95.7592091105545,
+    "avg_read_latency_ticks": 123.26708894309,
+    "avg_read_latency_ns": 38.5209652947157,
+    "wall_seconds": 21.475802292,
+    "commands": {
+     "ACT": 600344,
+     "PREab": 5408,
+     "PREpb": 434392,
+     "RD": 14156288,
+     "REFab": 5408,
+     "WR": 128
+    },
+    "slots": 33768896,
+    "slot_reasons": {
+     "ACT:Bank:nRC": 744,
+     "ACT:Bank:nRP": 1703,
+     "ACT:Channel:bus(ACT)": 5489,
+     "ACT:PseudoChannel:nFAW": 630,
+     "ACT:PseudoChannel:nRFC": 2947376,
+     "PREpb:Bank:nCWL+nBL+nWR": 1312,
+     "PREpb:Bank:nRAS": 352,
+     "PREpb:Channel:bus(ACT)": 32,
+     "RD:Bank:nRCDRD": 1325467,
+     "RD:BankGroup:nCCDL": 1384,
+     "RD:Channel:bus(RD/WR/RDA/WRA)": 412964,
+     "RD:Sid:nCCDR": 414104,
+     "WR:Bank:nRCDWR": 1024,
+     "data": 28312816,
+     "empty": 447,
+     "refresh:PREab:PseudoChannel:nRAS": 18640,
+     "refresh:PREab:PseudoChannel:nRTP": 37788,
+     "refresh:REFab:PseudoChannel:nRC": 14976,
+     "refresh:REFab:PseudoChannel:nRP": 266240,
+     "refresh:arbitration": 5408
+    },
+    "classes": {
+     "weights": {
+      "served": 13631488,
+      "row_hits": 13053776
+     },
+     "kv_read": {
+      "served": 524288,
+      "row_hits": 502296
+     },
+     "kv_write": {
+      "served": 128,
+      "row_hits": 0
+     },
+     "other": {
+      "served": 512,
+      "row_hits": 0
+     }
+    }
+   },
+   "wall": 21.491894721984863,
+   "pct_of_peak": 83.8429702139959,
+   "achieved_GBps": 686.841611993054,
+   "row_hit_rate_pct": 95.7592091105545,
+   "sim_time_us": 659.5484375,
+   "avg_read_latency_ns": 38.5209652947157,
+   "attribution": {
+    "data": 83.84288310757924,
+    "ACT:PseudoChannel:nRFC": 8.72807923599279,
+    "RD:Bank:nRCDRD": 3.925112032090122,
+    "RD:Sid:nCCDR": 1.2262882387389864,
+    "RD:Channel:bus(RD/WR/RDA/WRA)": 1.2229123510582045,
+    "refresh:REFab:PseudoChannel:nRP": 0.7884178387116949,
+    "refresh:PREab:PseudoChannel:nRTP": 0.11190179270296548,
+    "refresh:PREab:PseudoChannel:nRAS": 0.0551987248857647,
+    "refresh:REFab:PseudoChannel:nRC": 0.04434850342753284,
+    "ACT:Channel:bus(ACT)": 0.016254603052465795,
+    "refresh:arbitration": 0.016014737348831302,
+    "ACT:Bank:nRP": 0.005043102386290627,
+    "RD:BankGroup:nCCDL": 0.004098446096668366,
+    "PREpb:Bank:nCWL+nBL+nWR": 0.0038852321378821503,
+    "WR:Bank:nRCDWR": 0.003032376302737288,
+    "ACT:Bank:nRC": 0.002203210907457561,
+    "ACT:PseudoChannel:nFAW": 0.0018656221393793862,
+    "empty": 0.0013237033274644218,
+    "PREpb:Bank:nRAS": 0.0010423793540659428,
+    "PREpb:Channel:bus(ACT)": 9.476175946054026e-05
+   }
+  },
+  {
+   "sweep": "ablation",
+   "name": "bank_low/nRRDL",
+   "segs": "/Users/tirthshah/Documents/Tirth_grad/tokenwall/traces/sweep_8b_b1_s4096.segs",
+   "policy": "bank_low",
+   "refresh": "allbank",
+   "stacks": 1,
+   "disable": "nRRDL",
+   "nonblocking": false,
+   "gen": {
+    "model": "llama3_8b",
+    "model_source": "/Users/tirthshah/Documents/Tirth_grad/tokenwall/configs/models/llama3_8b.yaml",
+    "run": {
+     "batch": 1,
+     "seq_len": 4096,
+     "tp": 1,
+     "stacks": 1,
+     "kv_layout": "head_major",
+     "kv_order": "head_outer",
+     "kv_capacity": null,
+     "request_bytes": 32,
+     "alignment": 2097152,
+     "small_alignment": 512,
+     "weight_streams": 1,
+     "chunk_bytes": 4096,
+     "kv_chunk_bytes": 0,
+     "layers": [
+      0,
+      1
+     ],
+     "include_embed": false,
+     "include_lm_head": false,
+     "seed": 1
+    },
+    "shard": {
+     "heads": 32,
+     "kv_heads": 8,
+     "intermediate": 14336,
+     "vocab": 128256,
+     "kv_capacity_positions": 4097,
+     "layers_emitted": 1
+    },
+    "footprint_bytes": 16867393536,
+    "capacity_bytes": 17179869184,
+    "capacity_utilization": 0.9818115234375,
+    "bytes": {
+     "weights": 436207616,
+     "norm": 16384,
+     "embed": 0,
+     "kv_read": 16777216,
+     "kv_write": 4096,
+     "total_read": 453001216,
+     "total_write": 4096,
+     "total": 453005312
+    },
+    "requests": {
+     "total": 14156416,
+     "write": 128,
+     "read": 14156288
+    },
+    "segments": 27,
+    "groups": 11,
+    "derived": {
+     "peak_GBps_ramulator_preset": 819.2,
+     "time_at_peak_ms": 0.552985,
+     "note": "time_at_peak is a floor: every byte at 100% of HBM3 peak per Ramulator 2.1's preset"
+    },
+    "hbm_source": "/Users/tirthshah/Documents/Tirth_grad/tokenwall/configs/hbm3/hbm3_16gb_8hi_6400.yaml"
+   },
+   "rule": "nRRDL",
+   "result": {
+    "channels": 16,
+    "requests_accepted": 14156416,
+    "requests_served": 14156416,
+    "in_flight_at_end": 0,
+    "served_per_channel_min_max": [
+     884776,
+     884776
+    ],
+    "controller_ticks": 2112621,
+    "sim_time_us": 660.1940625,
+    "achieved_GBps": 686.169927497644,
+    "peak_GBps": 819.2,
+    "pct_of_peak": 83.7609774777397,
+    "row_hits": 13551912,
+    "row_misses": 167696,
+    "row_conflicts": 436808,
+    "row_hit_rate_pct": 95.7298231416765,
+    "avg_read_latency_ticks": 123.360084084189,
+    "avg_read_latency_ns": 38.5500262763092,
+    "wall_seconds": 21.716733584,
+    "commands": {
+     "ACT": 604504,
+     "PREab": 5408,
+     "PREpb": 436824,
+     "RD": 14156288,
+     "REFab": 5408,
+     "WR": 128
+    },
+    "slots": 33801952,
+    "slot_reasons": {
+     "ACT:Bank:nRC": 1144,
+     "ACT:Bank:nRP": 2263,
+     "ACT:Channel:bus(ACT)": 165,
+     "ACT:PseudoChannel:nFAW": 776,
+     "ACT:PseudoChannel:nRFC": 2950064,
+     "ACT:PseudoChannel:nRRDS": 32,
+     "PREpb:Bank:nCWL+nBL+nWR": 1280,
+     "PREpb:Bank:nRAS": 496,
+     "RD:Bank:nRCDRD": 1357232,
+     "RD:BankGroup:nCCDL": 1504,
+     "RD:Channel:bus(RD/WR/RDA/WRA)": 418839,
+     "RD:Sid:nCCDR": 413624,
+     "WR:Bank:nRCDWR": 1152,
+     "data": 28312816,
+     "empty": 47,
+     "mode_wait": 176,
+     "refresh:PREab:PseudoChannel:nRAS": 15072,
+     "refresh:PREab:PseudoChannel:nRTP": 38646,
+     "refresh:REFab:PseudoChannel:nRC": 12480,
+     "refresh:REFab:PseudoChannel:nRP": 268736,
+     "refresh:arbitration": 5408
+    },
+    "classes": {
+     "weights": {
+      "served": 13631488,
+      "row_hits": 13050032
+     },
+     "kv_read": {
+      "served": 524288,
+      "row_hits": 501880
+     },
+     "kv_write": {
+      "served": 128,
+      "row_hits": 0
+     },
+     "other": {
+      "served": 512,
+      "row_hits": 0
+     }
+    }
+   },
+   "wall": 21.734551191329956,
+   "pct_of_peak": 83.7609774777397,
+   "achieved_GBps": 686.169927497644,
+   "row_hit_rate_pct": 95.7298231416765,
+   "sim_time_us": 660.1940625,
+   "avg_read_latency_ns": 38.5500262763092,
+   "attribution": {
+    "data": 83.76089049531814,
+    "ACT:PseudoChannel:nRFC": 8.727495974196993,
+    "RD:Bank:nRCDRD": 4.0152474034635635,
+    "RD:Channel:bus(RD/WR/RDA/WRA)": 1.2390970793639373,
+    "RD:Sid:nCCDR": 1.223668976276873,
+    "refresh:REFab:PseudoChannel:nRP": 0.79503100886008,
+    "refresh:PREab:PseudoChannel:nRTP": 0.11433067534087972,
+    "refresh:PREab:PseudoChannel:nRAS": 0.04458914088748484,
+    "refresh:REFab:PseudoChannel:nRC": 0.036920944683904645,
+    "refresh:arbitration": 0.015999076029692014,
+    "ACT:Bank:nRP": 0.006694879632986876,
+    "RD:BankGroup:nCCDL": 0.0044494471798551755,
+    "PREpb:Bank:nCWL+nBL+nWR": 0.0037867635573235535,
+    "WR:Bank:nRCDWR": 0.003408087201591198,
+    "ACT:Bank:nRC": 0.0033844199293579257,
+    "ACT:PseudoChannel:nFAW": 0.0022957254066274043,
+    "PREpb:Bank:nRAS": 0.0014673708784628768,
+    "mode_wait": 0.0005206799891319886,
+    "ACT:Channel:bus(ACT)": 0.0004881374898112393,
+    "empty": 0.00013904522437047423,
+    "ACT:PseudoChannel:nRRDS": 9.466908893308884e-05
+   }
+  },
+  {
+   "sweep": "ablation",
+   "name": "bank_low/nWTR",
+   "segs": "/Users/tirthshah/Documents/Tirth_grad/tokenwall/traces/sweep_8b_b1_s4096.segs",
+   "policy": "bank_low",
+   "refresh": "allbank",
+   "stacks": 1,
+   "disable": "nWTR",
+   "nonblocking": false,
+   "gen": {
+    "model": "llama3_8b",
+    "model_source": "/Users/tirthshah/Documents/Tirth_grad/tokenwall/configs/models/llama3_8b.yaml",
+    "run": {
+     "batch": 1,
+     "seq_len": 4096,
+     "tp": 1,
+     "stacks": 1,
+     "kv_layout": "head_major",
+     "kv_order": "head_outer",
+     "kv_capacity": null,
+     "request_bytes": 32,
+     "alignment": 2097152,
+     "small_alignment": 512,
+     "weight_streams": 1,
+     "chunk_bytes": 4096,
+     "kv_chunk_bytes": 0,
+     "layers": [
+      0,
+      1
+     ],
+     "include_embed": false,
+     "include_lm_head": false,
+     "seed": 1
+    },
+    "shard": {
+     "heads": 32,
+     "kv_heads": 8,
+     "intermediate": 14336,
+     "vocab": 128256,
+     "kv_capacity_positions": 4097,
+     "layers_emitted": 1
+    },
+    "footprint_bytes": 16867393536,
+    "capacity_bytes": 17179869184,
+    "capacity_utilization": 0.9818115234375,
+    "bytes": {
+     "weights": 436207616,
+     "norm": 16384,
+     "embed": 0,
+     "kv_read": 16777216,
+     "kv_write": 4096,
+     "total_read": 453001216,
+     "total_write": 4096,
+     "total": 453005312
+    },
+    "requests": {
+     "total": 14156416,
+     "write": 128,
+     "read": 14156288
+    },
+    "segments": 27,
+    "groups": 11,
+    "derived": {
+     "peak_GBps_ramulator_preset": 819.2,
+     "time_at_peak_ms": 0.552985,
+     "note": "time_at_peak is a floor: every byte at 100% of HBM3 peak per Ramulator 2.1's preset"
+    },
+    "hbm_source": "/Users/tirthshah/Documents/Tirth_grad/tokenwall/configs/hbm3/hbm3_16gb_8hi_6400.yaml"
+   },
+   "rule": "nWTR",
+   "result": {
+    "channels": 16,
+    "requests_accepted": 14156416,
+    "requests_served": 14156416,
+    "in_flight_at_end": 0,
+    "served_per_channel_min_max": [
+     884776,
+     884776
+    ],
+    "controller_ticks": 2112621,
+    "sim_time_us": 660.1940625,
+    "achieved_GBps": 686.169927497644,
+    "peak_GBps": 819.2,
+    "pct_of_peak": 83.7609774777397,
+    "row_hits": 13551912,
+    "row_misses": 167696,
+    "row_conflicts": 436808,
+    "row_hit_rate_pct": 95.7298231416765,
+    "avg_read_latency_ticks": 123.359564173885,
+    "avg_read_latency_ns": 38.5498638043391,
+    "wall_seconds": 21.705579084,
+    "commands": {
+     "ACT": 604504,
+     "PREab": 5408,
+     "PREpb": 436824,
+     "RD": 14156288,
+     "REFab": 5408,
+     "WR": 128
+    },
+    "slots": 33801952,
+    "slot_reasons": {
+     "ACT:Bank:nRC": 1144,
+     "ACT:Bank:nRP": 2263,
+     "ACT:Channel:bus(ACT)": 165,
+     "ACT:PseudoChannel:nFAW": 776,
+     "ACT:PseudoChannel:nRFC": 2950064,
+     "ACT:PseudoChannel:nRRDS": 32,
+     "PREpb:Bank:nCWL+nBL+nWR": 1280,
+     "PREpb:Bank:nRAS": 496,
+     "RD:Bank:nRCDRD": 1357216,
+     "RD:BankGroup:nCCDL": 1456,
+     "RD:Channel:bus(RD/WR/RDA/WRA)": 418855,
+     "RD:Sid:nCCDR": 413640,
+     "WR:Bank:nRCDWR": 1152,
+     "data": 28312816,
+     "empty": 47,
+     "mode_wait": 176,
+     "refresh:PREab:PseudoChannel:nRAS": 15072,
+     "refresh:PREab:PseudoChannel:nRTP": 38678,
+     "refresh:REFab:PseudoChannel:nRC": 12480,
+     "refresh:REFab:PseudoChannel:nRP": 268736,
+     "refresh:arbitration": 5408
+    },
+    "classes": {
+     "weights": {
+      "served": 13631488,
+      "row_hits": 13050032
+     },
+     "kv_read": {
+      "served": 524288,
+      "row_hits": 501880
+     },
+     "kv_write": {
+      "served": 128,
+      "row_hits": 0
+     },
+     "other": {
+      "served": 512,
+      "row_hits": 0
+     }
+    }
+   },
+   "wall": 21.731672048568726,
+   "pct_of_peak": 83.7609774777397,
+   "achieved_GBps": 686.169927497644,
+   "row_hit_rate_pct": 95.7298231416765,
+   "sim_time_us": 660.1940625,
+   "avg_read_latency_ns": 38.5498638043391,
+   "attribution": {
+    "data": 83.76089049531814,
+    "ACT:PseudoChannel:nRFC": 8.727495974196993,
+    "RD:Bank:nRCDRD": 4.015200068919096,
+    "RD:Channel:bus(RD/WR/RDA/WRA)": 1.2391444139084038,
+    "RD:Sid:nCCDR": 1.2237163108213396,
+    "refresh:REFab:PseudoChannel:nRP": 0.79503100886008,
+    "refresh:PREab:PseudoChannel:nRTP": 0.11442534442981281,
+    "refresh:PREab:PseudoChannel:nRAS": 0.04458914088748484,
+    "refresh:REFab:PseudoChannel:nRC": 0.036920944683904645,
+    "refresh:arbitration": 0.015999076029692014,
+    "ACT:Bank:nRP": 0.006694879632986876,
+    "RD:BankGroup:nCCDL": 0.004307443546455542,
+    "PREpb:Bank:nCWL+nBL+nWR": 0.0037867635573235535,
+    "WR:Bank:nRCDWR": 0.003408087201591198,
+    "ACT:Bank:nRC": 0.0033844199293579257,
+    "ACT:PseudoChannel:nFAW": 0.0022957254066274043,
+    "PREpb:Bank:nRAS": 0.0014673708784628768,
+    "mode_wait": 0.0005206799891319886,
+    "ACT:Channel:bus(ACT)": 0.0004881374898112393,
+    "empty": 0.00013904522437047423,
+    "ACT:PseudoChannel:nRRDS": 9.466908893308884e-05
+   }
+  },
+  {
+   "sweep": "ablation",
+   "name": "bank_low/nRTW",
+   "segs": "/Users/tirthshah/Documents/Tirth_grad/tokenwall/traces/sweep_8b_b1_s4096.segs",
+   "policy": "bank_low",
+   "refresh": "allbank",
+   "stacks": 1,
+   "disable": "nRTW",
+   "nonblocking": false,
+   "gen": {
+    "model": "llama3_8b",
+    "model_source": "/Users/tirthshah/Documents/Tirth_grad/tokenwall/configs/models/llama3_8b.yaml",
+    "run": {
+     "batch": 1,
+     "seq_len": 4096,
+     "tp": 1,
+     "stacks": 1,
+     "kv_layout": "head_major",
+     "kv_order": "head_outer",
+     "kv_capacity": null,
+     "request_bytes": 32,
+     "alignment": 2097152,
+     "small_alignment": 512,
+     "weight_streams": 1,
+     "chunk_bytes": 4096,
+     "kv_chunk_bytes": 0,
+     "layers": [
+      0,
+      1
+     ],
+     "include_embed": false,
+     "include_lm_head": false,
+     "seed": 1
+    },
+    "shard": {
+     "heads": 32,
+     "kv_heads": 8,
+     "intermediate": 14336,
+     "vocab": 128256,
+     "kv_capacity_positions": 4097,
+     "layers_emitted": 1
+    },
+    "footprint_bytes": 16867393536,
+    "capacity_bytes": 17179869184,
+    "capacity_utilization": 0.9818115234375,
+    "bytes": {
+     "weights": 436207616,
+     "norm": 16384,
+     "embed": 0,
+     "kv_read": 16777216,
+     "kv_write": 4096,
+     "total_read": 453001216,
+     "total_write": 4096,
+     "total": 453005312
+    },
+    "requests": {
+     "total": 14156416,
+     "write": 128,
+     "read": 14156288
+    },
+    "segments": 27,
+    "groups": 11,
+    "derived": {
+     "peak_GBps_ramulator_preset": 819.2,
+     "time_at_peak_ms": 0.552985,
+     "note": "time_at_peak is a floor: every byte at 100% of HBM3 peak per Ramulator 2.1's preset"
+    },
+    "hbm_source": "/Users/tirthshah/Documents/Tirth_grad/tokenwall/configs/hbm3/hbm3_16gb_8hi_6400.yaml"
+   },
+   "rule": "nRTW",
+   "result": {
+    "channels": 16,
+    "requests_accepted": 14156416,
+    "requests_served": 14156416,
+    "in_flight_at_end": 0,
+    "served_per_channel_min_max": [
+     884776,
+     884776
+    ],
+    "controller_ticks": 2112621,
+    "sim_time_us": 660.1940625,
+    "achieved_GBps": 686.169927497644,
+    "peak_GBps": 819.2,
+    "pct_of_peak": 83.7609774777397,
+    "row_hits": 13551912,
+    "row_misses": 167696,
+    "row_conflicts": 436808,
+    "row_hit_rate_pct": 95.7298231416765,
+    "avg_read_latency_ticks": 123.359564173885,
+    "avg_read_latency_ns": 38.5498638043391,
+    "wall_seconds": 21.603925958,
+    "commands": {
+     "ACT": 604504,
+     "PREab": 5408,
+     "PREpb": 436824,
+     "RD": 14156288,
+     "REFab": 5408,
+     "WR": 128
+    },
+    "slots": 33801952,
+    "slot_reasons": {
+     "ACT:Bank:nRC": 1144,
+     "ACT:Bank:nRP": 2263,
+     "ACT:Channel:bus(ACT)": 165,
+     "ACT:PseudoChannel:nFAW": 776,
+     "ACT:PseudoChannel:nRFC": 2950064,
+     "ACT:PseudoChannel:nRRDS": 32,
+     "PREpb:Bank:nCWL+nBL+nWR": 1280,
+     "PREpb:Bank:nRAS": 496,
+     "RD:Bank:nRCDRD": 1357216,
+     "RD:BankGroup:nCCDL": 1456,
+     "RD:Channel:bus(RD/WR/RDA/WRA)": 418855,
+     "RD:Sid:nCCDR": 413640,
+     "WR:Bank:nRCDWR": 1152,
+     "data": 28312816,
+     "empty": 47,
+     "mode_wait": 176,
+     "refresh:PREab:PseudoChannel:nRAS": 15072,
+     "refresh:PREab:PseudoChannel:nRTP": 38678,
+     "refresh:REFab:PseudoChannel:nRC": 12480,
+     "refresh:REFab:PseudoChannel:nRP": 268736,
+     "refresh:arbitration": 5408
+    },
+    "classes": {
+     "weights": {
+      "served": 13631488,
+      "row_hits": 13050032
+     },
+     "kv_read": {
+      "served": 524288,
+      "row_hits": 501880
+     },
+     "kv_write": {
+      "served": 128,
+      "row_hits": 0
+     },
+     "other": {
+      "served": 512,
+      "row_hits": 0
+     }
+    }
+   },
+   "wall": 21.624029874801636,
+   "pct_of_peak": 83.7609774777397,
+   "achieved_GBps": 686.169927497644,
+   "row_hit_rate_pct": 95.7298231416765,
+   "sim_time_us": 660.1940625,
+   "avg_read_latency_ns": 38.5498638043391,
+   "attribution": {
+    "data": 83.76089049531814,
+    "ACT:PseudoChannel:nRFC": 8.727495974196993,
+    "RD:Bank:nRCDRD": 4.015200068919096,
+    "RD:Channel:bus(RD/WR/RDA/WRA)": 1.2391444139084038,
+    "RD:Sid:nCCDR": 1.2237163108213396,
+    "refresh:REFab:PseudoChannel:nRP": 0.79503100886008,
+    "refresh:PREab:PseudoChannel:nRTP": 0.11442534442981281,
+    "refresh:PREab:PseudoChannel:nRAS": 0.04458914088748484,
+    "refresh:REFab:PseudoChannel:nRC": 0.036920944683904645,
+    "refresh:arbitration": 0.015999076029692014,
+    "ACT:Bank:nRP": 0.006694879632986876,
+    "RD:BankGroup:nCCDL": 0.004307443546455542,
+    "PREpb:Bank:nCWL+nBL+nWR": 0.0037867635573235535,
+    "WR:Bank:nRCDWR": 0.003408087201591198,
+    "ACT:Bank:nRC": 0.0033844199293579257,
+    "ACT:PseudoChannel:nFAW": 0.0022957254066274043,
+    "PREpb:Bank:nRAS": 0.0014673708784628768,
+    "mode_wait": 0.0005206799891319886,
+    "ACT:Channel:bus(ACT)": 0.0004881374898112393,
+    "empty": 0.00013904522437047423,
+    "ACT:PseudoChannel:nRRDS": 9.466908893308884e-05
+   }
+  },
+  {
+   "sweep": "ablation",
+   "name": "bank_low/nPPD",
+   "segs": "/Users/tirthshah/Documents/Tirth_grad/tokenwall/traces/sweep_8b_b1_s4096.segs",
+   "policy": "bank_low",
+   "refresh": "allbank",
+   "stacks": 1,
+   "disable": "nPPD",
+   "nonblocking": false,
+   "gen": {
+    "model": "llama3_8b",
+    "model_source": "/Users/tirthshah/Documents/Tirth_grad/tokenwall/configs/models/llama3_8b.yaml",
+    "run": {
+     "batch": 1,
+     "seq_len": 4096,
+     "tp": 1,
+     "stacks": 1,
+     "kv_layout": "head_major",
+     "kv_order": "head_outer",
+     "kv_capacity": null,
+     "request_bytes": 32,
+     "alignment": 2097152,
+     "small_alignment": 512,
+     "weight_streams": 1,
+     "chunk_bytes": 4096,
+     "kv_chunk_bytes": 0,
+     "layers": [
+      0,
+      1
+     ],
+     "include_embed": false,
+     "include_lm_head": false,
+     "seed": 1
+    },
+    "shard": {
+     "heads": 32,
+     "kv_heads": 8,
+     "intermediate": 14336,
+     "vocab": 128256,
+     "kv_capacity_positions": 4097,
+     "layers_emitted": 1
+    },
+    "footprint_bytes": 16867393536,
+    "capacity_bytes": 17179869184,
+    "capacity_utilization": 0.9818115234375,
+    "bytes": {
+     "weights": 436207616,
+     "norm": 16384,
+     "embed": 0,
+     "kv_read": 16777216,
+     "kv_write": 4096,
+     "total_read": 453001216,
+     "total_write": 4096,
+     "total": 453005312
+    },
+    "requests": {
+     "total": 14156416,
+     "write": 128,
+     "read": 14156288
+    },
+    "segments": 27,
+    "groups": 11,
+    "derived": {
+     "peak_GBps_ramulator_preset": 819.2,
+     "time_at_peak_ms": 0.552985,
+     "note": "time_at_peak is a floor: every byte at 100% of HBM3 peak per Ramulator 2.1's preset"
+    },
+    "hbm_source": "/Users/tirthshah/Documents/Tirth_grad/tokenwall/configs/hbm3/hbm3_16gb_8hi_6400.yaml"
+   },
+   "rule": "nPPD",
+   "result": {
+    "channels": 16,
+    "requests_accepted": 14156416,
+    "requests_served": 14156416,
+    "in_flight_at_end": 0,
+    "served_per_channel_min_max": [
+     884776,
+     884776
+    ],
+    "controller_ticks": 2112621,
+    "sim_time_us": 660.1940625,
+    "achieved_GBps": 686.169927497644,
+    "peak_GBps": 819.2,
+    "pct_of_peak": 83.7609774777397,
+    "row_hits": 13551912,
+    "row_misses": 167696,
+    "row_conflicts": 436808,
+    "row_hit_rate_pct": 95.7298231416765,
+    "avg_read_latency_ticks": 123.359564173885,
+    "avg_read_latency_ns": 38.5498638043391,
+    "wall_seconds": 22.152858542,
+    "commands": {
+     "ACT": 604504,
+     "PREab": 5408,
+     "PREpb": 436824,
+     "RD": 14156288,
+     "REFab": 5408,
+     "WR": 128
+    },
+    "slots": 33801952,
+    "slot_reasons": {
+     "ACT:Bank:nRC": 1144,
+     "ACT:Bank:nRP": 2263,
+     "ACT:Channel:bus(ACT)": 165,
+     "ACT:PseudoChannel:nFAW": 776,
+     "ACT:PseudoChannel:nRFC": 2950064,
+     "ACT:PseudoChannel:nRRDS": 32,
+     "PREpb:Bank:nCWL+nBL+nWR": 1280,
+     "PREpb:Bank:nRAS": 496,
+     "RD:Bank:nRCDRD": 1357216,
+     "RD:BankGroup:nCCDL": 1456,
+     "RD:Channel:bus(RD/WR/RDA/WRA)": 418855,
+     "RD:Sid:nCCDR": 413640,
+     "WR:Bank:nRCDWR": 1152,
+     "data": 28312816,
+     "empty": 47,
+     "mode_wait": 176,
+     "refresh:PREab:PseudoChannel:nRAS": 15072,
+     "refresh:PREab:PseudoChannel:nRTP": 38678,
+     "refresh:REFab:PseudoChannel:nRC": 12480,
+     "refresh:REFab:PseudoChannel:nRP": 268736,
+     "refresh:arbitration": 5408
+    },
+    "classes": {
+     "weights": {
+      "served": 13631488,
+      "row_hits": 13050032
+     },
+     "kv_read": {
+      "served": 524288,
+      "row_hits": 501880
+     },
+     "kv_write": {
+      "served": 128,
+      "row_hits": 0
+     },
+     "other": {
+      "served": 512,
+      "row_hits": 0
+     }
+    }
+   },
+   "wall": 22.175455808639526,
+   "pct_of_peak": 83.7609774777397,
+   "achieved_GBps": 686.169927497644,
+   "row_hit_rate_pct": 95.7298231416765,
+   "sim_time_us": 660.1940625,
+   "avg_read_latency_ns": 38.5498638043391,
+   "attribution": {
+    "data": 83.76089049531814,
+    "ACT:PseudoChannel:nRFC": 8.727495974196993,
+    "RD:Bank:nRCDRD": 4.015200068919096,
+    "RD:Channel:bus(RD/WR/RDA/WRA)": 1.2391444139084038,
+    "RD:Sid:nCCDR": 1.2237163108213396,
+    "refresh:REFab:PseudoChannel:nRP": 0.79503100886008,
+    "refresh:PREab:PseudoChannel:nRTP": 0.11442534442981281,
+    "refresh:PREab:PseudoChannel:nRAS": 0.04458914088748484,
+    "refresh:REFab:PseudoChannel:nRC": 0.036920944683904645,
+    "refresh:arbitration": 0.015999076029692014,
+    "ACT:Bank:nRP": 0.006694879632986876,
+    "RD:BankGroup:nCCDL": 0.004307443546455542,
+    "PREpb:Bank:nCWL+nBL+nWR": 0.0037867635573235535,
+    "WR:Bank:nRCDWR": 0.003408087201591198,
+    "ACT:Bank:nRC": 0.0033844199293579257,
+    "ACT:PseudoChannel:nFAW": 0.0022957254066274043,
+    "PREpb:Bank:nRAS": 0.0014673708784628768,
+    "mode_wait": 0.0005206799891319886,
+    "ACT:Channel:bus(ACT)": 0.0004881374898112393,
+    "empty": 0.00013904522437047423,
+    "ACT:PseudoChannel:nRRDS": 9.466908893308884e-05
+   }
+  },
+  {
+   "sweep": "ablation",
+   "name": "bank_low/bus(ACT)",
+   "segs": "/Users/tirthshah/Documents/Tirth_grad/tokenwall/traces/sweep_8b_b1_s4096.segs",
+   "policy": "bank_low",
+   "refresh": "allbank",
+   "stacks": 1,
+   "disable": "bus(ACT)",
+   "nonblocking": false,
+   "gen": {
+    "model": "llama3_8b",
+    "model_source": "/Users/tirthshah/Documents/Tirth_grad/tokenwall/configs/models/llama3_8b.yaml",
+    "run": {
+     "batch": 1,
+     "seq_len": 4096,
+     "tp": 1,
+     "stacks": 1,
+     "kv_layout": "head_major",
+     "kv_order": "head_outer",
+     "kv_capacity": null,
+     "request_bytes": 32,
+     "alignment": 2097152,
+     "small_alignment": 512,
+     "weight_streams": 1,
+     "chunk_bytes": 4096,
+     "kv_chunk_bytes": 0,
+     "layers": [
+      0,
+      1
+     ],
+     "include_embed": false,
+     "include_lm_head": false,
+     "seed": 1
+    },
+    "shard": {
+     "heads": 32,
+     "kv_heads": 8,
+     "intermediate": 14336,
+     "vocab": 128256,
+     "kv_capacity_positions": 4097,
+     "layers_emitted": 1
+    },
+    "footprint_bytes": 16867393536,
+    "capacity_bytes": 17179869184,
+    "capacity_utilization": 0.9818115234375,
+    "bytes": {
+     "weights": 436207616,
+     "norm": 16384,
+     "embed": 0,
+     "kv_read": 16777216,
+     "kv_write": 4096,
+     "total_read": 453001216,
+     "total_write": 4096,
+     "total": 453005312
+    },
+    "requests": {
+     "total": 14156416,
+     "write": 128,
+     "read": 14156288
+    },
+    "segments": 27,
+    "groups": 11,
+    "derived": {
+     "peak_GBps_ramulator_preset": 819.2,
+     "time_at_peak_ms": 0.552985,
+     "note": "time_at_peak is a floor: every byte at 100% of HBM3 peak per Ramulator 2.1's preset"
+    },
+    "hbm_source": "/Users/tirthshah/Documents/Tirth_grad/tokenwall/configs/hbm3/hbm3_16gb_8hi_6400.yaml"
+   },
+   "rule": "bus(ACT)",
+   "result": {
+    "channels": 16,
+    "requests_accepted": 14156416,
+    "requests_served": 14156416,
+    "in_flight_at_end": 0,
+    "served_per_channel_min_max": [
+     884776,
+     884776
+    ],
+    "controller_ticks": 2110559,
+    "sim_time_us": 659.5496875,
+    "achieved_GBps": 686.840310268512,
+    "peak_GBps": 819.2,
+    "pct_of_peak": 83.8428113120742,
+    "row_hits": 13555911,
+    "row_misses": 164417,
+    "row_conflicts": 436088,
+    "row_hit_rate_pct": 95.7580718170475,
+    "avg_read_latency_ticks": 123.266420618173,
+    "avg_read_latency_ns": 38.5207564431792,
+    "wall_seconds": 22.157768458,
+    "commands": {
+     "ACT": 600505,
+     "PREab": 5408,
+     "PREpb": 436136,
+     "RD": 14156288,
+     "REFab": 5408,
+     "WR": 128
+    },
+    "slots": 33768960,
+    "slot_reasons": {
+     "ACT:Bank:nRC": 928,
+     "ACT:Bank:nRP": 1616,
+     "ACT:PseudoChannel:nFAW": 576,
+     "ACT:PseudoChannel:nRFC": 2950064,
+     "PREpb:Bank:nCWL+nBL+nWR": 1280,
+     "PREpb:Bank:nRAS": 416,
+     "RD:Bank:nRCDRD": 1231338,
+     "RD:BankGroup:nCCDL": 1203,
+     "RD:Channel:bus(RD/WR/RDA/WRA)": 512367,
+     "RD:Sid:nCCDR": 412982,
+     "WR:Bank:nRCDWR": 1152,
+     "arbitration": 15,
+     "data": 28312816,
+     "empty": 447,
+     "refresh:PREab:PseudoChannel:nRAS": 17164,
+     "refresh:PREab:PseudoChannel:nRTP": 37972,
+     "refresh:REFab:PseudoChannel:nRC": 14560,
+     "refresh:REFab:PseudoChannel:nRP": 266656,
+     "refresh:arbitration": 5408
+    },
+    "classes": {
+     "weights": {
+      "served": 13631488,
+      "row_hits": 13053583
+     },
+     "kv_read": {
+      "served": 524288,
+      "row_hits": 502328
+     },
+     "kv_write": {
+      "served": 128,
+      "row_hits": 0
+     },
+     "other": {
+      "served": 512,
+      "row_hits": 0
+     }
+    }
+   },
+   "wall": 22.170197010040283,
+   "pct_of_peak": 83.8428113120742,
+   "achieved_GBps": 686.840310268512,
+   "row_hit_rate_pct": 95.7580718170475,
+   "sim_time_us": 659.5496875,
+   "avg_read_latency_ns": 38.5207564431792,
+   "attribution": {
+    "data": 83.84272420589797,
+    "ACT:PseudoChannel:nRFC": 8.736022666969903,
+    "RD:Bank:nRCDRD": 3.6463604446213327,
+    "RD:Channel:bus(RD/WR/RDA/WRA)": 1.5172720747100297,
+    "RD:Sid:nCCDR": 1.22296333674475,
+    "refresh:REFab:PseudoChannel:nRP": 0.7896482450155409,
+    "refresh:PREab:PseudoChannel:nRTP": 0.11244645970737624,
+    "refresh:PREab:PseudoChannel:nRAS": 0.05082774240012129,
+    "refresh:REFab:PseudoChannel:nRC": 0.043116518838602076,
+    "refresh:arbitration": 0.016014706997195056,
+    "ACT:Bank:nRP": 0.004785459783185505,
+    "PREpb:Bank:nCWL+nBL+nWR": 0.00379046319460238,
+    "RD:BankGroup:nCCDL": 0.003562443143052081,
+    "WR:Bank:nRCDWR": 0.0034114168751421424,
+    "ACT:Bank:nRC": 0.002748085816086726,
+    "ACT:PseudoChannel:nFAW": 0.0017057084375710712,
+    "empty": 0.00132370081874005,
+    "PREpb:Bank:nRAS": 0.0012319005382457737,
+    "arbitration": 4.441949056174664e-05
+   }
+  },
+  {
+   "sweep": "ablation",
+   "name": "bank_low/nRCDRD",
+   "segs": "/Users/tirthshah/Documents/Tirth_grad/tokenwall/traces/sweep_8b_b1_s4096.segs",
+   "policy": "bank_low",
+   "refresh": "allbank",
+   "stacks": 1,
+   "disable": "nRCDRD",
+   "nonblocking": false,
+   "gen": {
+    "model": "llama3_8b",
+    "model_source": "/Users/tirthshah/Documents/Tirth_grad/tokenwall/configs/models/llama3_8b.yaml",
+    "run": {
+     "batch": 1,
+     "seq_len": 4096,
+     "tp": 1,
+     "stacks": 1,
+     "kv_layout": "head_major",
+     "kv_order": "head_outer",
+     "kv_capacity": null,
+     "request_bytes": 32,
+     "alignment": 2097152,
+     "small_alignment": 512,
+     "weight_streams": 1,
+     "chunk_bytes": 4096,
+     "kv_chunk_bytes": 0,
+     "layers": [
+      0,
+      1
+     ],
+     "include_embed": false,
+     "include_lm_head": false,
+     "seed": 1
+    },
+    "shard": {
+     "heads": 32,
+     "kv_heads": 8,
+     "intermediate": 14336,
+     "vocab": 128256,
+     "kv_capacity_positions": 4097,
+     "layers_emitted": 1
+    },
+    "footprint_bytes": 16867393536,
+    "capacity_bytes": 17179869184,
+    "capacity_utilization": 0.9818115234375,
+    "bytes": {
+     "weights": 436207616,
+     "norm": 16384,
+     "embed": 0,
+     "kv_read": 16777216,
+     "kv_write": 4096,
+     "total_read": 453001216,
+     "total_write": 4096,
+     "total": 453005312
+    },
+    "requests": {
+     "total": 14156416,
+     "write": 128,
+     "read": 14156288
+    },
+    "segments": 27,
+    "groups": 11,
+    "derived": {
+     "peak_GBps_ramulator_preset": 819.2,
+     "time_at_peak_ms": 0.552985,
+     "note": "time_at_peak is a floor: every byte at 100% of HBM3 peak per Ramulator 2.1's preset"
+    },
+    "hbm_source": "/Users/tirthshah/Documents/Tirth_grad/tokenwall/configs/hbm3/hbm3_16gb_8hi_6400.yaml"
+   },
+   "rule": "nRCDRD",
+   "result": {
+    "channels": 16,
+    "requests_accepted": 14156416,
+    "requests_served": 14156416,
+    "in_flight_at_end": 0,
+    "served_per_channel_min_max": [
+     884776,
+     884776
+    ],
+    "controller_ticks": 2103683,
+    "sim_time_us": 657.4009375,
+    "achieved_GBps": 689.085284427359,
+    "peak_GBps": 819.2,
+    "pct_of_peak": 84.1168560091991,
+    "row_hits": 13551512,
+    "row_misses": 167992,
+    "row_conflicts": 436912,
+    "row_hit_rate_pct": 95.726997567746,
+    "avg_read_latency_ticks": 120.386323236713,
+    "avg_read_latency_ns": 37.6207260114728,
+    "wall_seconds": 21.978925417,
+    "commands": {
+     "ACT": 604904,
+     "PREab": 5376,
+     "PREpb": 437216,
+     "RD": 14156288,
+     "REFab": 5376,
+     "WR": 128
+    },
+    "slots": 33658944,
+    "slot_reasons": {
+     "ACT:Bank:nRC": 2384,
+     "ACT:Bank:nRP": 1824,
+     "ACT:BankGroup:nRRDL": 8,
+     "ACT:Channel:bus(ACT)": 6208,
+     "ACT:PseudoChannel:nFAW": 683874,
+     "ACT:PseudoChannel:nRFC": 2932608,
+     "ACT:PseudoChannel:nRRDS": 203601,
+     "PREpb:Bank:nCWL+nBL+nWR": 1280,
+     "PREpb:Bank:nRAS": 4336,
+     "RD:BankGroup:nCCDL": 672,
+     "RD:Channel:bus(RD/WR/RDA/WRA)": 453930,
+     "RD:Sid:nCCDR": 430317,
+     "WR:Bank:nRCDWR": 1152,
+     "arbitration": 276097,
+     "data": 28312816,
+     "empty": 47,
+     "refresh:PREab:PseudoChannel:nRAS": 25232,
+     "refresh:PREab:PseudoChannel:nRTP": 37630,
+     "refresh:REFab:PseudoChannel:nRC": 15808,
+     "refresh:REFab:PseudoChannel:nRP": 263744,
+     "refresh:arbitration": 5376
+    },
+    "classes": {
+     "weights": {
+      "served": 13631488,
+      "row_hits": 13049632
+     },
+     "kv_read": {
+      "served": 524288,
+      "row_hits": 501880
+     },
+     "kv_write": {
+      "served": 128,
+      "row_hits": 0
+     },
+     "other": {
+      "served": 512,
+      "row_hits": 0
+     }
+    }
+   },
+   "wall": 21.99433183670044,
+   "pct_of_peak": 84.1168560091991,
+   "achieved_GBps": 689.085284427359,
+   "row_hit_rate_pct": 95.726997567746,
+   "sim_time_us": 657.4009375,
+   "avg_read_latency_ns": 37.6207260114728,
+   "attribution": {
+    "data": 84.11676848804288,
+    "ACT:PseudoChannel:nRFC": 8.712715407827412,
+    "ACT:PseudoChannel:nFAW": 2.031774971906427,
+    "RD:Channel:bus(RD/WR/RDA/WRA)": 1.3486162845750598,
+    "RD:Sid:nCCDR": 1.278462568522649,
+    "arbitration": 0.8202782594724303,
+    "refresh:REFab:PseudoChannel:nRP": 0.7835777616790355,
+    "ACT:PseudoChannel:nRRDS": 0.604894199889337,
+    "refresh:PREab:PseudoChannel:nRTP": 0.11179792212138324,
+    "refresh:PREab:PseudoChannel:nRAS": 0.0749637302940936,
+    "refresh:REFab:PseudoChannel:nRC": 0.046965228617986354,
+    "ACT:Channel:bus(ACT)": 0.01844383472042379,
+    "refresh:arbitration": 0.015971980582635034,
+    "PREpb:Bank:nRAS": 0.01288216291039909,
+    "ACT:Bank:nRC": 0.0070828128178947024,
+    "ACT:Bank:nRP": 0.005419064840536887,
+    "PREpb:Bank:nCWL+nBL+nWR": 0.003802852519675008,
+    "WR:Bank:nRCDWR": 0.0034225672677075073,
+    "RD:BankGroup:nCCDL": 0.0019964975728293793,
+    "empty": 0.0001396359909568167,
+    "ACT:BankGroup:nRRDL": 2.37678282479688e-05
+   }
+  },
+  {
+   "sweep": "ablation",
+   "name": "bank_low/nRP",
+   "segs": "/Users/tirthshah/Documents/Tirth_grad/tokenwall/traces/sweep_8b_b1_s4096.segs",
+   "policy": "bank_low",
+   "refresh": "allbank",
+   "stacks": 1,
+   "disable": "nRP",
+   "nonblocking": false,
+   "gen": {
+    "model": "llama3_8b",
+    "model_source": "/Users/tirthshah/Documents/Tirth_grad/tokenwall/configs/models/llama3_8b.yaml",
+    "run": {
+     "batch": 1,
+     "seq_len": 4096,
+     "tp": 1,
+     "stacks": 1,
+     "kv_layout": "head_major",
+     "kv_order": "head_outer",
+     "kv_capacity": null,
+     "request_bytes": 32,
+     "alignment": 2097152,
+     "small_alignment": 512,
+     "weight_streams": 1,
+     "chunk_bytes": 4096,
+     "kv_chunk_bytes": 0,
+     "layers": [
+      0,
+      1
+     ],
+     "include_embed": false,
+     "include_lm_head": false,
+     "seed": 1
+    },
+    "shard": {
+     "heads": 32,
+     "kv_heads": 8,
+     "intermediate": 14336,
+     "vocab": 128256,
+     "kv_capacity_positions": 4097,
+     "layers_emitted": 1
+    },
+    "footprint_bytes": 16867393536,
+    "capacity_bytes": 17179869184,
+    "capacity_utilization": 0.9818115234375,
+    "bytes": {
+     "weights": 436207616,
+     "norm": 16384,
+     "embed": 0,
+     "kv_read": 16777216,
+     "kv_write": 4096,
+     "total_read": 453001216,
+     "total_write": 4096,
+     "total": 453005312
+    },
+    "requests": {
+     "total": 14156416,
+     "write": 128,
+     "read": 14156288
+    },
+    "segments": 27,
+    "groups": 11,
+    "derived": {
+     "peak_GBps_ramulator_preset": 819.2,
+     "time_at_peak_ms": 0.552985,
+     "note": "time_at_peak is a floor: every byte at 100% of HBM3 peak per Ramulator 2.1's preset"
+    },
+    "hbm_source": "/Users/tirthshah/Documents/Tirth_grad/tokenwall/configs/hbm3/hbm3_16gb_8hi_6400.yaml"
+   },
+   "rule": "nRP",
+   "result": {
+    "channels": 16,
+    "requests_accepted": 14156416,
+    "requests_served": 14156416,
+    "in_flight_at_end": 0,
+    "served_per_channel_min_max": [
+     884776,
+     884776
+    ],
+    "controller_ticks": 2074285,
+    "sim_time_us": 648.2140625,
+    "achieved_GBps": 698.851410678861,
+    "peak_GBps": 819.2,
+    "pct_of_peak": 85.3090100926343,
+    "row_hits": 13546624,
+    "row_misses": 169664,
+    "row_conflicts": 440128,
+    "row_hit_rate_pct": 95.6924690543143,
+    "avg_read_latency_ticks": 122.033507300784,
+    "avg_read_latency_ns": 38.135471031495,
+    "wall_seconds": 20.93304725,
+    "commands": {
+     "ACT": 609792,
+     "PREab": 5312,
+     "PREpb": 440168,
+     "RD": 14156288,
+     "REFab": 5312,
+     "WR": 128
+    },
+    "slots": 33188576,
+    "slot_reasons": {
+     "ACT:Bank:nRC": 1072,
+     "ACT:Channel:bus(ACT)": 5151,
+     "ACT:PseudoChannel:nFAW": 864,
+     "ACT:PseudoChannel:nRFC": 2964088,
+     "PREpb:Bank:nCWL+nBL+nWR": 1280,
+     "PREpb:Bank:nRAS": 304,
+     "PREpb:PseudoChannel:nPPD": 64,
+     "RD:Bank:nRCDRD": 1013734,
+     "RD:BankGroup:nCCDL": 128,
+     "RD:Channel:bus(RD/WR/RDA/WRA)": 413287,
+     "RD:Sid:nCCDR": 415863,
+     "WR:Bank:nRCDWR": 1152,
+     "data": 28312816,
+     "empty": 47,
+     "refresh:PREab:PseudoChannel:nRAS": 6350,
+     "refresh:PREab:PseudoChannel:nRTP": 43224,
+     "refresh:REFab:PseudoChannel:nRC": 6048,
+     "refresh:arbitration": 3104
+    },
+    "classes": {
+     "weights": {
+      "served": 13631488,
+      "row_hits": 13044248
+     },
+     "kv_read": {
+      "served": 524288,
+      "row_hits": 502376
+     },
+     "kv_write": {
+      "served": 128,
+      "row_hits": 0
+     },
+     "other": {
+      "served": 512,
+      "row_hits": 0
+     }
+    }
+   },
+   "wall": 20.947709321975708,
+   "pct_of_peak": 85.3090100926343,
+   "achieved_GBps": 698.851410678861,
+   "row_hit_rate_pct": 95.6924690543143,
+   "sim_time_us": 648.2140625,
+   "avg_read_latency_ns": 38.135471031495,
+   "attribution": {
+    "data": 85.308920756347,
+    "ACT:PseudoChannel:nRFC": 8.931049045310049,
+    "RD:Bank:nRCDRD": 3.054466693599629,
+    "RD:Sid:nCCDR": 1.253030560877333,
+    "RD:Channel:bus(RD/WR/RDA/WRA)": 1.2452688539574581,
+    "refresh:PREab:PseudoChannel:nRTP": 0.13023758536672378,
+    "refresh:PREab:PseudoChannel:nRAS": 0.01913308965108958,
+    "refresh:REFab:PseudoChannel:nRC": 0.018223137985793666,
+    "ACT:Channel:bus(ACT)": 0.015520400754765736,
+    "refresh:arbitration": 0.009352615791650717,
+    "PREpb:Bank:nCWL+nBL+nWR": 0.0038567487800621517,
+    "WR:Bank:nRCDWR": 0.0034710739020559363,
+    "ACT:Bank:nRC": 0.0032300271033020517,
+    "ACT:PseudoChannel:nFAW": 0.002603305426541952,
+    "PREpb:Bank:nRAS": 0.000915977835264761,
+    "RD:BankGroup:nCCDL": 0.00038567487800621517,
+    "PREpb:PseudoChannel:nPPD": 0.00019283743900310759,
+    "empty": 0.00014161499426790713
+   }
+  },
+  {
+   "sweep": "ablation",
+   "name": "bank_low/nRAS",
+   "segs": "/Users/tirthshah/Documents/Tirth_grad/tokenwall/traces/sweep_8b_b1_s4096.segs",
+   "policy": "bank_low",
+   "refresh": "allbank",
+   "stacks": 1,
+   "disable": "nRAS",
+   "nonblocking": false,
+   "gen": {
+    "model": "llama3_8b",
+    "model_source": "/Users/tirthshah/Documents/Tirth_grad/tokenwall/configs/models/llama3_8b.yaml",
+    "run": {
+     "batch": 1,
+     "seq_len": 4096,
+     "tp": 1,
+     "stacks": 1,
+     "kv_layout": "head_major",
+     "kv_order": "head_outer",
+     "kv_capacity": null,
+     "request_bytes": 32,
+     "alignment": 2097152,
+     "small_alignment": 512,
+     "weight_streams": 1,
+     "chunk_bytes": 4096,
+     "kv_chunk_bytes": 0,
+     "layers": [
+      0,
+      1
+     ],
+     "include_embed": false,
+     "include_lm_head": false,
+     "seed": 1
+    },
+    "shard": {
+     "heads": 32,
+     "kv_heads": 8,
+     "intermediate": 14336,
+     "vocab": 128256,
+     "kv_capacity_positions": 4097,
+     "layers_emitted": 1
+    },
+    "footprint_bytes": 16867393536,
+    "capacity_bytes": 17179869184,
+    "capacity_utilization": 0.9818115234375,
+    "bytes": {
+     "weights": 436207616,
+     "norm": 16384,
+     "embed": 0,
+     "kv_read": 16777216,
+     "kv_write": 4096,
+     "total_read": 453001216,
+     "total_write": 4096,
+     "total": 453005312
+    },
+    "requests": {
+     "total": 14156416,
+     "write": 128,
+     "read": 14156288
+    },
+    "segments": 27,
+    "groups": 11,
+    "derived": {
+     "peak_GBps_ramulator_preset": 819.2,
+     "time_at_peak_ms": 0.552985,
+     "note": "time_at_peak is a floor: every byte at 100% of HBM3 peak per Ramulator 2.1's preset"
+    },
+    "hbm_source": "/Users/tirthshah/Documents/Tirth_grad/tokenwall/configs/hbm3/hbm3_16gb_8hi_6400.yaml"
+   },
+   "rule": "nRAS",
+   "result": {
+    "channels": 16,
+    "requests_accepted": 14156416,
+    "requests_served": 14156416,
+    "in_flight_at_end": 0,
+    "served_per_channel_min_max": [
+     884776,
+     884776
+    ],
+    "controller_ticks": 2112621,
+    "sim_time_us": 660.1940625,
+    "achieved_GBps": 686.169927497644,
+    "peak_GBps": 819.2,
+    "pct_of_peak": 83.7609774777397,
+    "row_hits": 13551888,
+    "row_misses": 167544,
+    "row_conflicts": 436984,
+    "row_hit_rate_pct": 95.7296536072407,
+    "avg_read_latency_ticks": 123.369961885489,
+    "avg_read_latency_ns": 38.5531130892152,
+    "wall_seconds": 21.067673042,
+    "commands": {
+     "ACT": 604528,
+     "PREab": 5408,
+     "PREpb": 436984,
+     "RD": 14156288,
+     "REFab": 5408,
+     "WR": 128
+    },
+    "slots": 33801952,
+    "slot_reasons": {
+     "ACT:Bank:nRC": 864,
+     "ACT:Bank:nRP": 1926,
+     "ACT:Channel:bus(ACT)": 165,
+     "ACT:PseudoChannel:nFAW": 488,
+     "ACT:PseudoChannel:nRFC": 2950064,
+     "PREpb:Bank:nCWL+nBL+nWR": 1280,
+     "PREpb:Bank:nRTP": 216,
+     "PREpb:Channel:bus(ACT)": 16,
+     "RD:Bank:nRCDRD": 1358831,
+     "RD:BankGroup:nCCDL": 1519,
+     "RD:Channel:bus(RD/WR/RDA/WRA)": 418655,
+     "RD:Sid:nCCDR": 413417,
+     "WR:Bank:nRCDWR": 1152,
+     "data": 28312816,
+     "empty": 47,
+     "mode_wait": 176,
+     "refresh:PREab:Channel:bus(ACT)": 160,
+     "refresh:PREab:PseudoChannel:nRTP": 50048,
+     "refresh:REFab:PseudoChannel:nRC": 14400,
+     "refresh:REFab:PseudoChannel:nRP": 268736,
+     "refresh:arbitration": 5408,
+     "refresh:wait_active": 1568
+    },
+    "classes": {
+     "weights": {
+      "served": 13631488,
+      "row_hits": 13050216
+     },
+     "kv_read": {
+      "served": 524288,
+      "row_hits": 501672
+     },
+     "kv_write": {
+      "served": 128,
+      "row_hits": 0
+     },
+     "other": {
+      "served": 512,
+      "row_hits": 0
+     }
+    }
+   },
+   "wall": 21.083112955093384,
+   "pct_of_peak": 83.7609774777397,
+   "achieved_GBps": 686.169927497644,
+   "row_hit_rate_pct": 95.7296536072407,
+   "sim_time_us": 660.1940625,
+   "avg_read_latency_ns": 38.5531130892152,
+   "attribution": {
+    "data": 83.76089049531814,
+    "ACT:PseudoChannel:nRFC": 8.727495974196993,
+    "RD:Bank:nRCDRD": 4.019977899501189,
+    "RD:Channel:bus(RD/WR/RDA/WRA)": 1.238552732102572,
+    "RD:Sid:nCCDR": 1.223056585607837,
+    "refresh:REFab:PseudoChannel:nRP": 0.79503100886008,
+    "refresh:PREab:PseudoChannel:nRTP": 0.14806245509135094,
+    "refresh:REFab:PseudoChannel:nRC": 0.04260109001988997,
+    "refresh:arbitration": 0.015999076029692014,
+    "ACT:Bank:nRP": 0.005697895790160284,
+    "refresh:wait_active": 0.004638785357721353,
+    "RD:BankGroup:nCCDL": 0.00449382331529256,
+    "PREpb:Bank:nCWL+nBL+nWR": 0.0037867635573235535,
+    "WR:Bank:nRCDWR": 0.003408087201591198,
+    "ACT:Bank:nRC": 0.0025560654011933985,
+    "ACT:PseudoChannel:nFAW": 0.0014437036062296047,
+    "PREpb:Bank:nRTP": 0.0006390163502983496,
+    "mode_wait": 0.0005206799891319886,
+    "ACT:Channel:bus(ACT)": 0.0004881374898112393,
+    "refresh:PREab:Channel:bus(ACT)": 0.0004733454446654442,
+    "empty": 0.00013904522437047423,
+    "PREpb:Channel:bus(ACT)": 4.733454446654442e-05
+   }
+  }
+ ]
+}

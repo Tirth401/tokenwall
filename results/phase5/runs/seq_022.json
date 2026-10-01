@@ -1,0 +1,26 @@
+{
+  "config": {"segs": "/Users/tirthshah/Documents/Tirth_grad/tokenwall/traces/sweep_8b_b32_s1024.segs", "spec": "/Users/tirthshah/Documents/Tirth_grad/tokenwall/configs/hbm3/hbm3_16gb_8hi_6400.spec", "policy": "ramulator", "stacks": 4, "interleave_log2": 0, "channels": 64, "frontend_ratio": 0, "max_requests": -1, "reads_only": false, "drain": true, "refresh": "allbank", "refresh_blocks_scheduling": true, "disabled": []},
+  "result": {
+    "channels": 64,
+    "requests_accepted": 17830400,
+    "requests_served": 17830400,
+    "in_flight_at_end": 0,
+    "served_per_channel_min_max": [278600, 278600],
+    "controller_ticks": 1331309,
+    "sim_time_us": 416.0340625,
+    "achieved_GBps": 1371.45693449079,
+    "peak_GBps": 3276.8,
+    "pct_of_peak": 41.8535441433957,
+    "row_hits": 17257040,
+    "row_misses": 434168,
+    "row_conflicts": 139192,
+    "row_hit_rate_pct": 96.784368269921,
+    "avg_read_latency_ticks": 198.633480782107,
+    "avg_read_latency_ns": 62.0729627444085,
+    "wall_seconds": 52.631570541,
+    "commands": {"ACT": 573360, "PREab": 13568, "PREpb": 139248, "RD": 17826304, "REFab": 13568, "WR": 4096},
+    "slots": 85203840,
+    "slot_reasons": {"ACT:Bank:nRP": 525352, "ACT:BankGroup:nRRDL": 520, "ACT:Channel:bus(ACT)": 56, "ACT:PseudoChannel:nRFC": 7379096, "PREpb:Bank:nCWL+nBL+nWR": 64472, "PREpb:Bank:nRAS": 120, "PREpb:Bank:nRTP": 568, "RD:Bank:nRCDRD": 5474752, "RD:BankGroup:nCCDL": 27642748, "RD:BankGroup:nCWL+nBL+nWTRL": 8, "RD:Channel:bus(RD/WR/RDA/WRA)": 7329866, "RD:PseudoChannel:nCWL+nBL+nWTRS": 40, "RD:Sid:nCCDR": 21169, "WR:Bank:nRCDWR": 44392, "data": 35660760, "empty": 36982, "mode_wait": 161736, "refresh:PREab:PseudoChannel:nRAS": 63808, "refresh:PREab:PseudoChannel:nRTP": 92899, "refresh:REFab:PseudoChannel:nRC": 183872, "refresh:REFab:PseudoChannel:nRP": 513616, "refresh:arbitration": 7008},
+    "classes": {"weights": {"served": 13631488, "row_hits": 13196880}, "kv_read": {"served": 4194304, "row_hits": 4059776}, "kv_write": {"served": 4096, "row_hits": 0}, "other": {"served": 512, "row_hits": 384}}
+  }
+}

@@ -1,0 +1,40 @@
+
+[full step 8b b1 s4096 bank_low_perbank]
+  channels                         16
+  requests_accepted                485839360
+  requests_served                  485839360
+  in_flight_at_end                 0
+  served_per_channel_min_max       [30364960, 30364960]
+  controller_ticks                 89727669
+  sim_time_us                      28039.897
+  achieved_GBps                    554.455
+  peak_GBps                        819.2
+  pct_of_peak                      67.682
+  row_hits                         463482584
+  row_misses                       7473528
+  row_conflicts                    14883248
+  row_hit_rate_pct                 95.398
+  avg_read_latency_ticks           141.586
+  avg_read_latency_ns              44.246
+  wall_seconds                     687.253
+  commands: ACT=22356776 PREpb=22355848 RD=485835264 REFpb=7362240 WR=4096
+  column-command slots per pseudo channel: 1435642720
+    data                                          67.68%
+    refresh:REFpb:Bank:nRP                        25.00%
+    ACT:Bank:nRFCpb                                3.93%
+    RD:Bank:nRCDRD                                 1.17%
+    refresh:arbitration                            0.50%
+    arbitration                                    0.37%
+    RD:Channel:bus(RD/WR/RDA/WRA)                  0.19%
+    refresh:REFpb:Bank:nRC                         0.19%
+    refresh:PREpb:Bank:nRTP                        0.18%
+    ACT:Bank:nRP                                   0.17%
+    RD:BankGroup:nCCDL                             0.17%
+    ACT:PseudoChannel:nFAW                         0.15%
+    refresh:PREpb:Bank:nRAS                        0.10%
+    RD:Sid:nCCDR                                   0.08%
+  weights    served    469041152  row hits  95.40%
+  kv_read    served     16777216  row hits  95.39%
+  kv_write   served         4096  row hits   0.00%
+  other      served        16896  row hits   0.00%
+wrote results/phase5/fullstep/fullstep_8b_b1_s4096_bank_low_perbank.json

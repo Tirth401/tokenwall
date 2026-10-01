@@ -97,6 +97,9 @@ Summary summarize(const MemorySystem& mem, const DramSpec& spec, double wall) {
     lat += st.read_latency_sum;
     for (int i = 0; i < spec.command_count; i++)
       if (st.cmd_count[i]) s.cmd_counts[spec.commands[i]] += st.cmd_count[i];
+    s.max_refresh_wait_ticks = std::max(s.max_refresh_wait_ticks, st.max_maint_wait);
+    s.avg_refresh_wait_ticks += double(st.maint_wait_sum);
+    s.refreshes += st.num_maint_served;
     s.slots += st.slots;
     for (const auto& [k, v] : st.slot_reasons) s.slot_reasons[k] += v;
     for (int i = 0; i < 4; i++) {
@@ -105,6 +108,7 @@ Summary summarize(const MemorySystem& mem, const DramSpec& spec, double wall) {
     }
   }
   s.in_flight_at_end = s.requests_accepted - s.requests_served;
+  s.avg_refresh_wait_ticks = s.refreshes ? s.avg_refresh_wait_ticks / double(s.refreshes) : 0;
   s.sim_time_us = double(s.controller_ticks) * spec.tick_ps() * 1e-6;
   s.achieved_GBps = s.sim_time_us > 0 ? double(s.requests_served) * spec.tx_bytes / (s.sim_time_us * 1e-6) / 1e9 : 0;
   const double per_pc = double(spec.tx_bytes) / (double(spec.t("nBL")) * spec.tick_ps() * 1e-12) / 1e9;
@@ -137,6 +141,9 @@ void print_summary(const Summary& s, const std::string& title) {
   std::printf("  %-32s %.3f\n", "row_hit_rate_pct", s.row_hit_rate_pct);
   std::printf("  %-32s %.3f\n", "avg_read_latency_ticks", s.avg_read_latency_ticks);
   std::printf("  %-32s %.3f\n", "avg_read_latency_ns", s.avg_read_latency_ns);
+  std::printf("  %-32s %llu (max wait %lld ticks = %.1f ns, avg %.1f ticks)\n", "refresh_commands",
+              (unsigned long long)s.refreshes, (long long)s.max_refresh_wait_ticks,
+              s.max_refresh_wait_ticks * 0.3125, s.avg_refresh_wait_ticks);
   std::printf("  %-32s %.3f\n", "wall_seconds", s.wall_seconds);
   std::printf("  commands:");
   for (const auto& [k, v] : s.cmd_counts) std::printf(" %s=%llu", k.c_str(), (unsigned long long)v);
@@ -164,7 +171,8 @@ std::string summary_json(const Summary& s, const SimConfig& cfg) {
     << ", \"channels\": " << s.channels << ", \"frontend_ratio\": " << cfg.frontend_ratio
     << ", \"max_requests\": " << (cfg.max_requests == ~0ull ? -1 : (long long)cfg.max_requests)
     << ", \"reads_only\": " << (cfg.reads_only ? "true" : "false") << ", \"drain\": " << (cfg.drain ? "true" : "false")
-    << ", \"refresh\": \"" << refresh_name(cfg.ctrl.refresh) << "\", \"disabled\": [";
+    << ", \"refresh\": \"" << refresh_name(cfg.ctrl.refresh) << "\", \"refresh_blocks_scheduling\": "
+    << (cfg.ctrl.refresh_blocks_scheduling ? "true" : "false") << ", \"disabled\": [";
   for (size_t i = 0; i < cfg.disable.size(); i++) o << (i ? ", " : "") << "\"" << cfg.disable[i] << "\"";
   o << "]},\n";
   o << "  \"result\": {\n";
@@ -185,6 +193,9 @@ std::string summary_json(const Summary& s, const SimConfig& cfg) {
   o << "    \"avg_read_latency_ticks\": " << s.avg_read_latency_ticks << ",\n";
   o << "    \"avg_read_latency_ns\": " << s.avg_read_latency_ns << ",\n";
   o << "    \"wall_seconds\": " << s.wall_seconds << ",\n";
+  o << "    \"refresh_commands\": " << s.refreshes << ",\n";
+  o << "    \"max_refresh_wait_ticks\": " << s.max_refresh_wait_ticks << ",\n";
+  o << "    \"avg_refresh_wait_ticks\": " << s.avg_refresh_wait_ticks << ",\n";
   o << "    \"commands\": {";
   bool first = true;
   for (const auto& [k, v] : s.cmd_counts) {

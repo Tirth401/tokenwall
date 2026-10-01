@@ -19,12 +19,66 @@ JEDEC" visible everywhere; keep the vendor-override path obvious.
 - Phase 2 Address mapping: **done** 2026-09-30
 - Phase 3 Timing core: **done** 2026-09-30 (cycle-exact with Ramulator on the first validation run)
 - Phase 4 Validation: **done** 2026-09-30 (30 cases identical, writes and per-bank refresh included)
-- Phase 5 Sweeps and findings: **next**. Plan below.
-- Phase 6: not started
+- Phase 5 Sweeps and findings: **done** 2026-10-01
+- Phase 6 Writeup: **next**
 
 Repo is public at https://github.com/Tirth401/tokenwall (pushed 2026-09-30 on
 Tirth's instruction; author is the GitHub no-reply address). Push after each
 phase unless told otherwise.
+
+## Session 6, 2026-10-01: Phase 5
+
+Decisions taken by Tirth: the plan as proposed.
+
+What exists now:
+
+- `scripts/sweep.py`: 8 sweeps, 92 runs, one decode layer each, parallel
+  workers, JSON + CSV; `scripts/plot_sweeps.py`: 7 figures following the
+  charting rules (validated palette, legend row, direct labels, provenance
+  caption on every figure).
+- Core: `--refresh-nonblocking` (keeps scheduling while a refresh waits) with
+  bank reservation (no new row open on a bank with a pending refresh);
+  longest and average refresh postponement reported in every run.
+- `results/phase5/`: sweep JSON/CSV, 7 PNGs, full-step anchors (6).
+- `docs/phase5_findings.md`; README "Findings" with three figures embedded.
+
+Decisions made this session (alternative in brackets):
+
+- One layer per sweep run [full steps]. Phase 4 showed per-layer equals
+  full-step within 0.1 point; 84 runs took 10 minutes instead of a day.
+  Full-step anchors keep the absolute token times honest.
+- Report refresh postponement in every run [trust the bandwidth number].
+  Caught the starvation in the first non-blocking attempt.
+- Reserve the refresh target bank in non-blocking mode [deadline-based
+  priority]. Simple, mirrors real controllers, removes the tRP race.
+- 70B on 2 and 4 stacks, not 5 [modulo channel mapping]. The bit-slice
+  mapping needs a power of two; stated on the figure.
+
+Facts learned (verified this session):
+
+- Mapping: 42 / 84 / 30 / 84 (default / bank_low / bank_high / xor) with
+  all-bank refresh; 39.5 / 94 / 33.5 / 94 without refresh.
+- Batch 1 to 32, context 512 to 8192, GQA vs MHA, 8B vs 70B: fraction of
+  peak unchanged to the first decimal.
+- KV layout mismatch: 17.9% to 34.2% of peak under bank_low with 95% row
+  hits (channel parallelism loss); Phase 2's static prediction was wrong.
+- Per-bank refresh: 67.7% blocking, 92.2% non-blocking with reservation and
+  0.15 us worst postponement; the unreserved attempt starved refresh (567 us).
+- Ablation: tCCD_L 15 points under the default mapping; tFAW 1.3 under
+  bank_low; turnaround rules 0 on decode traffic.
+- All-bank refresh speeds up the default mapping (39.5 to 42.0), confirming
+  the Phase 3 explanation.
+
+## Phase 6 plan (writeup)
+
+1. README pass for a stranger: what, why, how to run in five commands, the
+   figures, the provenance rules, limits.
+2. Resume bullets using only measured numbers, each with the command that
+   reproduces it and the qualifiers.
+3. A short "architecture" doc tying the six phase docs together; a glossary
+   of the DRAM terms used.
+4. Housekeeping: pin tool versions, confirm a fresh clone builds and tests,
+   final push.
 
 ## Session 5, 2026-09-30: Phase 4
 

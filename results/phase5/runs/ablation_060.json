@@ -1,0 +1,26 @@
+{
+  "config": {"segs": "/Users/tirthshah/Documents/Tirth_grad/tokenwall/traces/sweep_8b_b1_s4096.segs", "spec": "/Users/tirthshah/Documents/Tirth_grad/tokenwall/configs/hbm3/hbm3_16gb_8hi_6400.spec", "policy": "ramulator", "stacks": 1, "interleave_log2": 0, "channels": 16, "frontend_ratio": 0, "max_requests": -1, "reads_only": false, "drain": true, "refresh": "allbank", "refresh_blocks_scheduling": true, "disabled": ["nRCDRD"]},
+  "result": {
+    "channels": 16,
+    "requests_accepted": 14156416,
+    "requests_served": 14156416,
+    "in_flight_at_end": 0,
+    "served_per_channel_min_max": [884776, 884776],
+    "controller_ticks": 3864339,
+    "sim_time_us": 1207.6059375,
+    "achieved_GBps": 375.126767708527,
+    "peak_GBps": 819.2,
+    "pct_of_peak": 45.7918417612947,
+    "row_hits": 13703872,
+    "row_misses": 315483,
+    "row_conflicts": 137061,
+    "row_hit_rate_pct": 96.8032586779027,
+    "avg_read_latency_ticks": 183.702714722956,
+    "avg_read_latency_ns": 57.4070983509236,
+    "wall_seconds": 36.213413458,
+    "commands": {"ACT": 452544, "PREab": 9888, "PREpb": 137061, "RD": 14156288, "REFab": 9888, "WR": 128},
+    "slots": 61829440,
+    "slot_reasons": {"ACT:Bank:nRC": 800, "ACT:Bank:nRP": 72612, "ACT:Channel:bus(ACT)": 46, "ACT:PseudoChannel:nRFC": 5393417, "ACT:PseudoChannel:nRRDS": 761, "PREpb:Bank:nCWL+nBL+nWR": 4928, "PREpb:Bank:nRAS": 752, "PREpb:Bank:nRTP": 256, "PREpb:Channel:bus(ACT)": 32, "RD:BankGroup:nCCDL": 20233996, "RD:Channel:bus(RD/WR/RDA/WRA)": 6697531, "RD:Sid:nCCDR": 460444, "WR:Bank:nRCDWR": 2048, "arbitration": 19825, "data": 28312816, "empty": 11950, "mode_wait": 1584, "refresh:PREab:PseudoChannel:nRAS": 41278, "refresh:PREab:PseudoChannel:nRTP": 50428, "refresh:REFab:PseudoChannel:nRC": 89856, "refresh:REFab:PseudoChannel:nRP": 424320, "refresh:arbitration": 9760},
+    "classes": {"weights": {"served": 13631488, "row_hits": 13195888}, "kv_read": {"served": 524288, "row_hits": 507504}, "kv_write": {"served": 128, "row_hits": 0}, "other": {"served": 512, "row_hits": 480}}
+  }
+}

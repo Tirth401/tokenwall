@@ -75,6 +75,9 @@ struct Summary {
   double sim_time_us = 0, achieved_GBps = 0, peak_GBps = 0, pct_of_peak = 0;
   uint64_t row_hits = 0, row_misses = 0, row_conflicts = 0;
   double row_hit_rate_pct = 0, avg_read_latency_ticks = 0, avg_read_latency_ns = 0;
+  Tick max_refresh_wait_ticks = 0;
+  double avg_refresh_wait_ticks = 0;
+  uint64_t refreshes = 0;
   std::map<std::string, uint64_t> cmd_counts;
   uint64_t slots = 0;
   std::map<std::string, uint64_t> slot_reasons;

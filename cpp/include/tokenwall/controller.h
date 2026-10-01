@@ -57,6 +57,13 @@ struct ControllerConfig {
   double wr_low = 0.2;
   double wr_high = 0.8;
   Refresh refresh = Refresh::AllBank;
+  // Ramulator's HBM34 controller schedules no read or write while a priority (refresh) request
+  // waits. false = Tokenwall extension: keep serving other banks meanwhile (Phase 5 experiment).
+  bool refresh_blocks_scheduling = true;
+  // With non-blocking scheduling, reserve the bank(s) a pending refresh targets: no new ACT
+  // may open a row there, otherwise a queued read's ACT (legal at tRP - 2 ticks) beats the
+  // REFpb (legal at tRP) every time and refresh starves. Measured in Phase 5.
+  bool reserve_refresh_banks = true;
   bool attribute = true;      // per-slot stall attribution (small cost)
   bool record_cmds = false;   // keep every issued command in memory (tests)
   std::FILE* cmd_trace = nullptr;  // stream every issued command as CSV (Phase 4 diffs)
@@ -77,6 +84,8 @@ struct ControllerStats {
   uint64_t num_read_served = 0, num_write_served = 0, num_maint_served = 0;
   uint64_t read_forwarded = 0, write_coalesced = 0;
   uint64_t read_latency_sum = 0;  // over departed reads
+  Tick max_maint_wait = 0;        // longest arrive-to-issue wait of a refresh request (postponement)
+  uint64_t maint_wait_sum = 0;
   uint64_t queue_len_sum = 0, read_q_sum = 0, write_q_sum = 0, prio_q_sum = 0;
   std::vector<uint64_t> cmd_count;  // per command id
   // attribution: one entry per (pseudo channel, rising edge)
@@ -138,6 +147,8 @@ class Controller {
   ReqBuffer active_, priority_, read_, write_;
   std::map<uint64_t, int> buffered_write_addrs_;
   std::vector<int> active_per_bank_;
+  std::vector<int> refresh_reserved_;  // per flat bank: pending refresh requests targeting it
+  void reserve(const MemReq& r, int delta);
   bool write_mode_ = false;
   // all-bank refresh (mirrors Ramulator's AllBank)
   Tick next_refresh_ = -1;

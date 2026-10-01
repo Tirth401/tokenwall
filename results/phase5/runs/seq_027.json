@@ -1,0 +1,26 @@
+{
+  "config": {"segs": "/Users/tirthshah/Documents/Tirth_grad/tokenwall/traces/sweep_8b_b32_s4096.segs", "spec": "/Users/tirthshah/Documents/Tirth_grad/tokenwall/configs/hbm3/hbm3_16gb_8hi_6400.spec", "policy": "bank_low", "stacks": 4, "interleave_log2": 0, "channels": 64, "frontend_ratio": 0, "max_requests": -1, "reads_only": false, "drain": true, "refresh": "allbank", "refresh_blocks_scheduling": true, "disabled": []},
+  "result": {
+    "channels": 64,
+    "requests_accepted": 30413312,
+    "requests_served": 30413312,
+    "in_flight_at_end": 0,
+    "served_per_channel_min_max": [475208, 475208],
+    "controller_ticks": 1135307,
+    "sim_time_us": 354.7834375,
+    "achieved_GBps": 2743.1550662508,
+    "peak_GBps": 3276.8,
+    "pct_of_peak": 83.7144490432984,
+    "row_hits": 29098880,
+    "row_misses": 363680,
+    "row_conflicts": 950752,
+    "row_hit_rate_pct": 95.678103062238,
+    "avg_read_latency_ticks": 121.046030979556,
+    "avg_read_latency_ns": 37.8268846811111,
+    "wall_seconds": 53.200010542,
+    "commands": {"ACT": 1314432, "PREab": 11520, "PREpb": 952792, "RD": 30409216, "REFab": 11520, "WR": 4096},
+    "slots": 72659712,
+    "slot_reasons": {"ACT:Bank:nRC": 3456, "ACT:Bank:nRP": 16948, "ACT:BankGroup:nRRDL": 296, "ACT:Channel:bus(ACT)": 1879, "ACT:PseudoChannel:nFAW": 2872, "ACT:PseudoChannel:nRFC": 6284160, "ACT:PseudoChannel:nRRDS": 544, "PREpb:Bank:nCWL+nBL+nWR": 896, "PREpb:Bank:nRAS": 608, "PREpb:Channel:bus(ACT)": 416, "PREpb:PseudoChannel:nPPD": 80, "RD:Bank:nRCDRD": 2974451, "RD:BankGroup:nCCDL": 2623, "RD:Channel:bus(RD/WR/RDA/WRA)": 911626, "RD:Sid:nCCDR": 894946, "WR:Bank:nRCDWR": 10496, "data": 60826560, "empty": 191, "refresh:PREab:PseudoChannel:nRAS": 33872, "refresh:PREab:PseudoChannel:nRTP": 82232, "refresh:REFab:PseudoChannel:nRC": 29952, "refresh:REFab:PseudoChannel:nRP": 569088, "refresh:arbitration": 11520},
+    "classes": {"weights": {"served": 13631488, "row_hits": 13046976}, "kv_read": {"served": 16777216, "row_hits": 16051904}, "kv_write": {"served": 4096, "row_hits": 0}, "other": {"served": 512, "row_hits": 0}}
+  }
+}

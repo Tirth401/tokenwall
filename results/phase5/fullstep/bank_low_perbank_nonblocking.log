@@ -1,0 +1,35 @@
+
+[full step 8b b1 s4096 bank_low perbank nonblocking (bank reserved)]
+  channels                         16
+  requests_accepted                485839360
+  requests_served                  485839360
+  in_flight_at_end                 0
+  served_per_channel_min_max       [30364960, 30364960]
+  controller_ticks                 65885537
+  sim_time_us                      20589.230
+  achieved_GBps                    755.097
+  peak_GBps                        819.2
+  pct_of_peak                      92.175
+  row_hits                         465465496
+  row_misses                       5313600
+  row_conflicts                    15060264
+  row_hit_rate_pct                 95.806
+  avg_read_latency_ticks           116.448
+  avg_read_latency_ns              36.390
+  refresh_commands                 5405984 (max wait 2222 ticks = 694.4 ns, avg 96.9 ticks)
+  wall_seconds                     461.847
+  commands: ACT=20373864 PREpb=20372968 RD=485835264 REFpb=5405984 WR=4096
+  column-command slots per pseudo channel: 1054168608
+    data                                          92.17%
+    ACT:Bank:nRFCpb                                5.37%
+    RD:Bank:nRCDRD                                 1.45%
+    RD:BankGroup:nCCDL                             0.30%
+    RD:Channel:bus(RD/WR/RDA/WRA)                  0.26%
+    RD:Sid:nCCDR                                   0.20%
+    ACT:PseudoChannel:nFAW                         0.09%
+    ACT:PseudoChannel:nRRDS                        0.05%
+  weights    served    469041152  row hits  95.81%
+  kv_read    served     16777216  row hits  95.79%
+  kv_write   served         4096  row hits   0.00%
+  other      served        16896  row hits   0.00%
+wrote results/phase5/fullstep/fullstep_8b_b1_s4096_bank_low_perbank_nonblocking.json

@@ -1,0 +1,26 @@
+{
+  "config": {"segs": "/Users/tirthshah/Documents/Tirth_grad/tokenwall/traces/sweep_8b_b32_s512.segs", "spec": "/Users/tirthshah/Documents/Tirth_grad/tokenwall/configs/hbm3/hbm3_16gb_8hi_6400.spec", "policy": "ramulator", "stacks": 4, "interleave_log2": 0, "channels": 64, "frontend_ratio": 0, "max_requests": -1, "reads_only": false, "drain": true, "refresh": "allbank", "refresh_blocks_scheduling": true, "disabled": []},
+  "result": {
+    "channels": 64,
+    "requests_accepted": 15733248,
+    "requests_served": 15733248,
+    "in_flight_at_end": 0,
+    "served_per_channel_min_max": [245832, 245832],
+    "controller_ticks": 1173047,
+    "sim_time_us": 366.5771875,
+    "achieved_GBps": 1373.41862278323,
+    "peak_GBps": 3276.8,
+    "pct_of_peak": 41.9134101191171,
+    "row_hits": 15227200,
+    "row_misses": 380800,
+    "row_conflicts": 125248,
+    "row_hit_rate_pct": 96.7835757753262,
+    "avg_read_latency_ticks": 198.492923521878,
+    "avg_read_latency_ns": 62.029038600587,
+    "wall_seconds": 47.171016792,
+    "commands": {"ACT": 506048, "PREab": 11904, "PREpb": 125376, "RD": 15729152, "REFab": 11904, "WR": 4096},
+    "slots": 75075072,
+    "slot_reasons": {"ACT:Bank:nRP": 446248, "ACT:BankGroup:nRRDL": 640, "ACT:Channel:bus(ACT)": 128, "ACT:PseudoChannel:nRFC": 6433152, "ACT:PseudoChannel:nRRDS": 168, "PREpb:Bank:nCWL+nBL+nWR": 29640, "PREpb:Bank:nRTP": 512, "RD:Bank:nRCDRD": 4882536, "RD:BankGroup:nCCDL": 24411092, "RD:Channel:bus(RD/WR/RDA/WRA)": 6446490, "RD:Sid:nCCDR": 18977, "WR:Bank:nRCDWR": 24400, "data": 31466432, "empty": 23486, "mode_wait": 118080, "refresh:PREab:PseudoChannel:nCWL+nBL+nWR": 384, "refresh:PREab:PseudoChannel:nRAS": 75736, "refresh:PREab:PseudoChannel:nRTP": 78579, "refresh:REFab:PseudoChannel:nRC": 176384, "refresh:REFab:PseudoChannel:nRP": 435992, "refresh:arbitration": 6016},
+    "classes": {"weights": {"served": 13631488, "row_hits": 13197056}, "kv_read": {"served": 2097152, "row_hits": 2029760}, "kv_write": {"served": 4096, "row_hits": 0}, "other": {"served": 512, "row_hits": 384}}
+  }
+}
