@@ -667,3 +667,39 @@ ticks (0.69 us, tREFI is 3.9 us) and an average of 97 ticks. Raw:
   was caught by the postponement statistic.
 - Ablation: tCCD_L is 15 points under the default mapping; under bank_low the
   leftovers are tCCD_R 2.4, tRP 1.5, tFAW 1.3; turnaround rules cost nothing.
+
+---
+
+## Phase 6, 2026-10-01
+
+### Fresh-clone check (toolchain check)
+
+A clean clone from GitHub into a scratch directory, following the README's
+quick start verbatim on the same laptop (macOS, Apple M5, Apple Clang 21,
+CMake 4.4.3, Python 3.12.10):
+
+```
+git clone --recursive https://github.com/Tirth401/tokenwall.git      -> commit 5e7eac6, submodule 72427a1
+python3 -m venv .venv && .venv/bin/pip install -r requirements.txt -e .   -> imports ok (pinned versions)
+cmake -S . -B build && cmake --build build && ctest --test-dir build  -> 100% tests passed (35 C++ cases)
+scripts/setup_ramulator2.sh                                          -> patches 0001 and 0002 applied, Ramulator built, import OK
+.venv/bin/python -m pytest -q                                        -> 94 passed in 3.82s
+python scripts/tokenwall_vs_ramulator.py --trace layer0_b1 --requests 300000 --policies ramulator,bank_low --refresh allbank
+    ramulator  32B allbank  ticks 89407 / 89407   343.0 / 343.0 GB/s  identical True
+    bank_low   32B allbank  ticks 44115 / 44115   695.2 / 695.2 GB/s  identical True
+```
+Wall time for the whole sequence: about 9 minutes, dominated by the Ramulator
+build. Log kept in the session scratch directory only.
+
+### Final inventory
+
+| Item | Count |
+|---|---:|
+| C++ unit cases | 35 |
+| Python tests | 94 |
+| Ramulator-identity cases (Phases 3 to 4) | 30, all identical |
+| Identical consecutive DRAM commands | 2,081,313 |
+| Sweep runs (Phase 5) | 92 |
+| Full decode-step runs | 6 |
+| Figures | 7 |
+| Patches to Ramulator | 2 (build fix; flat address on pre-mapped traces) |

@@ -20,11 +20,56 @@ JEDEC" visible everywhere; keep the vendor-override path obvious.
 - Phase 3 Timing core: **done** 2026-09-30 (cycle-exact with Ramulator on the first validation run)
 - Phase 4 Validation: **done** 2026-09-30 (30 cases identical, writes and per-bank refresh included)
 - Phase 5 Sweeps and findings: **done** 2026-10-01
-- Phase 6 Writeup: **next**
+- Phase 6 Writeup: **done** 2026-10-01. The project is complete; see "What I
+  would do next" below for extensions.
 
 Repo is public at https://github.com/Tirth401/tokenwall (pushed 2026-09-30 on
 Tirth's instruction; author is the GitHub no-reply address). Push after each
 phase unless told otherwise.
+
+## Session 7, 2026-10-01: Phase 6
+
+Decisions taken by Tirth: the proposed scope as is.
+
+What exists now:
+
+- `README.md` rewritten for a stranger: the question, the answer table, how
+  it works, five-command quick start, a one-minute reproduction, findings
+  with three figures, what is validated and what is not, vendor override
+  path, repository map, documentation index, status.
+- `docs/architecture.md`: pipeline diagram, the three file formats, where
+  the numbers come from, the test pyramid, modelled versus not, a glossary of
+  every DRAM and LLM term used, the phase-document index.
+- `docs/resume_bullets.md`: six claims with exact numbers, each with the
+  command that reproduces it and its qualifiers; a three-minute live demo;
+  a table of expected interview questions and where the answer lives.
+- `requirements.txt` pinned to the tested versions (pandas dropped: unused).
+- Fresh-clone check from GitHub recorded in RESULTS (Phase 6).
+
+Decisions made this session (alternative in brackets):
+
+- Lead the README with the answer table and one figure [lead with the
+  architecture]. A stranger decides in ten seconds whether to read on.
+- Resume bullets live in `docs/` with commands beside them [a bare list]. A
+  claim without its reproduction is the thing this project refuses to make.
+- Exact version pins [floors]. A reviewer should get the versions that
+  produced the numbers; the comment says when to relax them.
+- Fresh clone from GitHub rather than a local copy [trust the working tree].
+  It is the path a stranger takes, submodule fetch and patches included.
+
+## What I would do next (not started)
+
+1. A deeper controller model: deeper queues, bank-aware read batching, and
+   deadline-driven refresh priority, each validated the same way.
+2. Non-power-of-two stack counts (an H100's five) with a modulo channel
+   select, so the 70B shard runs at its real memory system size.
+3. A multi-stream frontend that models many concurrent warps, to replace
+   the single ordered stream and retest the coarse-interleave result.
+4. Prefill traffic and a paged KV cache layout (vLLM-style 16-position
+   blocks) as generator options.
+5. Vendor datasheet timings through the override path, reported side by side
+   with the Ramulator preset.
+6. HBM4 via Ramulator's HBM4 DSL and the same exporter.
 
 ## Session 6, 2026-10-01: Phase 5
 
