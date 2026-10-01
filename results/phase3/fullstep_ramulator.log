@@ -1,0 +1,36 @@
+
+[full decode step, llama3_8b b1 s4096, ramulator, allbank refresh, drained]
+  channels                         16
+  requests_accepted                485839360
+  requests_served                  485839360
+  in_flight_at_end                 0
+  served_per_channel_min_max       [30364960, 30364960]
+  controller_ticks                 144494643
+  sim_time_us                      45154.576
+  achieved_GBps                    344.303
+  peak_GBps                        819.2
+  pct_of_peak                      42.029
+  row_hits                         470355200
+  row_misses                       11779640
+  row_conflicts                    3704520
+  row_hit_rate_pct                 96.813
+  avg_read_latency_ticks           198.276
+  avg_read_latency_ns              61.961
+  wall_seconds                     741.682
+  commands: ACT=15484160 PREab=370496 PREpb=3704584 RD=485835264 REFab=370496 WR=4096
+  column-command slots per pseudo channel: 2311914304
+    data                                          42.03%
+    RD:BankGroup:nCCDL                            32.57%
+    ACT:PseudoChannel:nRFC                         8.70%
+    RD:Channel:bus(RD/WR/RDA/WRA)                  8.67%
+    RD:Bank:nRCDRD                                 6.39%
+    refresh:REFab:PseudoChannel:nRP                0.59%
+    ACT:Bank:nRP                                   0.56%
+    refresh:REFab:PseudoChannel:nRC                0.24%
+    refresh:PREab:PseudoChannel:nRTP               0.11%
+    refresh:PREab:PseudoChannel:nRAS               0.09%
+  weights    served    469041152  row hits  96.81%
+  kv_read    served     16777216  row hits  96.80%
+  kv_write   served         4096  row hits   1.17%
+  other      served        16896  row hits  93.56%
+wrote results/phase3/fullstep_llama3_8b_tp1_b1_s4096_ramulator.json

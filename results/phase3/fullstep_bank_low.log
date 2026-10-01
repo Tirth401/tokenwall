@@ -1,0 +1,34 @@
+
+[full decode step, llama3_8b b1 s4096, bank_low, allbank refresh, drained]
+  channels                         16
+  requests_accepted                485839360
+  requests_served                  485839360
+  in_flight_at_end                 0
+  served_per_channel_min_max       [30364960, 30364960]
+  controller_ticks                 72515053
+  sim_time_us                      22660.954
+  achieved_GBps                    686.064
+  peak_GBps                        819.2
+  pct_of_peak                      83.748
+  row_hits                         465068167
+  row_misses                       5753728
+  row_conflicts                    15017465
+  row_hit_rate_pct                 95.725
+  avg_read_latency_ticks           123.461
+  avg_read_latency_ns              38.582
+  wall_seconds                     394.642
+  commands: ACT=20771193 PREab=185920 PREpb=15018465 RD=485835264 REFab=185920 WR=4096
+  column-command slots per pseudo channel: 1160240864
+    data                                          83.75%
+    ACT:PseudoChannel:nRFC                         8.74%
+    RD:Bank:nRCDRD                                 4.02%
+    RD:Channel:bus(RD/WR/RDA/WRA)                  1.24%
+    RD:Sid:nCCDR                                   1.22%
+    refresh:REFab:PseudoChannel:nRP                0.80%
+    refresh:PREab:PseudoChannel:nRTP               0.12%
+  weights    served    469041152  row hits  95.73%
+  kv_read    served     16777216  row hits  95.68%
+  kv_write   served         4096  row hits   0.00%
+  other      served        16896  row hits   0.00%
+wrote results/phase3/fullstep_llama3_8b_tp1_b1_s4096_bank_low.json
+EXIT 0

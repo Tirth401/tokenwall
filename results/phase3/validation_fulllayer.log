@@ -1,0 +1,83 @@
+
+=== ramulator, refresh=none, 16 channels, 20,000,000 reads ===
+  metric                          ramulator        tokenwall         diff    rel %
+  controller_ticks                  4352953          4352953        0.000    0.000
+  requests_served                  13762560         13762560        0.000    0.000
+  row_hits                         13332416         13332416        0.000    0.000
+  row_misses                           1024             1024        0.000    0.000
+  row_conflicts                      429120           429120        0.000    0.000
+  achieved_GBps                     323.754          323.754       -0.000   -0.000
+  avg_read_latency_ticks            207.915          207.915        0.000    0.000
+  wall: ramulator 37.1s, tokenwall 24.6s
+  tokenwall slot attribution (top):
+    data                                          39.52%
+    RD:BankGroup:nCCDL                            34.85%
+    RD:Bank:nRCDRD                                19.71%
+    RD:Channel:bus(RD/WR/RDA/WRA)                  3.75%
+    ACT:Bank:nRP                                   2.16%
+    empty                                          0.00%
+    PREpb:Bank:nRTP                                0.00%
+    RD:Sid:nCCDR                                   0.00%
+
+=== ramulator, refresh=allbank, 16 channels, 20,000,000 reads ===
+  metric                          ramulator        tokenwall         diff    rel %
+  controller_ticks                  4090635          4090635        0.000    0.000
+  requests_served                  13762560         13762560        0.000    0.000
+  row_hits                         13324063         13324063        0.000    0.000
+  row_misses                         333745           333745        0.000    0.000
+  row_conflicts                      104752           104752        0.000    0.000
+  achieved_GBps                     344.515          344.515       -0.000   -0.000
+  avg_read_latency_ticks            198.185          198.185       -0.000   -0.000
+  wall: ramulator 35.9s, tokenwall 22.0s
+  tokenwall slot attribution (top):
+    data                                          42.06%
+    RD:BankGroup:nCCDL                            32.59%
+    ACT:PseudoChannel:nRFC                         8.68%
+    RD:Channel:bus(RD/WR/RDA/WRA)                  8.67%
+    RD:Bank:nRCDRD                                 6.39%
+    refresh:REFab:PseudoChannel:nRP                0.58%
+    ACT:Bank:nRP                                   0.55%
+    refresh:REFab:PseudoChannel:nRC                0.24%
+
+=== bank_low, refresh=none, 16 channels, 20,000,000 reads ===
+  metric                          ramulator        tokenwall         diff    rel %
+  controller_ticks                  1828879          1828879        0.000    0.000
+  requests_served                  13762560         13762560        0.000    0.000
+  row_hits                         13331856         13331856        0.000    0.000
+  row_misses                           1024             1024        0.000    0.000
+  row_conflicts                      429680           429680        0.000    0.000
+  achieved_GBps                     770.574          770.574        0.000    0.000
+  avg_read_latency_ticks            114.357          114.357       -0.000   -0.000
+  wall: ramulator 19.1s, tokenwall 10.5s
+  tokenwall slot attribution (top):
+    data                                          94.06%
+    RD:Bank:nRCDRD                                 3.17%
+    RD:Channel:bus(RD/WR/RDA/WRA)                  1.38%
+    RD:Sid:nCCDR                                   1.38%
+    ACT:Bank:nRC                                   0.00%
+    ACT:PseudoChannel:nFAW                         0.00%
+    PREpb:Bank:nRAS                                0.00%
+    ACT:Channel:bus(ACT)                           0.00%
+
+=== bank_low, refresh=allbank, 16 channels, 20,000,000 reads ===
+  metric                          ramulator        tokenwall         diff    rel %
+  controller_ticks                  2052919          2052919        0.000    0.000
+  requests_served                  13762560         13762560        0.000    0.000
+  row_hits                         13175344         13175344        0.000    0.000
+  row_misses                         163152           163152        0.000    0.000
+  row_conflicts                      424064           424064        0.000    0.000
+  achieved_GBps                     686.479          686.479       -0.000   -0.000
+  avg_read_latency_ticks            123.429          123.429       -0.000   -0.000
+  wall: ramulator 21.0s, tokenwall 11.5s
+  tokenwall slot attribution (top):
+    data                                          83.80%
+    ACT:PseudoChannel:nRFC                         8.72%
+    RD:Bank:nRCDRD                                 4.00%
+    RD:Channel:bus(RD/WR/RDA/WRA)                  1.24%
+    RD:Sid:nCCDR                                   1.22%
+    refresh:REFab:PseudoChannel:nRP                0.80%
+    refresh:PREab:PseudoChannel:nRTP               0.12%
+    refresh:PREab:PseudoChannel:nRAS               0.04%
+
+wrote results/phase3/validation_llama3_8b_layer0_b1_s1024_reads20000000_ch16.json
+EXIT 0

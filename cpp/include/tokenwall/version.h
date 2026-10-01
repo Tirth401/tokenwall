@@ -1,5 +1,5 @@
 #pragma once
 
 namespace tokenwall {
-inline constexpr const char* kVersion = "0.0.1-phase0";
+inline constexpr const char* kVersion = "0.3.0-phase3";
 }  // namespace tokenwall

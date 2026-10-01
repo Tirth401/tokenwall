@@ -17,12 +17,88 @@ JEDEC" visible everywhere; keep the vendor-override path obvious.
 - Phase 0 Setup and orientation: **done** 2026-09-30
 - Phase 1 Trace generator: **done** 2026-09-30
 - Phase 2 Address mapping: **done** 2026-09-30
-- Phase 3 Timing core: **next**. Settle the open questions below first.
-- Phases 4 to 6: not started
+- Phase 3 Timing core: **done** 2026-09-30 (cycle-exact with Ramulator on the first validation run)
+- Phase 4 Validation: **next**. Scope proposal below.
+- Phases 5 to 6: not started
 
 Repo is public at https://github.com/Tirth401/tokenwall (pushed 2026-09-30 on
 Tirth's instruction; author is the GitHub no-reply address). Push after each
 phase unless told otherwise.
+
+## Session 4, 2026-09-30: Phase 3
+
+Decisions taken by Tirth: go with the recommendations (half-CK ticks, rule
+order, FR-FCFS controller like Ramulator's, binding-constraint attribution).
+
+What exists now:
+
+- `scripts/export_dram_spec.py` -> `configs/hbm3/hbm3_16gb_8hi_6400.spec`:
+  Ramulator's resolved runtime tables (29 timings in ticks, 11 command
+  lengths, 60 constraint entries with names), self-checked entry by entry
+  against `dram.to_config()`. `--override`/`--out` for vendor timings.
+- `cpp/include/tokenwall/{dram_spec,device,controller,system}.h` + sources:
+  spec loader with per-constraint enable flags; timing tree + bank state
+  machine mirroring Ramulator's node/device; controller mirroring HBM34
+  (buffers, FR-FCFS, write watermarks, all-bank refresh, edge and pairing
+  rules); memory system, trace frontend with Ramulator's loop interleaving,
+  drain mode, JSON output; per pseudo-channel slot attribution.
+- `tokenwall sim` CLI; `scripts/tokenwall_vs_ramulator.py` side-by-side.
+- Tests: 34 C++ cases (17 per-rule timing tests with hand-derived ticks, 7
+  controller timelines, 10 earlier), 92 Python tests unchanged.
+- `results/phase3/`: validation JSON/logs, full-step runs.
+
+Decisions made this session (alternative in brackets):
+
+- Table-driven timing engine fed by Ramulator's resolved table [hand-coded
+  if-statements per rule]. Same rule semantics by construction; "one
+  constraint at a time" lives in the per-rule unit tests and in the
+  `--disable` ablation switch, not in 51 bespoke code paths.
+- Mirror Ramulator's controller tick structure and FR-FCFS exactly [a
+  simpler scheduler]. Chosen so Phase 4 diffs isolate timing bugs; it paid
+  off: zero difference on the first run.
+- Attribution per (pseudo channel, rising edge) slot [per idle tick per bank].
+  A slot is `data` if a burst is on that PC's wires, else the named rule that
+  blocks the oldest request to that PC, else `arbitration`/`empty`;
+  refresh-in-progress is reported first because Ramulator's controller stops
+  all read/write scheduling while a priority request waits.
+- Ramulator-comparable stop condition by default (stop at last send),
+  `--drain` for full-step bandwidth over every byte.
+
+Facts learned (verified this session):
+
+- Tokenwall == Ramulator 2.1 on 1.8 M reads of layer 0, 16 channels, for
+  `ramulator` and `bank_low`, refresh none and allbank: ticks, served, hits,
+  misses, conflicts, bandwidth, latency all identical. Tokenwall ran 1.6 to
+  1.8x faster (3.0 s vs 4.5 s).
+- Where the bandwidth goes (slot attribution, 16 channels, reads only):
+  `ramulator` mapping, no refresh: data 39.6%, RD blocked by tCCD_L 34.7%,
+  RD waiting for tRCD 19.5%, column bus 4.0%, ACT waiting for tRP 2.2%.
+  `bank_low`, no refresh: data 94.0%, tRCD 3.2%, column bus 1.4%, tCCD_R
+  1.4%. With all-bank refresh `bank_low` drops to 84.0% data and nRFC takes
+  8.55%.
+- Surprise: under the `ramulator` mapping, all-bank refresh made the run 5.9%
+  SHORTER (534,313 vs 567,661 ticks). Refresh's PREab closes all 64 rows at
+  once, so the next visit to each bank is a miss (ACT only) instead of a
+  conflict (PREpb, then tRP, then ACT); conflicts fell from 55,280 to
+  13,632. For streaming traffic under an open-row policy, batched precharge
+  can be worth more than tRFC costs. Analysis, backed by the attribution
+  shift from tRCD/tRP (21.6%) to nRFC + tRCD/tRP (15.5%).
+- HBM3 edge rules cost a tick here and there: a RD whose timing expires on an
+  even tick issues on the next odd one (tests pin this: ACT at 1, RD at 65).
+
+## Phase 4 scope proposal (validation)
+
+1. Writes: patch Ramulator's `ReadWriteTrace` to carry the flat address (so
+   its write coalescing works) and validate with the KV-append writes
+   included, both policies, refresh on and off.
+2. Matrix: policies x interleave (32 B, 256 B, 1 KiB) x channels (16, 32) x
+   refresh, on a full layer; record the error table (expected zero).
+3. Command-level diff tool: Ramulator's `CmdTraceRecorder` plugin versus
+   `tokenwall sim --cmd-trace`, first divergence reported per bank; needed
+   only if a case ever disagrees.
+4. Per-bank refresh (`HBM34PerBankRefresh`) in the core, validated, so Phase
+   5 can sweep refresh policy.
+5. Batch-32 and 70B slices through both (KV-heavy, TP shard).
 
 ## Session 3, 2026-09-30: Phase 2
 
@@ -92,28 +168,13 @@ Facts learned (verified this session):
 - Ramulator with 16 channels runs the 1.8 M-request prefix in 2.5 to 5 s
   (0.35 to 0.7 M requests/s); a full layer (13.8 M reads) is 20 to 40 s.
 
-## Open questions to settle at the start of Phase 3
+## Phase 3 questions, as resolved
 
-1. **Tick model.** Copy Ramulator's half-CK ticks (ACT 3 ticks, PRE/REF 1,
-   RD/WR 2, with the +/- command-length adjustments, see Phase 0 doc) so
-   validation can be cycle-exact [CK-granularity ticks with a tolerance].
-   Recommendation: half-CK ticks.
-2. **Constraint order (end-to-end first).** First slice: bus occupancy (nBL),
-   tRCD (RD and WR), tRP, tRAS, tRC, tCCD_S, tCCD_L, then a first validation
-   run against Ramulator with refresh off. Then tRRD_S/L, tFAW, WTR/RTW,
-   tCCD_R (SID), tPPD, finally tREFI/tRFC all-bank. Per-bank refresh later.
-3. **Controller model.** FR-FCFS over a 32-entry read queue and 32-entry write
-   queue per channel with Ramulator's write watermarks (0.2/0.8), open-row
-   policy, one command per tick per bus (HBM3 has separate row and column
-   command buses). Match Ramulator's HBM34 controller closely enough that
-   Phase 4 diffs are about timing, not scheduling.
-4. **Stall attribution.** Per issued command, record which constraint set its
-   earliest tick (the binding one); per idle data-bus tick, attribute to the
-   reason the oldest request could not issue. Categories: row miss (tRCD/tRP),
-   same-bank-group spacing (tCCD_L), tFAW, turnaround, refresh, empty queue.
-5. **Validation frontend.** Phase 4 needs writes: patch Ramulator's
-   ReadWriteTrace to accept an optional flat address, or drive Ramulator's
-   DeviceUnderTest directly per command.
+Half-CK ticks with Ramulator's command-length adjustments; the whole rule
+table at once (table-driven) with per-rule tests and an ablation switch
+instead of a hand-coded incremental build; controller mirrors HBM34; stall
+attribution per column-command slot by binding constraint; writes deferred
+to Phase 4 (Ramulator-side patch).
 
 ## Session 2, 2026-09-30: Phase 1
 

@@ -1,0 +1,492 @@
+{
+  "date": "2026-09-30",
+  "command": "python scripts/tokenwall_vs_ramulator.py --requests 20000000",
+  "channels": 16,
+  "requests": 20000000,
+  "cases": [
+    {
+      "policy": "ramulator",
+      "refresh": "none",
+      "ramulator": {
+        "channels": 16,
+        "requests_accepted": 13763072,
+        "requests_served": 13762560,
+        "in_flight_at_end": 512,
+        "served_per_channel_min_max": [
+          860160,
+          860160
+        ],
+        "controller_ticks": 4352953,
+        "sim_time_us": 1360.2978125,
+        "achieved_GBps": 323.7540455869843,
+        "peak_GBps": 819.2,
+        "pct_of_peak": 39.52075751794242,
+        "row_hits": 13332416,
+        "row_misses": 1024,
+        "row_conflicts": 429120,
+        "row_hit_rate_pct": 96.8745349702381,
+        "avg_read_latency_ticks": 207.914809125,
+        "avg_read_latency_ns": 64.9733778515625,
+        "ramulator_total_throughput_MBps": 324272.875008,
+        "wall_seconds": 37.08237099647522
+      },
+      "tokenwall": {
+        "channels": 16,
+        "requests_accepted": 13763072,
+        "requests_served": 13762560,
+        "in_flight_at_end": 512,
+        "served_per_channel_min_max": [
+          860160,
+          860160
+        ],
+        "controller_ticks": 4352953,
+        "sim_time_us": 1360.3,
+        "achieved_GBps": 323.754,
+        "peak_GBps": 819.2,
+        "pct_of_peak": 39.5208,
+        "row_hits": 13332416,
+        "row_misses": 1024,
+        "row_conflicts": 429120,
+        "row_hit_rate_pct": 96.8745,
+        "avg_read_latency_ticks": 207.915,
+        "avg_read_latency_ns": 64.9734,
+        "wall_seconds": 24.5663,
+        "commands": {
+          "ACT": 430144,
+          "PREpb": 429120,
+          "RD": 13762560
+        },
+        "slots": 69647264,
+        "slot_reasons": {
+          "ACT:Bank:nRP": 1506130,
+          "ACT:Channel:bus(ACT)": 16,
+          "PREpb:Bank:nRTP": 512,
+          "PREpb:Channel:bus(ACT)": 32,
+          "RD:Bank:nRCDRD": 13730832,
+          "RD:BankGroup:nCCDL": 24272421,
+          "RD:Channel:bus(RD/WR/RDA/WRA)": 2609179,
+          "RD:Sid:nCCDR": 80,
+          "data": 27525104,
+          "empty": 2958
+        },
+        "classes": {
+          "weights": {
+            "served": 13630976,
+            "row_hits": 13204992
+          },
+          "kv_read": {
+            "served": 131072,
+            "row_hits": 126944
+          },
+          "kv_write": {
+            "served": 0,
+            "row_hits": 0
+          },
+          "other": {
+            "served": 512,
+            "row_hits": 480
+          }
+        },
+        "wall_seconds_total": 24.579793214797974
+      },
+      "diff": {
+        "controller_ticks": {
+          "abs": 0,
+          "rel_pct": 0.0
+        },
+        "requests_served": {
+          "abs": 0,
+          "rel_pct": 0.0
+        },
+        "row_hits": {
+          "abs": 0,
+          "rel_pct": 0.0
+        },
+        "row_misses": {
+          "abs": 0,
+          "rel_pct": 0.0
+        },
+        "row_conflicts": {
+          "abs": 0,
+          "rel_pct": 0.0
+        },
+        "achieved_GBps": {
+          "abs": -4.558698429946162e-05,
+          "rel_pct": -1.4080745838035738e-05
+        },
+        "avg_read_latency_ticks": {
+          "abs": 0.00019087499998704516,
+          "rel_pct": 9.180442739520764e-05
+        }
+      }
+    },
+    {
+      "policy": "ramulator",
+      "refresh": "allbank",
+      "ramulator": {
+        "channels": 16,
+        "requests_accepted": 13763072,
+        "requests_served": 13762560,
+        "in_flight_at_end": 512,
+        "served_per_channel_min_max": [
+          860160,
+          860160
+        ],
+        "controller_ticks": 4090635,
+        "sim_time_us": 1278.3234375,
+        "achieved_GBps": 344.515251055154,
+        "peak_GBps": 819.2,
+        "pct_of_peak": 42.0550843573186,
+        "row_hits": 13324063,
+        "row_misses": 333745,
+        "row_conflicts": 104752,
+        "row_hit_rate_pct": 96.8138413202195,
+        "avg_read_latency_ticks": 198.18542787500002,
+        "avg_read_latency_ns": 61.9329462109375,
+        "ramulator_total_throughput_MBps": 345067.343744,
+        "wall_seconds": 35.93061804771423
+      },
+      "tokenwall": {
+        "channels": 16,
+        "requests_accepted": 13763072,
+        "requests_served": 13762560,
+        "in_flight_at_end": 512,
+        "served_per_channel_min_max": [
+          860160,
+          860160
+        ],
+        "controller_ticks": 4090635,
+        "sim_time_us": 1278.32,
+        "achieved_GBps": 344.515,
+        "peak_GBps": 819.2,
+        "pct_of_peak": 42.0551,
+        "row_hits": 13324063,
+        "row_misses": 333745,
+        "row_conflicts": 104752,
+        "row_hit_rate_pct": 96.8138,
+        "avg_read_latency_ticks": 198.185,
+        "avg_read_latency_ns": 61.9329,
+        "wall_seconds": 22.0238,
+        "commands": {
+          "ACT": 438497,
+          "PREab": 10464,
+          "PREpb": 104752,
+          "RD": 13762560,
+          "REFab": 10464
+        },
+        "slots": 65450176,
+        "slot_reasons": {
+          "ACT:Bank:nRP": 360786,
+          "ACT:Channel:bus(ACT)": 32,
+          "ACT:PseudoChannel:nRFC": 5682203,
+          "PREpb:Bank:nRTP": 512,
+          "PREpb:Channel:bus(ACT)": 8,
+          "RD:Bank:nRCDRD": 4182414,
+          "RD:BankGroup:nCCDL": 21331167,
+          "RD:Channel:bus(RD/WR/RDA/WRA)": 5676067,
+          "RD:Sid:nCCDR": 11994,
+          "data": 27525104,
+          "empty": 2654,
+          "refresh:PREab:PseudoChannel:nRAS": 59567,
+          "refresh:PREab:PseudoChannel:nRTP": 74888,
+          "refresh:REFab:PseudoChannel:nRC": 156468,
+          "refresh:REFab:PseudoChannel:nRP": 381738,
+          "refresh:arbitration": 4574
+        },
+        "classes": {
+          "weights": {
+            "served": 13630976,
+            "row_hits": 13196735
+          },
+          "kv_read": {
+            "served": 131072,
+            "row_hits": 126848
+          },
+          "kv_write": {
+            "served": 0,
+            "row_hits": 0
+          },
+          "other": {
+            "served": 512,
+            "row_hits": 480
+          }
+        },
+        "wall_seconds_total": 22.03923201560974
+      },
+      "diff": {
+        "controller_ticks": {
+          "abs": 0,
+          "rel_pct": 0.0
+        },
+        "requests_served": {
+          "abs": 0,
+          "rel_pct": 0.0
+        },
+        "row_hits": {
+          "abs": 0,
+          "rel_pct": 0.0
+        },
+        "row_misses": {
+          "abs": 0,
+          "rel_pct": 0.0
+        },
+        "row_conflicts": {
+          "abs": 0,
+          "rel_pct": 0.0
+        },
+        "achieved_GBps": {
+          "abs": -0.0002510551540240158,
+          "rel_pct": -7.287200007985248e-05
+        },
+        "avg_read_latency_ticks": {
+          "abs": -0.0004278750000139553,
+          "rel_pct": -0.0002158962970192872
+        }
+      }
+    },
+    {
+      "policy": "bank_low",
+      "refresh": "none",
+      "ramulator": {
+        "channels": 16,
+        "requests_accepted": 13763072,
+        "requests_served": 13762560,
+        "in_flight_at_end": 512,
+        "served_per_channel_min_max": [
+          860160,
+          860160
+        ],
+        "controller_ticks": 1828879,
+        "sim_time_us": 571.5246875,
+        "achieved_GBps": 770.5737470876969,
+        "peak_GBps": 819.2,
+        "pct_of_peak": 94.06417811129113,
+        "row_hits": 13331856,
+        "row_misses": 1024,
+        "row_conflicts": 429680,
+        "row_hit_rate_pct": 96.87046595982143,
+        "avg_read_latency_ticks": 114.3574961875,
+        "avg_read_latency_ns": 35.73671755859375,
+        "ramulator_total_throughput_MBps": 771808.624992,
+        "wall_seconds": 19.114899158477783
+      },
+      "tokenwall": {
+        "channels": 16,
+        "requests_accepted": 13763072,
+        "requests_served": 13762560,
+        "in_flight_at_end": 512,
+        "served_per_channel_min_max": [
+          860160,
+          860160
+        ],
+        "controller_ticks": 1828879,
+        "sim_time_us": 571.525,
+        "achieved_GBps": 770.574,
+        "peak_GBps": 819.2,
+        "pct_of_peak": 94.0642,
+        "row_hits": 13331856,
+        "row_misses": 1024,
+        "row_conflicts": 429680,
+        "row_hit_rate_pct": 96.8705,
+        "avg_read_latency_ticks": 114.357,
+        "avg_read_latency_ns": 35.7367,
+        "wall_seconds": 10.464,
+        "commands": {
+          "ACT": 430704,
+          "PREpb": 429680,
+          "RD": 13762560
+        },
+        "slots": 29262080,
+        "slot_reasons": {
+          "ACT:Bank:nRC": 768,
+          "ACT:Channel:bus(ACT)": 31,
+          "ACT:PseudoChannel:nFAW": 640,
+          "PREpb:Bank:nRAS": 288,
+          "RD:Bank:nRCDRD": 928722,
+          "RD:Channel:bus(RD/WR/RDA/WRA)": 403264,
+          "RD:Sid:nCCDR": 403232,
+          "data": 27525104,
+          "empty": 31
+        },
+        "classes": {
+          "weights": {
+            "served": 13630976,
+            "row_hits": 13204992
+          },
+          "kv_read": {
+            "served": 131072,
+            "row_hits": 126864
+          },
+          "kv_write": {
+            "served": 0,
+            "row_hits": 0
+          },
+          "other": {
+            "served": 512,
+            "row_hits": 0
+          }
+        },
+        "wall_seconds_total": 10.481426000595093
+      },
+      "diff": {
+        "controller_ticks": {
+          "abs": 0,
+          "rel_pct": 0.0
+        },
+        "requests_served": {
+          "abs": 0,
+          "rel_pct": 0.0
+        },
+        "row_hits": {
+          "abs": 0,
+          "rel_pct": 0.0
+        },
+        "row_misses": {
+          "abs": 0,
+          "rel_pct": 0.0
+        },
+        "row_conflicts": {
+          "abs": 0,
+          "rel_pct": 0.0
+        },
+        "achieved_GBps": {
+          "abs": 0.0002529123030399205,
+          "rel_pct": 3.2821297636439884e-05
+        },
+        "avg_read_latency_ticks": {
+          "abs": -0.0004961875000049076,
+          "rel_pct": -0.0004338915388558009
+        }
+      }
+    },
+    {
+      "policy": "bank_low",
+      "refresh": "allbank",
+      "ramulator": {
+        "channels": 16,
+        "requests_accepted": 13763072,
+        "requests_served": 13762560,
+        "in_flight_at_end": 512,
+        "served_per_channel_min_max": [
+          860160,
+          860160
+        ],
+        "controller_ticks": 2052919,
+        "sim_time_us": 641.5371875,
+        "achieved_GBps": 686.4791762363736,
+        "peak_GBps": 819.2,
+        "pct_of_peak": 83.7987275679167,
+        "row_hits": 13175344,
+        "row_misses": 163152,
+        "row_conflicts": 424064,
+        "row_hit_rate_pct": 95.73323567708333,
+        "avg_read_latency_ticks": 123.42936068750001,
+        "avg_read_latency_ns": 38.57167521484375,
+        "ramulator_total_throughput_MBps": 687579.312496,
+        "wall_seconds": 20.97026515007019
+      },
+      "tokenwall": {
+        "channels": 16,
+        "requests_accepted": 13763072,
+        "requests_served": 13762560,
+        "in_flight_at_end": 512,
+        "served_per_channel_min_max": [
+          860160,
+          860160
+        ],
+        "controller_ticks": 2052919,
+        "sim_time_us": 641.537,
+        "achieved_GBps": 686.479,
+        "peak_GBps": 819.2,
+        "pct_of_peak": 83.7987,
+        "row_hits": 13175344,
+        "row_misses": 163152,
+        "row_conflicts": 424064,
+        "row_hit_rate_pct": 95.7332,
+        "avg_read_latency_ticks": 123.429,
+        "avg_read_latency_ns": 38.5717,
+        "wall_seconds": 11.4995,
+        "commands": {
+          "ACT": 587216,
+          "PREab": 5248,
+          "PREpb": 424064,
+          "RD": 13762560,
+          "REFab": 5248
+        },
+        "slots": 32846720,
+        "slot_reasons": {
+          "ACT:Bank:nRC": 1176,
+          "ACT:Bank:nRP": 983,
+          "ACT:BankGroup:nRRDL": 48,
+          "ACT:Channel:bus(ACT)": 61,
+          "ACT:PseudoChannel:nFAW": 904,
+          "ACT:PseudoChannel:nRFC": 2862784,
+          "ACT:PseudoChannel:nRRDS": 32,
+          "PREpb:Bank:nRAS": 464,
+          "PREpb:Channel:bus(ACT)": 16,
+          "PREpb:PseudoChannel:nPPD": 32,
+          "RD:Bank:nRCDRD": 1315368,
+          "RD:BankGroup:nCCDL": 1528,
+          "RD:Channel:bus(RD/WR/RDA/WRA)": 407743,
+          "RD:Sid:nCCDR": 402224,
+          "data": 27525104,
+          "empty": 31,
+          "refresh:PREab:PseudoChannel:nRAS": 11760,
+          "refresh:PREab:PseudoChannel:nRTP": 38318,
+          "refresh:REFab:PseudoChannel:nRC": 9984,
+          "refresh:REFab:PseudoChannel:nRP": 262912,
+          "refresh:arbitration": 5248
+        },
+        "classes": {
+          "weights": {
+            "served": 13630976,
+            "row_hits": 13050528
+          },
+          "kv_read": {
+            "served": 131072,
+            "row_hits": 124816
+          },
+          "kv_write": {
+            "served": 0,
+            "row_hits": 0
+          },
+          "other": {
+            "served": 512,
+            "row_hits": 0
+          }
+        },
+        "wall_seconds_total": 11.51447606086731
+      },
+      "diff": {
+        "controller_ticks": {
+          "abs": 0,
+          "rel_pct": 0.0
+        },
+        "requests_served": {
+          "abs": 0,
+          "rel_pct": 0.0
+        },
+        "row_hits": {
+          "abs": 0,
+          "rel_pct": 0.0
+        },
+        "row_misses": {
+          "abs": 0,
+          "rel_pct": 0.0
+        },
+        "row_conflicts": {
+          "abs": 0,
+          "rel_pct": 0.0
+        },
+        "achieved_GBps": {
+          "abs": -0.0001762363735906547,
+          "rel_pct": -2.567250103009267e-05
+        },
+        "avg_read_latency_ticks": {
+          "abs": -0.00036068750000595173,
+          "rel_pct": -0.0002922218003860077
+        }
+      }
+    }
+  ]
+}
