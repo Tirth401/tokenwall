@@ -1,0 +1,54 @@
+trace 70b_layer0: 6,751,248 requests (16 writes); using the first 6,751,248; 32 channels; stacks 2
+
+=== 70b_layer0: ramulator, interleave 32 B, refresh=allbank, 32 ch, 6,751,248 requests ===
+  metric                          ramulator        tokenwall         diff    rel %
+  controller_ticks                  1003361          1003361        0.000    0.000
+  requests_served                   6750208          6750208        0.000    0.000
+  row_hits                          6535023          6535023        0.000    0.000
+  row_misses                         163681           163681        0.000    0.000
+  row_conflicts                       51504            51504        0.000    0.000
+  achieved_GBps                     688.906          688.906        0.000    0.000
+  avg_read_latency_ticks            198.191          198.191        0.000    0.000
+  integer statistics identical: True; wall ramulator 16.5s, tokenwall 10.4s
+
+=== 70b_layer0: ramulator, interleave 32 B, refresh=perbank, 32 ch, 6,751,248 requests ===
+  metric                          ramulator        tokenwall         diff    rel %
+  controller_ticks                  1457011          1457011        0.000    0.000
+  requests_served                   6750208          6750208        0.000    0.000
+  row_hits                          6512624          6512624        0.000    0.000
+  row_misses                         232864           232864        0.000    0.000
+  row_conflicts                        4720             4720        0.000    0.000
+  achieved_GBps                     474.410          474.410       -0.000   -0.000
+  avg_read_latency_ticks            267.263          267.263       -0.000   -0.000
+  integer statistics identical: True; wall ramulator 19.5s, tokenwall 12.3s
+
+=== 70b_layer0: bank_low, interleave 32 B, refresh=allbank, 32 ch, 6,751,248 requests ===
+  metric                          ramulator        tokenwall         diff    rel %
+  controller_ticks                   503439           503439        0.000    0.000
+  requests_served                   6750208          6750208        0.000    0.000
+  row_hits                          6460144          6460144        0.000    0.000
+  row_misses                          80624            80624        0.000    0.000
+  row_conflicts                      209440           209440        0.000    0.000
+  achieved_GBps                    1372.999         1372.999        0.000    0.000
+  avg_read_latency_ticks            123.282          123.282       -0.000   -0.000
+  integer statistics identical: True; wall ramulator 10.6s, tokenwall 6.3s
+
+=== 70b_layer0: bank_low, interleave 32 B, refresh=perbank, 32 ch, 6,751,248 requests ===
+  metric                          ramulator        tokenwall         diff    rel %
+  controller_ticks                   623061           623061        0.000    0.000
+  requests_served                   6750208          6750208        0.000    0.000
+  row_hits                          6437200          6437200        0.000    0.000
+  row_misses                         105360           105360        0.000    0.000
+  row_conflicts                      207648           207648        0.000    0.000
+  achieved_GBps                    1109.396         1109.396        0.000    0.000
+  avg_read_latency_ticks            141.669          141.669       -0.000   -0.000
+  integer statistics identical: True; wall ramulator 11.0s, tokenwall 6.4s
+
+=== summary ===
+  policy           il refresh    ticks R2   ticks TW  GB/s R2  GB/s TW identical
+  ramulator       32B allbank     1003361    1003361    688.9    688.9 True
+  ramulator       32B perbank     1457011    1457011    474.4    474.4 True
+  bank_low        32B allbank      503439     503439   1373.0   1373.0 True
+  bank_low        32B perbank      623061     623061   1109.4   1109.4 True
+wrote results/phase4/validation_70b_layer0_req10000000.json
+EXIT 0

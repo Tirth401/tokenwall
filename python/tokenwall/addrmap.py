@@ -29,7 +29,7 @@ import numpy as np
 import yaml
 
 from .hbm_config import DEFAULT_HBM3_YAML
-from .segments import SegmentTrace, iter_filtered
+from .segments import SegmentTrace, iter_filtered, split_accesses
 
 FIELDS = ("channel", "pseudo_channel", "sid", "bank_group", "bank", "row", "column")
 POLICY_NAMES = ("ramulator", "bank_low", "bank_high", "bank_low_xor")
@@ -256,14 +256,22 @@ def to_addr_vec(vec: dict[str, np.ndarray]) -> np.ndarray:
 
 
 def export_ramulator_mapped(trace: SegmentTrace, path: str | pathlib.Path, policy: Policy, geo: Geometry,
-                            max_requests: int | None = None, reads_only: bool = False) -> int:
-    """Write Ramulator 2.1 ReadWriteTrace format: 'R ch,pc,sid,bg,bank,row,col' per line."""
+                            max_requests: int | None = None, reads_only: bool = False, with_addr: bool = True) -> int:
+    """Write Ramulator 2.1 ReadWriteTrace format: 'R ch,pc,sid,bg,bank,row,col [flat_addr]' per line.
+
+    The flat address needs patches/ramulator2/0002 on the Ramulator side; it lets Ramulator
+    coalesce writes and forward reads exactly as it does for flat traces.
+    """
     n = 0
     with open(path, "w") as f:
         for addrs, write, _ in iter_filtered(trace, max_requests, reads_only):
+            addrs = split_accesses(trace, addrs, geo.line_bytes)
             av = to_addr_vec(policy.map(addrs, geo)).tolist()
             op = "W " if write else "R "
-            f.write("\n".join(op + ",".join(map(str, row)) for row in av))
+            if with_addr:
+                f.write("\n".join(op + ",".join(map(str, row)) + " " + str(a) for row, a in zip(av, addrs.tolist())))
+            else:
+                f.write("\n".join(op + ",".join(map(str, row)) for row in av))
             f.write("\n")
             n += len(av)
     return n

@@ -28,7 +28,10 @@ TraceFrontend::TraceFrontend(const SegmentTrace& trace, const Policy& policy, co
       n += k;
       if (s.write) w += k;
     }
-  total_ = std::min(max_requests, reads_only ? n - w : n);
+  // a trace request wider than one access becomes request_bytes / access_bytes adjacent accesses
+  split_k_ = trace.request_bytes > geo.line_bytes ? int(trace.request_bytes / geo.line_bytes) : 1;
+  split_i_ = split_k_;
+  total_ = std::min(max_requests, reads_only ? n - w : n) * uint64_t(split_k_);
   uint32_t max_id = 0;
   for (const auto& t : trace.tensors) max_id = std::max(max_id, t.id);
   tensor_cls_.assign(max_id + 1, 3);
@@ -36,18 +39,23 @@ TraceFrontend::TraceFrontend(const SegmentTrace& trace, const Policy& policy, co
 }
 
 bool TraceFrontend::next_request() {
-  tokenwall::Request r;
-  for (;;) {
-    if (produced_ >= max_requests_) return false;
-    if (!ex_.next(r)) return false;
-    if (reads_only_ && r.write) continue;
-    break;
+  if (split_i_ >= split_k_) {
+    for (;;) {
+      if (produced_ >= max_requests_) return false;
+      if (!ex_.next(base_)) return false;
+      if (reads_only_ && base_.write) continue;
+      break;
+    }
+    produced_++;
+    split_i_ = 0;
   }
-  produced_++;
-  if (r.addr >= geo_.capacity_bytes()) throw std::runtime_error("address beyond the configured stacks");
-  const AddrVec v = policy_.map(r.addr, geo_);
+  const tokenwall::Request& r = base_;
+  const uint64_t addr = r.addr + uint64_t(split_i_) * geo_.line_bytes;
+  split_i_++;
+  if (addr >= geo_.capacity_bytes()) throw std::runtime_error("address beyond the configured stacks");
+  const AddrVec v = policy_.map(addr, geo_);
   pending_ = MemReq{};
-  pending_.addr = r.addr;
+  pending_.addr = addr;
   pending_.av.fill(-1);
   for (int i = 0; i < FIELD_COUNT; i++) pending_.av[i] = int(v[i]);
   pending_.type = r.write ? 1 : 0;
@@ -156,7 +164,7 @@ std::string summary_json(const Summary& s, const SimConfig& cfg) {
     << ", \"channels\": " << s.channels << ", \"frontend_ratio\": " << cfg.frontend_ratio
     << ", \"max_requests\": " << (cfg.max_requests == ~0ull ? -1 : (long long)cfg.max_requests)
     << ", \"reads_only\": " << (cfg.reads_only ? "true" : "false") << ", \"drain\": " << (cfg.drain ? "true" : "false")
-    << ", \"refresh\": \"" << (cfg.ctrl.refresh_allbank ? "allbank" : "none") << "\", \"disabled\": [";
+    << ", \"refresh\": \"" << refresh_name(cfg.ctrl.refresh) << "\", \"disabled\": [";
   for (size_t i = 0; i < cfg.disable.size(); i++) o << (i ? ", " : "") << "\"" << cfg.disable[i] << "\"";
   o << "]},\n";
   o << "  \"result\": {\n";
@@ -206,7 +214,15 @@ Summary run_simulation(const SimConfig& cfg, const DramSpec& spec, const Segment
   Geometry geo = geometry_for_stacks(cfg.stacks);
   geo.channels = channels;
   Policy policy = make_policy(cfg.policy, geo, cfg.interleave_log2);
-  MemorySystem mem(spec, channels, cfg.ctrl);
+  ControllerConfig ctrl_cfg = cfg.ctrl;
+  std::FILE* trace_file = nullptr;
+  if (!cfg.cmd_trace_path.empty()) {
+    trace_file = std::fopen(cfg.cmd_trace_path.c_str(), "w");
+    if (!trace_file) throw std::runtime_error("cannot write " + cfg.cmd_trace_path);
+    std::fprintf(trace_file, "clock,command,Channel,PseudoChannel,Sid,BankGroup,Bank,Row,Column,type\n");
+    ctrl_cfg.cmd_trace = trace_file;
+  }
+  MemorySystem mem(spec, channels, ctrl_cfg);
   TraceFrontend fe(trace, policy, geo, cfg.max_requests, cfg.reads_only);
   const int fe_tick = cfg.frontend_ratio > 0 ? cfg.frontend_ratio : channels;
   const int mem_tick = 1;
@@ -228,6 +244,7 @@ Summary run_simulation(const SimConfig& cfg, const DramSpec& spec, const Segment
     while (!mem.idle()) mem.tick();
   }
   const double wall = std::chrono::duration<double>(std::chrono::steady_clock::now() - t0).count();
+  if (trace_file) std::fclose(trace_file);
   return summarize(mem, spec, wall);
 }
 

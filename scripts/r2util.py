@@ -31,7 +31,7 @@ def make_refresh(kind: str):
 
 def run_trace(trace_path: pathlib.Path, refresh: str = "allbank", verbose: bool = False, channels: int = 1,
               premapped: bool = False, interleave_bits: int = 0, frontend_ratio: int | None = None,
-              **dram_overrides):
+              cmd_trace: str | None = None, **dram_overrides):
     """HBM3 channels with HBM34 controllers, FRFCFS, open-row policy.
 
     premapped=False: LoadStoreTrace (LD/ST <addr>), Ramulator maps with
@@ -41,7 +41,9 @@ def run_trace(trace_path: pathlib.Path, refresh: str = "allbank", verbose: bool 
         flat address, which this frontend leaves unset).
     frontend_ratio: frontend ticks per memory tick, i.e. the maximum requests issued per
         tick; defaults to `channels` (each channel's peak is half a request per tick).
+    cmd_trace: path prefix for Ramulator's CmdTraceRecorder (writes <prefix>.ch<N> CSV files).
     """
+    plugins = [ramulator.controller_plugin.CmdTraceRecorder(path=str(cmd_trace))] if cmd_trace else []
     dram = ramulator.dram.HBM3(org_preset=ORG_PRESET, timing_preset=TIMING_PRESET, verbose=verbose, **dram_overrides)
     ctrl = ramulator.controller.HBM34(
         dram=dram,
@@ -50,6 +52,7 @@ def run_trace(trace_path: pathlib.Path, refresh: str = "allbank", verbose: bool 
         row_policy=ramulator.row_policy.Open(),
         addr_mapper=(ramulator.addr_mapper.PassThroughAddrMapper() if premapped
                      else ramulator.addr_mapper.RoBaRaCoCh()),
+        controller_plugins=plugins,
     )
     mem = ramulator.memory_system.GenericDRAM(
         clock_ratio=1,
@@ -63,7 +66,11 @@ def run_trace(trace_path: pathlib.Path, refresh: str = "allbank", verbose: bool 
     sim = ramulator.Simulation(frontend, mem)
     t0 = time.time()
     sim.run()
-    return sim.stats, sim.stats_yaml, time.time() - t0
+    wall = time.time() - t0
+    stats, stats_yaml = sim.stats, sim.stats_yaml
+    if cmd_trace:
+        sim.finalize()  # flush the recorder files
+    return stats, stats_yaml, wall
 
 
 def summarize(stats: dict, facts: dict, wall: float) -> dict:

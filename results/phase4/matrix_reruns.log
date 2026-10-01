@@ -1,0 +1,21 @@
+##### C (rerun): 32 channels with matching export geometry
+trace layer0_b1: 13,763,200 requests (128 writes); using the first 2,000,000; 32 channels; stacks 1
+  ramulator       32B allbank      296505     296505    690.3    690.3 True
+  bank_low        32B allbank      148117     148117   1381.9   1381.9 True
+##### E (rerun): command traces with tCCD_L disabled in Tokenwall (a rule that binds)
+  command traces DIFFER:
+    first divergence: channel 0, command index 2 (of 130083 / 130803)
+      ramulator  tick        73 RD     pc 0 sid 0 bg 0 bank 0 row   1002 col   1 type 0
+      tokenwall  tick        69 RD     pc 0 sid 0 bg 0 bank 0 row   1002 col   1 type 0
+      bank pc0/sid0/bg0/bank0 in ramulator: open_row=1002 last={ACT:1, RD:65}
+          tick         1 ACT    pc 0 sid 0 bg 0 bank 0 row   1002 col   0 type 0
+          tick        65 RD     pc 0 sid 0 bg 0 bank 0 row   1002 col   0 type 0
+      bank pc0/sid0/bg0/bank0 in tokenwall: open_row=1002 last={ACT:1, RD:65}
+          tick         1 ACT    pc 0 sid 0 bg 0 bank 0 row   1002 col   0 type 0
+          tick        65 RD     pc 0 sid 0 bg 0 bank 0 row   1002 col   0 type 0
+
+=== summary ===
+  policy           il refresh    ticks R2   ticks TW  GB/s R2  GB/s TW identical
+  ramulator       32B allbank      594037     438535    344.6    466.9 False
+wrote results/phase4/validation_layer0_b1_req2000000_inject_nccdl.json
+EXIT 0

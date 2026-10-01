@@ -10,7 +10,7 @@ set -euo pipefail
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 R2="$ROOT/external/ramulator2"
 PY="$ROOT/.venv/bin/python"
-PATCH="$ROOT/patches/ramulator2/0001-apple-clang-build-fixes.patch"
+PATCHES=("$ROOT"/patches/ramulator2/*.patch)
 
 if [ ! -x "$PY" ]; then
   echo "No venv found. Run: python3 -m venv .venv && .venv/bin/pip install -r requirements.txt" >&2
@@ -19,16 +19,18 @@ fi
 
 git -C "$ROOT" submodule update --init external/ramulator2
 
-# Apply the build patch once (idempotent).
-if git -C "$R2" apply --check "$PATCH" 2>/dev/null; then
-  git -C "$R2" apply "$PATCH"
-  echo "Applied $PATCH"
-elif git -C "$R2" apply --check --reverse "$PATCH" 2>/dev/null; then
-  echo "Patch already applied"
-else
-  echo "Patch does not apply cleanly to $(git -C "$R2" rev-parse --short HEAD); inspect manually" >&2
-  exit 1
-fi
+# Apply the patches in order (idempotent).
+for PATCH in "${PATCHES[@]}"; do
+  if git -C "$R2" apply --check "$PATCH" 2>/dev/null; then
+    git -C "$R2" apply "$PATCH"
+    echo "Applied $(basename "$PATCH")"
+  elif git -C "$R2" apply --check --reverse "$PATCH" 2>/dev/null; then
+    echo "Already applied: $(basename "$PATCH")"
+  else
+    echo "$(basename "$PATCH") does not apply cleanly to $(git -C "$R2" rev-parse --short HEAD); inspect manually" >&2
+    exit 1
+  fi
+done
 
 # The patch bumps fmt to 11.2.0. Drop a stale fetched copy so CMake re-fetches.
 if [ -d "$R2/ext/fmt" ] && ! grep -q "FMT_VERSION 110200" "$R2/ext/fmt/include/fmt/base.h" 2>/dev/null; then

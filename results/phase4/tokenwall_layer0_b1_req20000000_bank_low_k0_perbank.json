@@ -1,0 +1,26 @@
+{
+  "config": {"segs": "/Users/tirthshah/Documents/Tirth_grad/tokenwall/traces/val_layer0_b1.segs", "spec": "/Users/tirthshah/Documents/Tirth_grad/tokenwall/configs/hbm3/hbm3_16gb_8hi_6400.spec", "policy": "bank_low", "stacks": 1, "interleave_log2": 0, "channels": 16, "frontend_ratio": 0, "max_requests": 20000000, "reads_only": false, "drain": false, "refresh": "perbank", "disabled": []},
+  "result": {
+    "channels": 16,
+    "requests_accepted": 13763200,
+    "requests_served": 13762560,
+    "in_flight_at_end": 640,
+    "served_per_channel_min_max": [860160, 860160],
+    "controller_ticks": 2541151,
+    "sim_time_us": 794.1096875,
+    "achieved_GBps": 554.585754250731,
+    "peak_GBps": 819.2,
+    "pct_of_peak": 67.698456329435,
+    "row_hits": 13129472,
+    "row_misses": 212416,
+    "row_conflicts": 420688,
+    "row_hit_rate_pct": 95.3998146858553,
+    "avg_read_latency_ticks": 141.700628371466,
+    "avg_read_latency_ns": 44.2814463660831,
+    "wall_seconds": 11.211105334,
+    "commands": {"ACT": 633104, "PREpb": 632128, "RD": 13762560, "REFpb": 208480},
+    "slots": 40658432,
+    "slot_reasons": {"ACT:Bank:nRC": 1320, "ACT:Bank:nRFCpb": 1597590, "ACT:Bank:nRP": 69744, "ACT:BankGroup:nRRDL": 1808, "ACT:Channel:bus(ACT)": 3631, "ACT:PseudoChannel:nFAW": 62352, "ACT:PseudoChannel:nRRDS": 15824, "ACT:PseudoChannel:nRREFD": 3568, "PREpb:Bank:nRAS": 1136, "PREpb:Bank:nRTP": 4240, "PREpb:Channel:bus(ACT)": 1256, "RD:Bank:nRCDRD": 475579, "RD:BankGroup:nCCDL": 69072, "RD:Channel:bus(RD/WR/RDA/WRA)": 78230, "RD:Sid:nCCDR": 32536, "arbitration": 148703, "data": 27525104, "empty": 31, "refresh:PREpb:Bank:nRAS": 39392, "refresh:PREpb:Bank:nRTP": 76124, "refresh:PREpb:Channel:bus(ACT)": 2048, "refresh:PREpb:PseudoChannel:nPPD": 1232, "refresh:REFpb:Bank:nRC": 77696, "refresh:REFpb:Bank:nRP": 10161104, "refresh:REFpb:PseudoChannel:nFAW": 7400, "refresh:arbitration": 201712},
+    "classes": {"weights": {"served": 13630976, "row_hits": 13004480}, "kv_read": {"served": 131072, "row_hits": 124992}, "kv_write": {"served": 0, "row_hits": 0}, "other": {"served": 512, "row_hits": 0}}
+  }
+}

@@ -1,0 +1,26 @@
+{
+  "config": {"segs": "/Users/tirthshah/Documents/Tirth_grad/tokenwall/traces/val_layer0_b1.segs", "spec": "/Users/tirthshah/Documents/Tirth_grad/tokenwall/configs/hbm3/hbm3_16gb_8hi_6400.spec", "policy": "ramulator", "stacks": 1, "interleave_log2": 0, "channels": 16, "frontend_ratio": 0, "max_requests": 20000000, "reads_only": false, "drain": false, "refresh": "perbank", "disabled": []},
+  "result": {
+    "channels": 16,
+    "requests_accepted": 13763200,
+    "requests_served": 13762560,
+    "in_flight_at_end": 640,
+    "served_per_channel_min_max": [860160, 860160],
+    "controller_ticks": 5940451,
+    "sim_time_us": 1856.3909375,
+    "achieved_GBps": 237.235547267371,
+    "peak_GBps": 819.2,
+    "pct_of_peak": 28.9594173910365,
+    "row_hits": 13278592,
+    "row_misses": 475856,
+    "row_conflicts": 8112,
+    "row_hit_rate_pct": 96.4834449404762,
+    "avg_read_latency_ticks": 267.246212041946,
+    "avg_read_latency_ns": 83.514441263108,
+    "wall_seconds": 22.757727916,
+    "commands": {"ACT": 483968, "PREpb": 483488, "RD": 13762560, "REFpb": 487392},
+    "slots": 95047232,
+    "slot_reasons": {"ACT:Bank:nRC": 200, "ACT:Bank:nRFCpb": 13664064, "ACT:Bank:nRP": 37880, "ACT:Channel:bus(ACT)": 5448, "ACT:PseudoChannel:nRRDS": 7040, "ACT:PseudoChannel:nRREFD": 160, "PREpb:Bank:nRAS": 64, "PREpb:Bank:nRTP": 448, "RD:Bank:nRCDRD": 2918493, "RD:BankGroup:nCCDL": 19832406, "RD:Channel:bus(RD/WR/RDA/WRA)": 4897838, "RD:Sid:nCCDR": 166585, "arbitration": 370577, "data": 27525104, "empty": 93734, "mode_wait": 146256, "refresh:PREpb:Bank:nRAS": 98336, "refresh:PREpb:Bank:nRTP": 386767, "refresh:PREpb:Channel:bus(ACT)": 2784, "refresh:REFpb:Bank:nRC": 254592, "refresh:REFpb:Bank:nRP": 24162424, "refresh:REFpb:PseudoChannel:nRRDS": 2592, "refresh:arbitration": 473440},
+    "classes": {"weights": {"served": 13630976, "row_hits": 13151712}, "kv_read": {"served": 131072, "row_hits": 126416}, "kv_write": {"served": 0, "row_hits": 0}, "other": {"served": 512, "row_hits": 464}}
+  }
+}

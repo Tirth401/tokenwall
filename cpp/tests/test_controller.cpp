@@ -20,11 +20,16 @@ MemReq req(int type, int pc, int sid, int bg, int bank, int row, int col, uint64
   r.addr = addr;
   return r;
 }
-ControllerConfig cfg(bool refresh) {
+ControllerConfig cfg(bool refresh, Refresh mode = Refresh::AllBank) {
   ControllerConfig c;
-  c.refresh_allbank = refresh;
+  c.refresh = refresh ? mode : Refresh::None;
   c.record_cmds = true;
   return c;
+}
+bool has_bank(const std::vector<IssuedCmd>& v, Tick clk, int cmd, int pc, int bg, int bank) {
+  for (const auto& c : v)
+    if (c.clk == clk && c.cmd == cmd && c.av[1] == pc && c.av[3] == bg && c.av[4] == bank) return true;
+  return false;
 }
 void run(MemorySystem& m, int ticks) {
   for (int i = 0; i < ticks; i++) m.tick();
@@ -136,6 +141,24 @@ TW_TEST(all_bank_refresh_closes_rows_and_blocks_activates) {
   TW_CHECK(has(c.issued(), 2635, s.C_RD));   // 2571 + 63 = 2634 is a falling edge
   TW_CHECK_EQ(c.stats().num_maint_served, 2u);
   TW_CHECK_EQ(c.stats().row_misses, 2u);     // the second read finds its row closed by refresh
+}
+
+TW_TEST(per_bank_refresh_walks_banks_and_blocks_only_the_refreshed_bank) {
+  DramSpec s = load_spec();  // tREFIpb = 390 ticks, tRFCpb = 640 ticks
+  MemorySystem m(s, 1, cfg(true, Refresh::PerBank));
+  run(m, 400);
+  const auto& c = *m.controllers()[0];
+  TW_CHECK(has_bank(c.issued(), 391, s.C_REFpb, 0, 0, 0));  // seeded at 390 (falling edge), issued 391
+  TW_CHECK(has_bank(c.issued(), 393, s.C_REFpb, 1, 0, 0));  // pseudo channel 1 queued behind
+  MemReq same = req(0, 0, 0, 0, 0, 0, 0, 0);     // bank just refreshed
+  MemReq other = req(0, 0, 0, 1, 0, 0, 0, 4096);  // other bank group, same pseudo channel
+  TW_CHECK(m.send(same) && m.send(other));
+  run(m, 800);
+  TW_CHECK(has_bank(c.issued(), 415, s.C_ACT, 0, 1, 0));    // REFpb -> ACT elsewhere in the PC: tRREFD (24 ticks after 391)
+  TW_CHECK(has_bank(c.issued(), 1029, s.C_ACT, 0, 0, 0));   // REFpb -> ACT same bank: tRFCpb (638 ticks after 391)
+  TW_CHECK(has_bank(c.issued(), 781, s.C_REFpb, 0, 0, 1));  // next interval moves to the next bank
+  TW_CHECK(has_bank(c.issued(), 783, s.C_REFpb, 1, 0, 1));
+  TW_CHECK_EQ(c.stats().num_maint_served, 6u);  // 3 intervals x 2 pseudo channels within 1200 ticks
 }
 
 TW_TEST(sixteen_channels_run_independently) {

@@ -1,0 +1,72 @@
+diff --git a/src/ramulator/frontend/impl/memory_trace/readwrite_trace.cpp b/src/ramulator/frontend/impl/memory_trace/readwrite_trace.cpp
+index d8a341b..319ddb6 100644
+--- a/src/ramulator/frontend/impl/memory_trace/readwrite_trace.cpp
++++ b/src/ramulator/frontend/impl/memory_trace/readwrite_trace.cpp
+@@ -17,6 +17,7 @@ class ReadWriteTrace : public IFrontEnd, public Implementation {
+   struct Trace {
+     bool is_write;
+     AddrVec_t addr_vec;
++    Addr_t addr = -1;  // optional flat address: enables write coalescing / read forwarding
+   };
+   std::vector<Trace> m_trace;
+ 
+@@ -38,6 +39,7 @@ class ReadWriteTrace : public IFrontEnd, public Implementation {
+   void tick() override {
+     const Trace& t = m_trace[m_curr_trace_idx];
+     Request req(t.addr_vec, t.is_write ? Request::Type::Write : Request::Type::Read);
++    req.addr = t.addr;
+     req.size_bytes = m_memory_system->get_tx_bytes();
+     bool sent = m_memory_system->send(req);
+     if (sent) {
+@@ -48,15 +50,17 @@ class ReadWriteTrace : public IFrontEnd, public Implementation {
+ 
+  private:
+   // Trace format: one memory access per line, space-separated.
+-  //   <op> <addr_vec>
++  //   <op> <addr_vec> [<flat_addr>]
+   //
+-  // - op:       R (read) or W (write)
+-  // - addr_vec: comma-separated integers forming a multi-dimensional address
+-  //             vector (e.g., channel,rank,bank,row,column)
++  // - op:        R (read) or W (write)
++  // - addr_vec:  comma-separated integers forming a multi-dimensional address
++  //              vector (e.g., channel,rank,bank,row,column)
++  // - flat_addr: optional flat address (decimal or 0x hex). Without it the
++  //              controller cannot coalesce writes or forward reads.
+   //
+   // Example:
+   //   R 0,1,2,100,32
+-  //   W 0,0,3,200,16
++  //   W 0,0,3,200,16 0x1000
+   //
+   // The trace replays cyclically.
+   void init_trace(const std::string& file_path_str) {
+@@ -77,9 +81,9 @@ class ReadWriteTrace : public IFrontEnd, public Implementation {
+       std::vector<std::string> tokens;
+       tokenize(tokens, line, " ");
+ 
+-      if (tokens.size() != 2) {
++      if (tokens.size() != 2 && tokens.size() != 3) {
+         throw std::runtime_error(
+-            fmt::format("Trace {} line {}: expected 2 tokens, got {}", file_path_str, line_num, tokens.size()));
++            fmt::format("Trace {} line {}: expected 2 or 3 tokens, got {}", file_path_str, line_num, tokens.size()));
+       }
+ 
+       bool is_write = false;
+@@ -100,7 +104,15 @@ class ReadWriteTrace : public IFrontEnd, public Implementation {
+         addr_vec.push_back(static_cast<int>(std::stoll(token)));
+       }
+ 
+-      m_trace.push_back({is_write, addr_vec});
++      Addr_t addr = -1;
++      if (tokens.size() == 3) {
++        if (tokens[2].compare(0, 2, "0x") == 0 || tokens[2].compare(0, 2, "0X") == 0) {
++          addr = std::stoll(tokens[2].substr(2), nullptr, 16);
++        } else {
++          addr = std::stoll(tokens[2]);
++        }
++      }
++      m_trace.push_back({is_write, addr_vec, addr});
+     }
+ 
+     trace_file.close();

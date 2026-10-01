@@ -1,7 +1,8 @@
 // tokenwall: HBM3 timing simulation of a decode-step trace.
 //   tokenwall sim --segs FILE [--spec FILE] [--policy NAME] [--stacks N] [--interleave-log2 K]
 //                 [--channels N] [--frontend-ratio R] [--max-requests N] [--reads-only]
-//                 [--refresh allbank|none] [--drain] [--disable SUBSTR,...] [--json OUT] [--label TEXT]
+//                 [--refresh allbank|perbank|none] [--drain] [--disable SUBSTR,...] [--cmd-trace CSV]
+//                 [--json OUT] [--label TEXT]
 #include <cstdio>
 #include <cstdlib>
 #include <fstream>
@@ -17,8 +18,8 @@ void usage() {
                "tokenwall %s\n"
                "usage: tokenwall sim --segs FILE [--spec FILE] [--policy ramulator|bank_low|bank_high|bank_low_xor]\n"
                "         [--stacks N] [--interleave-log2 K] [--channels N] [--frontend-ratio R]\n"
-               "         [--max-requests N] [--reads-only] [--refresh allbank|none] [--drain]\n"
-               "         [--disable SUBSTR,...] [--no-attribution] [--json OUT] [--label TEXT]\n",
+               "         [--max-requests N] [--reads-only] [--refresh allbank|perbank|none] [--drain]\n"
+               "         [--disable SUBSTR,...] [--no-attribution] [--cmd-trace CSV] [--json OUT] [--label TEXT]\n",
                tokenwall::kVersion);
 }
 }  // namespace
@@ -51,10 +52,12 @@ int main(int argc, char** argv) {
     else if (a == "--reads-only") cfg.reads_only = true;
     else if (a == "--drain") cfg.drain = true;
     else if (a == "--no-attribution") cfg.ctrl.attribute = false;
+    else if (a == "--cmd-trace") cfg.cmd_trace_path = val();
     else if (a == "--refresh") {
       std::string r = val();
-      if (r == "allbank") cfg.ctrl.refresh_allbank = true;
-      else if (r == "none") cfg.ctrl.refresh_allbank = false;
+      if (r == "allbank") cfg.ctrl.refresh = tokenwall::Refresh::AllBank;
+      else if (r == "none") cfg.ctrl.refresh = tokenwall::Refresh::None;
+      else if (r == "perbank") cfg.ctrl.refresh = tokenwall::Refresh::PerBank;
       else {
         std::fprintf(stderr, "unknown refresh mode %s\n", r.c_str());
         return 2;

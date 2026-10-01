@@ -43,8 +43,8 @@ ground truth the C++ core is validated against.
 | 1 | Decode-step trace generator, Llama 3 8B/70B configs, Python/C++ cross-checked trace format | done 2026-09-30 |
 | 2 | Four address-mapping policies, bit-exact with Ramulator's default, Python/C++ mirrored, measured on real traffic | done 2026-09-30 |
 | 3 | C++ timing core: timing tree, bank state machine, HBM3 controller, stall attribution; cycle-exact with Ramulator on first run | done 2026-09-30 |
-| 4 | Validation against Ramulator 2.1 (writes, broader matrix, command-level diff, per-bank refresh) | next |
-| 5 | Sweeps and findings | planned |
+| 4 | Validation against Ramulator 2.1: writes, per-bank refresh, interleaves, 32 channels, KV-heavy and 70B slices, command-level diff; 30 cases identical | done 2026-09-30 |
+| 5 | Sweeps and findings | next |
 | 6 | Writeup | planned |
 
 `PROGRESS.md` is the session log with open design questions. `RESULTS.md` has
@@ -157,12 +157,17 @@ unit test with a hand-derived expected tick (`cpp/tests/test_timing.cpp`),
 and `cpp/tests/test_controller.cpp` checks command-by-command timelines.
 
 **Validation.** `scripts/tokenwall_vs_ramulator.py` feeds the same traffic to
-both simulators. On the first run, 1.8 M reads of Llama 3 8B layer 0, two
-mappings, refresh off and on, every statistic matched Ramulator exactly:
-ticks, served requests, hits, misses, conflicts, bandwidth, latency
-(`RESULTS.md`, Phase 3). This validates the implementation against Ramulator,
-whose algorithms it deliberately mirrors; it is not an independent model of
-HBM3 silicon, and the timings remain Ramulator's preset.
+both simulators. Across 30 cases (four mappings, three refresh modes, three
+channel interleaves, 16 and 32 channels, writes included, an 8B layer, a
+KV-heavy batch-32 slice and a 70B tensor-parallel slice) every integer
+statistic is identical: ticks, served requests, hits, misses, conflicts
+(`RESULTS.md`, Phases 3 and 4). With `--cmd-trace` both simulators log every
+DRAM command and `scripts/cmd_trace_diff.py` reports the first divergence
+with per-bank context; on a 2 M-request slice all 2,081,313 commands match,
+and removing one rule on purpose makes the tool point at the exact command.
+This validates the implementation against Ramulator, whose algorithms it
+deliberately mirrors; it is not an independent model of HBM3 silicon, and
+the timings remain Ramulator's preset.
 
 **What Ramulator does not report.** Every rising edge is a column-command
 slot per pseudo channel. Tokenwall labels each slot `data` (a burst is on the
@@ -173,8 +178,9 @@ rule for ablation.
 
 ```bash
 ./build/cpp/tokenwall sim --segs traces/llama3_8b_tp1_b1_s4096.segs --policy bank_low --stacks 1 --refresh allbank --drain --json out.json
-./build/cpp/tokenwall sim --segs ... --max-requests 1800000 --reads-only --refresh none   # the Ramulator-comparable mode
-python scripts/tokenwall_vs_ramulator.py --requests 1800000                            # side-by-side table
+./build/cpp/tokenwall sim --segs ... --refresh perbank --cmd-trace cmds.csv       # per-bank refresh, log every command
+python scripts/tokenwall_vs_ramulator.py --trace layer0_b1 --requests 2000000 --policies all --refresh none,allbank,perbank
+python scripts/tokenwall_vs_ramulator.py --trace 70b_layer0 --requests 10000000 --cmd-trace   # with command-level diff
 ```
 
 ## Layout
@@ -202,13 +208,14 @@ git clone --recursive <this repo> tokenwall && cd tokenwall
 python3 -m venv .venv && .venv/bin/pip install -r requirements.txt && .venv/bin/pip install -e .
 scripts/setup_ramulator2.sh        # builds Ramulator 2.1 into external/, pip-installs it into .venv
 cmake -S . -B build && cmake --build build && ctest --test-dir build   # Tokenwall C++
-.venv/bin/python -m pytest -q      # 92 Python tests; ctest runs 34 C++ cases (17 timing rules, 7 controller timelines)
+.venv/bin/python -m pytest -q      # 94 Python tests; ctest runs 35 C++ cases (17 timing rules, 8 controller timelines)
 ```
 
-`scripts/setup_ramulator2.sh` applies `patches/ramulator2/0001-apple-clang-build-fixes.patch`:
-a missing `template` keyword in `param.h` that Apple Clang 21 rejects, and a
-bump of the fetched `fmt` library from 10.2.1 to 11.2.0. Nothing in the patch
-touches simulation behaviour.
+`scripts/setup_ramulator2.sh` applies the patches in `patches/ramulator2/`:
+`0001` fixes two Apple Clang 21 build errors (a missing `template` keyword,
+`fmt` 10.2.1 to 11.2.0) and touches no simulation behaviour; `0002` lets
+Ramulator's pre-mapped `ReadWriteTrace` carry an optional flat address so its
+write coalescing and read forwarding work on pre-mapped traces.
 
 ## Reproduce
 
@@ -230,6 +237,14 @@ python -m tokenwall gen --model configs/models/llama3_8b.yaml --batch 1 --seq 40
 python -m tokenwall gen --model configs/models/llama3_70b.yaml --tp 8 --stacks 2 --batch 1 --seq 4096 --out traces/llama3_70b_tp8_b1_s4096
 python -m tokenwall gen --model configs/models/llama3_8b.yaml --n-kv-heads 32 --stacks 2 --batch 1 --seq 4096 --out traces/llama3_8b_mha32_tp1_b1_s4096
 python -m tokenwall export-ramulator traces/llama3_8b_tp1_b1_s4096.segs --out traces/slice.txt --max-requests 1000000
+```
+
+Phase 4 (validation matrix, about 15 minutes in total):
+
+```bash
+python scripts/tokenwall_vs_ramulator.py --trace layer0_b1 --requests 2000000 --policies all --refresh none,allbank,perbank
+python scripts/tokenwall_vs_ramulator.py --trace layer0_b1 --requests 2000000 --policies ramulator --refresh allbank --cmd-trace --disable nCCDL --label inject
+python scripts/tokenwall_vs_ramulator.py --trace layer0_b32 --requests 40000000 --policies ramulator,bank_low --refresh allbank
 ```
 
 Phase 3 (timing core):

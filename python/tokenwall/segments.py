@@ -253,12 +253,22 @@ def iter_filtered(trace: SegmentTrace, max_requests: int | None = None, reads_on
         yield addrs, write, tid
 
 
+def split_accesses(trace: SegmentTrace, addrs: np.ndarray, access_bytes: int) -> np.ndarray:
+    """A trace request wider than one access becomes request_bytes / access_bytes adjacent accesses."""
+    if trace.request_bytes <= access_bytes:
+        return addrs
+    k = trace.request_bytes // access_bytes
+    offs = np.arange(k, dtype=np.uint64) * np.uint64(access_bytes)
+    return (addrs[:, None] + offs[None, :]).ravel()
+
+
 def export_ramulator(trace: SegmentTrace, path: str | pathlib.Path, max_requests: int | None = None,
-                     reads_only: bool = False) -> int:
+                     reads_only: bool = False, access_bytes: int = 32) -> int:
     """Write Ramulator 2.1 LoadStoreTrace format: one 'LD <addr>' or 'ST <addr>' per line."""
     n = 0
     with open(path, "w") as f:
         for addrs, write, _ in iter_filtered(trace, max_requests, reads_only):
+            addrs = split_accesses(trace, addrs, access_bytes)
             op = "ST " if write else "LD "
             f.write("\n".join(op + str(a) for a in addrs.tolist()))
             f.write("\n")

@@ -1,7 +1,7 @@
 // Expand a .segs file: report request count and stream hash, optionally write
 // Ramulator 2.1 trace text. Usage:
 //   tw_expand <file.segs> [--max-requests N] [--reads-only] [--ramulator-out path]
-//             [--map policy --stacks S --interleave-log2 K]
+//             [--map policy --stacks S [--channels N] --interleave-log2 K]
 // Without --map the output is LoadStoreTrace ("LD <addr>"); with --map it is
 // ReadWriteTrace ("R ch,pc,sid,bg,bank,row,col") using the named policy.
 #include <cstdio>
@@ -19,7 +19,7 @@ int main(int argc, char** argv) {
   std::string path = argv[1];
   uint64_t max_requests = UINT64_MAX;
   std::string out_path, map_policy;
-  int stacks = 1, interleave_log2 = 0;
+  int stacks = 1, interleave_log2 = 0, channels = 0;
   bool reads_only = false;
   for (int i = 2; i < argc; i++) {
     std::string a = argv[i];
@@ -33,6 +33,8 @@ int main(int argc, char** argv) {
       stacks = std::atoi(argv[++i]);
     } else if (a == "--interleave-log2" && i + 1 < argc) {
       interleave_log2 = std::atoi(argv[++i]);
+    } else if (a == "--channels" && i + 1 < argc) {
+      channels = std::atoi(argv[++i]);
     } else if (a == "--reads-only") {
       reads_only = true;
     } else {
@@ -59,6 +61,7 @@ int main(int argc, char** argv) {
   }
 
   tokenwall::Geometry geo = tokenwall::geometry_for_stacks(stacks);
+  if (channels > 0) geo.channels = static_cast<uint32_t>(channels);  // must match the simulated channel count
   tokenwall::Policy policy;
   if (!map_policy.empty()) {
     try {
@@ -69,6 +72,8 @@ int main(int argc, char** argv) {
     }
   }
 
+  // A trace request wider than one access is exported as adjacent accesses.
+  const int split = trace.request_bytes > geo.line_bytes ? int(trace.request_bytes / geo.line_bytes) : 1;
   tokenwall::Expander ex(trace);
   tokenwall::StreamHash hash;
   tokenwall::Request r;
@@ -76,15 +81,19 @@ int main(int argc, char** argv) {
     if (reads_only && r.write) continue;
     hash.add(r.addr, r.write);
     if (!out) continue;
-    if (map_policy.empty()) {
-      std::fprintf(out, "%s %llu\n", r.write ? "ST" : "LD", static_cast<unsigned long long>(r.addr));
-    } else {
-      if (r.addr >= geo.capacity_bytes()) {
-        std::fprintf(stderr, "error: address %llu beyond %d stack(s)\n", static_cast<unsigned long long>(r.addr), stacks);
-        return 1;
+    for (int i = 0; i < split; i++) {
+      const uint64_t addr = r.addr + uint64_t(i) * geo.line_bytes;
+      if (map_policy.empty()) {
+        std::fprintf(out, "%s %llu\n", r.write ? "ST" : "LD", static_cast<unsigned long long>(addr));
+      } else {
+        if (addr >= geo.capacity_bytes()) {
+          std::fprintf(stderr, "error: address %llu beyond %d stack(s)\n", static_cast<unsigned long long>(addr), stacks);
+          return 1;
+        }
+        const tokenwall::AddrVec v = policy.map(addr, geo);
+        std::fprintf(out, "%s %u,%u,%u,%u,%u,%u,%u %llu\n", r.write ? "W" : "R", v[0], v[1], v[2], v[3], v[4], v[5], v[6],
+                     static_cast<unsigned long long>(addr));
       }
-      const tokenwall::AddrVec v = policy.map(r.addr, geo);
-      std::fprintf(out, "%s %u,%u,%u,%u,%u,%u,%u\n", r.write ? "W" : "R", v[0], v[1], v[2], v[3], v[4], v[5], v[6]);
     }
   }
   if (out) std::fclose(out);

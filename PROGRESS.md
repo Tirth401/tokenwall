@@ -18,12 +18,81 @@ JEDEC" visible everywhere; keep the vendor-override path obvious.
 - Phase 1 Trace generator: **done** 2026-09-30
 - Phase 2 Address mapping: **done** 2026-09-30
 - Phase 3 Timing core: **done** 2026-09-30 (cycle-exact with Ramulator on the first validation run)
-- Phase 4 Validation: **next**. Scope proposal below.
-- Phases 5 to 6: not started
+- Phase 4 Validation: **done** 2026-09-30 (30 cases identical, writes and per-bank refresh included)
+- Phase 5 Sweeps and findings: **next**. Plan below.
+- Phase 6: not started
 
 Repo is public at https://github.com/Tirth401/tokenwall (pushed 2026-09-30 on
 Tirth's instruction; author is the GitHub no-reply address). Push after each
 phase unless told otherwise.
+
+## Session 5, 2026-09-30: Phase 4
+
+Decisions taken by Tirth: the proposed scope as is.
+
+What exists now:
+
+- `patches/ramulator2/0002-readwrite-trace-flat-address.patch` (optional third
+  token on pre-mapped traces); setup script applies all patches in order.
+- Tokenwall: per-bank refresh (`--refresh perbank`, mirrors
+  `HBM34PerBankRefresh`), `--cmd-trace CSV`, 64 B requests split into 32 B
+  accesses in the frontend and both exporters, flat address appended to
+  pre-mapped exports, `tw_expand --channels`.
+- `scripts/cmd_trace_diff.py`: first divergence per channel with per-bank
+  history and reconstructed state; `scripts/tokenwall_vs_ramulator.py`
+  rewritten with trace presets (`layer0_b1`, `layer0_b32`, `70b_layer0`),
+  policy/refresh/interleave/channel matrices, `--cmd-trace`, `--disable`.
+- Tests: 35 C++ (per-bank refresh timeline), 94 Python (CLI end to end, 64 B).
+- `results/phase4/`: 30 identical cases plus the harness-bug rerun and the
+  injected-deviation demonstration.
+
+Decisions made this session (alternative in brackets):
+
+- Patch Ramulator's `ReadWriteTrace` [drive its device harness per command].
+  Twenty lines, keeps the whole controller in the loop, lets writes be
+  compared end to end.
+- Demonstrate the diff tool with a rule removed on purpose [trust a tool that
+  never fired]. tPPD removal changed nothing (never binding here); tCCD_L
+  removal diverged at command 3.
+- Keep Ramulator's "no scheduling while a priority request waits" rule even
+  though it makes per-bank refresh look terrible [write a smarter controller].
+  Fidelity first; the smarter controller is a Phase 5 experiment with a
+  measurable baseline.
+
+Facts learned (verified this session):
+
+- 30 of 30 matrix cases identical in every integer statistic; 2,081,313
+  commands identical in the command-level comparison.
+- One harness bug caught by the matrix (export geometry ignored
+  `--channels`); zero simulator discrepancies.
+- Per-bank refresh costs far more than all-bank under this controller: 25% of
+  slots waiting tRP between a refresh's PREpb and REFpb while nothing else is
+  scheduled. Controller policy, not DRAM protocol.
+- 1 KiB channel interleave collapses throughput to 163 GB/s with the
+  single-stream frontend (one row per channel in flight, head-of-line
+  blocking). A limitation of trace replay, to be stated with every
+  interleave number.
+- 42% and 84% of peak hold for the 8B layer, the KV-heavy batch-32 slice and
+  the 70B shard: the traffic is long sequential runs under either mapping.
+- The 128 KV-append writes per layer never change tick counts: they park in
+  the write queue until the run ends.
+
+## Phase 5 plan (sweeps and findings)
+
+Run Tokenwall only (validated), full decode steps with `--drain`, and plot:
+
+1. Mapping x refresh (4 x 3) on the 8B step, batch 1: the headline bars.
+2. Batch sweep (1, 4, 16, 32) and past-position sweep (512 to 8192) under
+   `bank_low` and `ramulator`, all-bank refresh: tokens/s and % of peak.
+3. KV layout x issue order x mapping on the batch-32 step.
+4. GQA knob: `--n-kv-heads 8` versus 32 on the 8B step.
+5. 70B TP=8 shard, batch 1 and 8, two and five stacks.
+6. Ablations with `--disable`: tFAW, tCCD_L, tRRD, refresh, each alone, to
+   rank the rules by cost on the 8B step.
+7. One smarter-controller experiment: let reads and writes schedule while a
+   refresh prerequisite waits (a flag), and measure per-bank refresh again.
+Every plot caption: "HBM3 per Ramulator 2.1's preset; Tokenwall, validated
+identical to Ramulator 2.1".
 
 ## Session 4, 2026-09-30: Phase 3
 

@@ -1,0 +1,30 @@
+trace layer0_b32: 30,413,312 requests (4,096 writes); using the first 30,413,312; 32 channels; stacks 2
+
+=== layer0_b32: ramulator, interleave 32 B, refresh=allbank, 32 ch, 30,413,312 requests ===
+  metric                          ramulator        tokenwall         diff    rel %
+  controller_ticks                  4532631          4532631        0.000    0.000
+  requests_served                  30412096         30412096        0.000    0.000
+  row_hits                         29438863         29438863        0.000    0.000
+  row_misses                         737968           737968        0.000    0.000
+  row_conflicts                      235265           235265        0.000    0.000
+  achieved_GBps                     687.062          687.062        0.000    0.000
+  avg_read_latency_ticks            198.452          198.452        0.000    0.000
+  integer statistics identical: True; wall ramulator 78.4s, tokenwall 50.0s
+
+=== layer0_b32: bank_low, interleave 32 B, refresh=allbank, 32 ch, 30,413,312 requests ===
+  metric                          ramulator        tokenwall         diff    rel %
+  controller_ticks                  2270331          2270331        0.000    0.000
+  requests_served                  30412096         30412096        0.000    0.000
+  row_hits                         29106288         29106288        0.000    0.000
+  row_misses                         361056           361056        0.000    0.000
+  row_conflicts                      944944           944944        0.000    0.000
+  achieved_GBps                    1371.694         1371.694        0.000    0.000
+  avg_read_latency_ticks            122.033          122.033       -0.000   -0.000
+  integer statistics identical: True; wall ramulator 45.3s, tokenwall 26.5s
+
+=== summary ===
+  policy           il refresh    ticks R2   ticks TW  GB/s R2  GB/s TW identical
+  ramulator       32B allbank     4532631    4532631    687.1    687.1 True
+  bank_low        32B allbank     2270331    2270331   1371.7   1371.7 True
+wrote results/phase4/validation_layer0_b32_req40000000.json
+EXIT 0

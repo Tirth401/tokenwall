@@ -22,3 +22,8 @@ results/**/*.trace
 
 # pip editable-install metadata
 *.egg-info/
+
+# Command traces from validation runs (regenerate with --cmd-trace; tens of MB each)
+traces/cmdtrace_*
+traces/*.csv
+traces/*.ch[0-9]*

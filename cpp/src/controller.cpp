@@ -15,7 +15,14 @@ Controller::Controller(const DramSpec& spec, int channel_id, const ControllerCon
   st_.cmd_count.assign(spec.command_count, 0);
   nREFI_ = spec.t("nREFI");
   nBL_ = spec.t("nBL");
-  next_refresh_ = cfg.refresh_allbank ? nREFI_ : -1;
+  next_refresh_ = cfg.refresh == Refresh::AllBank ? nREFI_ : -1;
+  nREFIpb_ = spec.t("nREFIpb");
+  nRFCpb_ = spec.t("nRFCpb");
+  banks_per_sid_ = spec.counts[spec.L_BG] * spec.counts[spec.L_BANK];
+  ref_sets_.assign(spec.counts[spec.L_PC], std::vector<RefSet>(spec.counts[spec.L_SID]));
+  for (auto& pcs : ref_sets_)
+    for (auto& set : pcs) set.refreshed.assign(banks_per_sid_, 0);
+  next_refresh_pb_ = cfg.refresh == Refresh::PerBank ? nREFIpb_ : -1;
   last_col_issue_.assign(spec.counts[spec.L_PC], -1000000);
 }
 
@@ -101,6 +108,61 @@ void Controller::serve_completed_reads() {
 }
 
 void Controller::refresh_tick() {
+  if (cfg_.refresh == Refresh::AllBank) refresh_tick_allbank();
+  else if (cfg_.refresh == Refresh::PerBank) refresh_tick_perbank();
+}
+
+// One REFpb per pseudo channel every tREFIpb, walking the banks of one SID in order,
+// then the next SID; a SID's set may not restart until tRFCpb after it completed.
+bool Controller::seed_pending_refpbs() {
+  for (int pc = 0; pc < spec_.counts[spec_.L_PC]; pc++)
+    if (clk_ < ref_sets_[pc][ref_next_sid_].next_set_allowed) return false;
+  for (int pc = 0; pc < spec_.counts[spec_.L_PC]; pc++) pending_refpb_.push_back({pc, ref_next_sid_, ref_next_flat_});
+  if (++ref_next_flat_ == banks_per_sid_) {
+    ref_next_flat_ = 0;
+    ref_next_sid_ = (ref_next_sid_ + 1) % spec_.counts[spec_.L_SID];
+  }
+  return true;
+}
+
+bool Controller::service_pending_refpb() {
+  if (pending_refpb_.empty()) return false;
+  const auto [pc, sid, flat] = pending_refpb_.front();
+  MemReq r;
+  r.av.fill(-1);
+  r.av[0] = channel_id_;
+  r.av[spec_.L_PC] = pc;
+  r.av[spec_.L_SID] = sid;
+  r.av[spec_.L_BG] = flat / spec_.counts[spec_.L_BANK];
+  r.av[spec_.L_BANK] = flat % spec_.counts[spec_.L_BANK];
+  r.type = -1;
+  r.final_command = spec_.C_REFpb;
+  r.arrive = clk_;
+  if (!priority_send(r)) return true;  // buffer full: retry next tick
+  RefSet& set = ref_sets_[pc][sid];
+  set.refreshed[flat] = 1;
+  pending_refpb_.pop_front();
+  bool all = true;
+  for (char f : set.refreshed) all = all && f;
+  if (all) {
+    std::fill(set.refreshed.begin(), set.refreshed.end(), 0);
+    set.next_set_allowed = clk_ + nRFCpb_;
+  }
+  return true;
+}
+
+void Controller::refresh_tick_perbank() {
+  if (service_pending_refpb()) return;
+  if (clk_ < next_refresh_pb_) return;
+  if (!seed_pending_refpbs()) {
+    next_refresh_pb_ = clk_ + 1;
+    return;
+  }
+  service_pending_refpb();
+  next_refresh_pb_ += nREFIpb_;
+}
+
+void Controller::refresh_tick_allbank() {
   if (next_refresh_ < 0 || clk_ != next_refresh_) return;
   next_refresh_ += nREFI_;
   for (int pc = 0; pc < spec_.counts[spec_.L_PC]; pc++) {
@@ -281,6 +343,9 @@ std::optional<IssuedCmd> Controller::try_issue_slot(Slot slot) {
   if (spec_.is_col_cmd[r.command]) last_col_issue_[r.av[spec_.L_PC]] = clk_;
   IssuedCmd issued{clk_, r.command, r.av};
   if (cfg_.record_cmds) issued_.push_back(issued);
+  if (cfg_.cmd_trace)
+    std::fprintf(cfg_.cmd_trace, "%lld,%s,%d,%d,%d,%d,%d,%d,%d,%d\n", (long long)clk_, spec_.commands[r.command].c_str(),
+                 r.av[0], r.av[1], r.av[2], r.av[3], r.av[4], r.av[5], r.av[6], r.type);
   if (r.command == r.final_command) retire(cand.it, *cand.buffer);
   else if (spec_.is_opening[r.command]) promote_to_active(cand.it, *cand.buffer);
   return issued;

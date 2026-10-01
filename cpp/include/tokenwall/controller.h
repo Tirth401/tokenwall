@@ -7,6 +7,7 @@
 #pragma once
 
 #include <cstdint>
+#include <cstdio>
 #include <functional>
 #include <list>
 #include <map>
@@ -43,15 +44,22 @@ struct ReqBuffer {
   bool empty() const { return q.empty(); }
 };
 
+enum class Refresh { None, AllBank, PerBank };
+
+inline const char* refresh_name(Refresh r) {
+  return r == Refresh::None ? "none" : (r == Refresh::AllBank ? "allbank" : "perbank");
+}
+
 struct ControllerConfig {
   int read_buffer = 32;
   int write_buffer = 32;
   int priority_buffer = 1568;
   double wr_low = 0.2;
   double wr_high = 0.8;
-  bool refresh_allbank = true;
-  bool attribute = true;   // per-slot stall attribution (small cost)
-  bool record_cmds = false;  // keep every issued command (tests, Phase 4 diffs)
+  Refresh refresh = Refresh::AllBank;
+  bool attribute = true;      // per-slot stall attribution (small cost)
+  bool record_cmds = false;   // keep every issued command in memory (tests)
+  std::FILE* cmd_trace = nullptr;  // stream every issued command as CSV (Phase 4 diffs)
 };
 
 struct IssuedCmd {
@@ -99,6 +107,10 @@ class Controller {
 
   void serve_completed_reads();
   void refresh_tick();
+  void refresh_tick_allbank();
+  void refresh_tick_perbank();
+  bool seed_pending_refpbs();
+  bool service_pending_refpb();
   bool priority_send(MemReq& req);
   std::optional<IssuedCmd> try_issue_slot(Slot slot);
   Candidate pick_best_ready_from(ReqBuffer& buffer, const Filter& filter);
@@ -127,9 +139,18 @@ class Controller {
   std::map<uint64_t, int> buffered_write_addrs_;
   std::vector<int> active_per_bank_;
   bool write_mode_ = false;
-  // all-bank refresh
+  // all-bank refresh (mirrors Ramulator's AllBank)
   Tick next_refresh_ = -1;
   Tick nREFI_ = 0;
+  // per-bank refresh (mirrors Ramulator's HBM34PerBankRefresh)
+  struct RefSet {
+    std::vector<char> refreshed;
+    Tick next_set_allowed = 0;
+  };
+  std::vector<std::vector<RefSet>> ref_sets_;  // [pseudo channel][sid]
+  std::deque<std::array<int, 3>> pending_refpb_;  // (pc, sid, flat bank within the sid)
+  int ref_next_sid_ = 0, ref_next_flat_ = 0, banks_per_sid_ = 0;
+  Tick nREFIpb_ = 0, nRFCpb_ = 0, next_refresh_pb_ = -1;
   // HBM3 command-bus edge rules
   int rising_column_pc_ = -1;
   struct RisingRow {

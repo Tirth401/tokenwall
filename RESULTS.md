@@ -416,3 +416,135 @@ issues at most one request per channel per tick. With those stated:
 > 42.0% of HBM3 peak under Ramulator's default address mapping and 83.7%
 > under a bank-group-interleaved mapping, 45.2 ms versus 22.7 ms per token on
 > a single stack, against a 19.0 ms floor.
+
+---
+
+## Phase 4, 2026-09-30
+
+### Test suites (toolchain check)
+
+```
+ctest --test-dir build   -> 35 C++ cases (adds the per-bank refresh timeline: REFpb at 391/393, next bank at 781/783,
+                            ACT to the refreshed bank at 1029, ACT elsewhere in the pseudo channel at 415)
+python -m pytest -q      -> 94 passed (adds two end-to-end CLI tests, one with 64 B requests split into two accesses)
+```
+
+### Ramulator patch 0002: pre-mapped traces carry the flat address (toolchain check)
+
+Ramulator's `ReadWriteTrace` left `req.addr` unset, so its write coalescing and
+read forwarding matched every request against every other. The patch accepts
+an optional third token. Four-line traces, one channel, all four requests in
+one tick group:
+
+| Trace | Flat address present | Forwarded reads | Coalesced writes | Correct? |
+|---|---|---:|---:|---|
+| W 4096, R 4096, W 4096 | yes | 1 | 1 | yes |
+| W 4096, R 12288, W 16384 | yes | 0 | 0 | yes |
+| same two traces | no (old format) | 1 | 1 | wrong for the second trace |
+
+### Validation matrix: Tokenwall versus Ramulator 2.1, writes included
+
+```
+python scripts/tokenwall_vs_ramulator.py --trace layer0_b1 --requests 2000000 --policies all --refresh none,allbank,perbank
+python scripts/tokenwall_vs_ramulator.py --trace layer0_b1 --requests 2000000 --policies ramulator,bank_low --refresh allbank --interleave 3,5 --label il
+python scripts/tokenwall_vs_ramulator.py --trace layer0_b1 --requests 2000000 --policies ramulator,bank_low --refresh allbank --channels 32 --label ch32
+python scripts/tokenwall_vs_ramulator.py --trace layer0_b1 --requests 20000000 --policies ramulator,bank_low --refresh allbank,perbank
+python scripts/tokenwall_vs_ramulator.py --trace layer0_b32 --requests 40000000 --policies ramulator,bank_low --refresh allbank
+python scripts/tokenwall_vs_ramulator.py --trace 70b_layer0 --requests 10000000 --policies ramulator,bank_low --refresh allbank,perbank
+```
+"Identical" means ticks, requests served, row hits, misses and conflicts are
+equal; bandwidth and latency then agree to printing precision. Traffic is one
+layer with its KV-append writes; frontend limited to one request per channel
+per tick; both simulators stop at the last send.
+
+| Trace | Requests | Ch | Mapping | Interleave | Refresh | Ticks (both) | GB/s (both) | % of peak | Identical |
+|---|---:|---:|---|---:|---|---:|---:|---:|---|
+| 8B layer 0, b1 | 2,000,000 | 16 | `ramulator` | 32 B | none | 630,897 | 324.5 | 39.6 | yes |
+| | | | `ramulator` | 32 B | all-bank | 594,037 | 344.6 | 42.1 | yes |
+| | | | `ramulator` | 32 B | per-bank | 862,415 | 237.4 | 29.0 | yes |
+| | | | `bank_low` | 32 B | none | 265,837 | 770.1 | 94.0 | yes |
+| | | | `bank_low` | 32 B | all-bank | 297,309 | 688.6 | 84.1 | yes |
+| | | | `bank_low` | 32 B | per-bank | 369,227 | 554.4 | 67.7 | yes |
+| | | | `bank_high` | 32 B | none | 746,495 | 274.3 | 33.5 | yes |
+| | | | `bank_high` | 32 B | all-bank | 830,363 | 246.6 | 30.1 | yes |
+| | | | `bank_high` | 32 B | per-bank | 799,805 | 256.0 | 31.3 | yes |
+| | | | `bank_low_xor` | 32 B | none | 265,909 | 769.9 | 94.0 | yes |
+| | | | `bank_low_xor` | 32 B | all-bank | 297,427 | 688.3 | 84.0 | yes |
+| | | | `bank_low_xor` | 32 B | per-bank | 368,835 | 555.0 | 67.7 | yes |
+| | | | `ramulator` | 256 B | all-bank | 654,145 | 313.0 | 38.2 | yes |
+| | | | `ramulator` | 1 KiB | all-bank | 1,252,899 | 163.4 | 19.9 | yes |
+| | | | `bank_low` | 256 B | all-bank | 379,845 | 539.0 | 65.8 | yes |
+| | | | `bank_low` | 1 KiB | all-bank | 1,252,807 | 163.5 | 20.0 | yes |
+| | | 32 | `ramulator` | 32 B | all-bank | 296,505 | 690.3 | 42.1 | yes |
+| | | 32 | `bank_low` | 32 B | all-bank | 148,117 | 1,381.9 | 84.3 | yes (after harness fix) |
+| 8B layer 0, b1 | 13,763,200 | 16 | `ramulator` | 32 B | all-bank | 4,090,635 | 344.5 | 42.1 | yes |
+| | | | `ramulator` | 32 B | per-bank | 5,940,451 | 237.2 | 29.0 | yes |
+| | | | `bank_low` | 32 B | all-bank | 2,052,919 | 686.5 | 83.8 | yes |
+| | | | `bank_low` | 32 B | per-bank | 2,541,151 | 554.6 | 67.7 | yes |
+| 8B layer 0, b32 (55% KV) | 30,413,312 | 32 | `ramulator` | 32 B | all-bank | 4,532,631 | 687.1 | 41.9 | yes |
+| | | | `bank_low` | 32 B | all-bank | 2,270,331 | 1,371.7 | 83.7 | yes |
+| 70B TP=8 layer 0, b1 | 6,751,248 | 32 | `ramulator` | 32 B | all-bank | 1,003,361 | 688.9 | 42.0 | yes |
+| | | | `ramulator` | 32 B | per-bank | 1,457,011 | 474.4 | 29.0 | yes |
+| | | | `bank_low` | 32 B | all-bank | 503,439 | 1,373.0 | 83.8 | yes |
+| | | | `bank_low` | 32 B | per-bank | 623,061 | 1,109.4 | 67.7 | yes |
+
+Peak is 51.2 GB/s per channel: 819.2 GB/s at 16 channels, 1,638.4 at 32.
+Raw: `results/phase4/validation_*.json`, `matrix_*.log`, `matrix_reruns.log`.
+Final validation error on every statistic, every case: **0**.
+
+### Command-level identity and the diff tool
+
+```
+python scripts/tokenwall_vs_ramulator.py --trace layer0_b1 --requests 2000000 --policies ramulator --refresh allbank --cmd-trace --label cmdtrace
+  command traces identical: 2,081,313 commands over 16 channels
+```
+Every DRAM command, with its tick and address vector, is the same in both
+simulators, which is stronger than agreeing on totals.
+
+To prove the diff tool reports something when there is something to report,
+Tokenwall ran once with tCCD_L removed (`--disable nCCDL`):
+
+```
+first divergence: channel 0, command index 2 (of 130083 / 130803)
+  ramulator  tick        73 RD     pc 0 sid 0 bg 0 bank 0 row   1002 col   1 type 0
+  tokenwall  tick        69 RD     pc 0 sid 0 bg 0 bank 0 row   1002 col   1 type 0
+  bank pc0/sid0/bg0/bank0 in ramulator: open_row=1002 last={ACT:1, RD:65}
+  bank pc0/sid0/bg0/bank0 in tokenwall: open_row=1002 last={ACT:1, RD:65}
+```
+The second read to the bank came 4 ticks after the first instead of 8, which
+is tCCD_S instead of tCCD_L. Totals: 594,037 versus 438,535 ticks. Removing
+tPPD instead produced identical traces: tPPD never binds on this traffic.
+
+### Fidelity log
+
+1. **No simulator discrepancy found** in 30 matrix cases, including writes,
+   per-bank refresh, three interleaves, 32 channels, a KV-heavy batch-32
+   slice and a 70B tensor-parallel slice.
+2. **Harness bug, found by the matrix and fixed.** The 32-channel `bank_low`
+   case first reported Ramulator at 297,309 ticks, exactly its 16-channel
+   result: the pre-mapped export still used a 16-channel geometry, so
+   Ramulator's 32-channel system received traffic for 16. `tw_expand` now
+   takes `--channels` and the script passes it; rerun identical.
+3. **Reporting bug, Phase 3, already logged**: attribution counted parked
+   writes as arbitration.
+4. **Null injection**: disabling tPPD changed nothing, so the first
+   demonstration of the diff tool had to use tCCD_L.
+
+### Findings from the matrix (Tokenwall attribution, same traffic)
+
+- **Per-bank refresh is worse than all-bank under this controller**: 29.0%
+  versus 42.1% of peak with `ramulator`, 67.7% versus 84% with `bank_low`,
+  on every trace. Attribution: 25% of all slots are
+  `refresh:REFpb:Bank:nRP`, the whole channel's scheduling paused while the
+  refresh's precharge waits tRP before the REFpb may issue, plus 4% to 14%
+  `ACT:Bank:nRFCpb`. The controller mirrors Ramulator's rule that no read or
+  write is scheduled while a priority request waits; a controller that kept
+  serving other banks during that 16 ns would not pay most of this.
+- **Coarser channel interleave collapses throughput** for this single-stream
+  frontend: 1 KiB interleave gives 163 GB/s under both mappings, because a
+  sequential stream then has at most one 1 KiB row in flight per channel and
+  the frontend blocks on a full queue. A GPU with many concurrent streams
+  would not see this; it is a property of the trace-replay frontend.
+- **The percentages do not depend on the model or batch**: 42% and 84% on
+  the 8B layer, the batch-32 KV-heavy slice and the 70B shard alike. Weight
+  sweeps and KV reads are both long sequential runs under these mappings.

@@ -23,6 +23,7 @@ struct SimConfig {
   uint64_t max_requests = ~0ull;
   bool reads_only = false;
   bool drain = false;  // keep ticking until every request is served (Ramulator stops at the last send)
+  std::string cmd_trace_path;  // CSV of every issued command (Phase 4 diffs against Ramulator)
   std::vector<std::string> disable;  // constraint-name substrings to disable (ablation)
   ControllerConfig ctrl;
 };
@@ -58,8 +59,10 @@ class TraceFrontend {
   const Geometry& geo_;
   Expander ex_;
   std::vector<uint8_t> tensor_cls_;
+  tokenwall::Request base_;  // current trace request (may be split into several accesses)
   MemReq pending_;
   bool have_pending_ = false;
+  int split_k_ = 1, split_i_ = 1;
   uint64_t sent_ = 0, total_ = 0, produced_ = 0, max_requests_;
   bool reads_only_;
 };
