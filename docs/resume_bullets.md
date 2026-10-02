@@ -113,10 +113,19 @@ python scripts/sweep.py --sweeps ablation,batch,gqa --workers 6
 
 ## A three-minute live demo
 
+From the repo root with the venv active (`source .venv/bin/activate`). Step 0
+only needs to run once per machine; `.segs` files are not committed.
+
+0. `python -m tokenwall gen --model configs/models/llama3_8b.yaml --batch 1 --seq 4096 --layers 0:1 --out traces/l0` (2 s): one decode layer of Llama 3 8B as a 13.8 M-request trace.
 1. `python scripts/ramulator2_probe_demo.py` (5 s): Ramulator's own device
    answers when each command becomes legal; the numbers match our unit tests.
 2. `python scripts/tokenwall_vs_ramulator.py --trace layer0_b1 --requests 300000 --policies ramulator,bank_low --refresh allbank` (30 s): identical statistics, two mappings, 42% versus 84%.
 3. `./build/cpp/tokenwall sim --segs traces/l0.segs --policy bank_low --stacks 1 --refresh perbank --refresh-nonblocking --max-requests 2000000` (10 s): 92% with the refresh breakdown and the postponement line.
+
+All four as one line:
+```bash
+python -m tokenwall gen --model configs/models/llama3_8b.yaml --batch 1 --seq 4096 --layers 0:1 --out traces/l0 && python scripts/ramulator2_probe_demo.py && python scripts/tokenwall_vs_ramulator.py --trace layer0_b1 --requests 300000 --policies ramulator,bank_low --refresh allbank && ./build/cpp/tokenwall sim --segs traces/l0.segs --policy bank_low --stacks 1 --refresh perbank --refresh-nonblocking --max-requests 2000000
+```
 
 ## Questions to expect, and where the answer lives
 
